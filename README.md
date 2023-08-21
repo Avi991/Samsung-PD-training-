@@ -76,3 +76,32 @@ I installed Yosys using the following commands and Below is the screenshot showi
 
 <img width="1085" alt="yosys" src="https://github.com/Avi991/Samsung-PD-training-/blob/cbd01432461cd5fbbf5f74a0625776a4dc6b082d/Samsung_PD_%23day1/5.png">
 </details>
+<details>
+<summary>Labs on Yosys </summary>
+ We were given the overview of this tool and the basic files required to perform the experiment on 2:1 MUX. 
+ 
+ **Procedure** : First we need to read the liberty file using the code
+ 
+ **read_liberty -lib <path of the .lib>**
+ 
+ Then we need read the RTL Design code
+
+ **read_verilog <RTL_Design_file>**
+
+ After this we need to perform synthesis 
+
+ **synth -top <instance_name>**
+ 
+ generating netlist
+
+ **abc -liberty <.lib path>**
+ 
+This Netlist can be viewed in the synthesized circuit form using the **show** command    
+
+<img width="1085" alt="ckt"src=">
+
+<img width="1085" alt="ckt" src="">
+
+Simplified Netlist code 
+<img width="1085" alt="netlist" src="">
+</details>
