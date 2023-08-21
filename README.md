@@ -23,7 +23,14 @@ I invoked lc_shell using the following commands and Below is the screenshot show
 <img width="1085" alt="lc_shell" src="https://github.com/Avi991/Samsung-PD-training-/blob/cbd01432461cd5fbbf5f74a0625776a4dc6b082d/Samsung_PD_%23day0/lc.png">
 </details>
 -------------------------------
+<details>
+ <summary>dc_shell</summary>
+Design Compiler is the command line interface of Synopsys synthesis tool. It includes innovative topographical technology that enables a predictable flow resulting in faster time to results.It is invoked using the command dc_shell    
 
+Below is the screenshot showing the successful launch:
+
+<img width="1085" alt="dc_shell" src="">
+</details>
 
 ------------------------------
 
