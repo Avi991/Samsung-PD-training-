@@ -98,10 +98,12 @@ I installed Yosys using the following commands and Below is the screenshot showi
  
 This Netlist can be viewed in the synthesized circuit form using the **show** command    
 
-<img width="1085" alt="ckt"src=">
-
-<img width="1085" alt="ckt" src="">
+<img width="1085" alt="ckt" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/6.png">
+<img width="1085" alt="ckt" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/7.png">
+<img width="1085" alt="ckt" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/8.png">
+<img width="1085" alt="ckt" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/9.png">
+<img width="1085" alt="ckt" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/9a.png">
 
 Simplified Netlist code 
-<img width="1085" alt="netlist" src="">
+<img width="1085" alt="netlist" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/9b.png">
 </details>
