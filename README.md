@@ -29,7 +29,7 @@ Design Compiler is the command line interface of Synopsys synthesis tool. It inc
 
 Below is the screenshot showing the successful launch:
 
-<img width="1085" alt="dc_shell" src="">
+<img width="1085" alt="dc_shell" src="https://github.com/Avi991/Samsung-PD-training-/blob/857bc676cc691d6f1ca6e79cda309159fe38d58e/training_1/dc.png">
 </details>
 
 ------------------------------
