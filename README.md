@@ -1,7 +1,5 @@
 # Samsung-PD-training-
 ## Day-0-Installation
-<details>
- <summary> Summary </summary>
 
  <details>
  <summary> ICC2 </summary>
