@@ -115,8 +115,8 @@ Simplified Netlist code
 <img width="1085" alt="netlist" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/9b.png">
 </details>
 
-
-##Day-2-Introduction to Timing libraries, Hierarchical vs flat synthesis, and flip flop coding
+<details>
+## Day-2-Introduction to Timing libraries, Hierarchical vs flat synthesis, and flip flop coding
 
 <details>
  <summary> Introduction to Timing Library File (.Lib),Hierarchical vs Flat Synthesis </summary>
