@@ -228,6 +228,29 @@ Its Yosys synthesised netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/14(async%20set%20netl).png">
 </details>
 
+Synchronous reset D Flop :
+
+The reset depend on the clock edge. Here the output signal goes low whenever the reset signal is high and at the clock edge(positive or negative)
+RTL code of positive edge trigerred synchronous reset D FF:
+```
+module dff_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+	always @ (posedge clk )
+	begin
+		if (sync_reset)
+			q <= 1'b0;
+		else	
+			q <= d;
+	end
+endmodule
+```
+
+Its GTKwave :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/d249e61b0031a5effcc73aa6e54e0459942414af/Samsung_PD_%23day2/synch%20res%20gtk.png">
+
+Its Yosys synthesised netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/d249e61b0031a5effcc73aa6e54e0459942414af/Samsung_PD_%23day2/sync%20net.png">
+</details>
+
 
 <details>
  <summary> Optimization Techniques </summary>
