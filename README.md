@@ -115,11 +115,11 @@ Simplified Netlist code
 <img width="1085" alt="netlist" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/9b.png">
 </details>
 
-<details>
 ## Day-2-Introduction to Timing libraries, Hierarchical vs flat synthesis, and flip flop coding
-
 <details>
+	
  <summary> Introduction to Timing Library File (.Lib),Hierarchical vs Flat Synthesis </summary>
+ 
 Liberty File(.lib) contains all std cells used in IC design their specifications are stored in .lib file. Also, Liberty File(.lib) consists of ASCII representations of Timing, Area, and Power associated with the Standard cell. The Naming convention in the timing file follows technology node and PVT format (Process, Voltage, Temperature).The Standard library used in our case was sky130_fd_sc_hd_tt_025C_1v8, File description 130 depicts technology node 130nm process is typical(tt), temperature is 25C, and 1v8 represents the 1.8V Voltage .
 Screenshot of a standard library file shown below: 
 <img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/2.png">
@@ -142,8 +142,9 @@ We do synthesis in yosys it generates the following gate level netlist :
 <img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/5(synthesis).png">
 
 The yosys considers the module hierarchy and does mapping according to the instantiation i.e by using sub blocks.The netlist code for hierarchical implementation of the multiple_modules.
-```
+
 <img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/7(synthesisize%20hier).png">
+
 In the netlist it can observed that separate modules namely sub_module1 sub_module2 are created  i.e submodules are getting instanstiated not the std cells present in library
 
 <img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/6(show%20hier).png">
