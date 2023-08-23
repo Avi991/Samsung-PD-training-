@@ -268,6 +268,8 @@ module mul8 (input [2:0] a, output [5:0] y);
 endmodule
 ```
 
-Yosys Synthesis result : 
-<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/4aa1beeae13c1dcd880195cfe9758467617731a4/Samsung_PD_%23day2/16(mult8).png">
+Yosys Synthesis result :
+
+<img width="1085" alt="lib8" src="https://github.com/Avi991/Samsung-PD-training-/blob/4aa1beeae13c1dcd880195cfe9758467617731a4/Samsung_PD_%23day2/16(mult8).png">
+
 </details>
