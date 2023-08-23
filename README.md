@@ -114,3 +114,160 @@ This Netlist can be viewed in the synthesized circuit form using the **show** co
 Simplified Netlist code 
 <img width="1085" alt="netlist" src="https://github.com/Avi991/Samsung-PD-training-/blob/d0c56f29c950594bf4d7302ad2fca09563c63e3c/Samsung_PD_%23day1/9b.png">
 </details>
+## Day-2-ntroduction to Timing libraries, Hierarchical vs flat synthesis, and flip flop coding
+
+<details>
+ <summary> Introduction to Timing Library File (.Lib),Hierarchical vs Flat Synthesis </summary>
+Liberty File(.lib) contains all std cells used in IC design their specifications are stored in .lib file. Also, Liberty File(.lib) consists of ASCII representations of Timing, Area, and Power associated with the Standard cell. The Naming convention in the timing file follows technology node and PVT format (Process, Voltage, Temperature).The Standard library used in our case was sky130_fd_sc_hd_tt_025C_1v8, File description 130 depicts technology node 130nm process is typical(tt), temperature is 25C, and 1v8 represents the 1.8V Voltage .
+Screenshot of a standard library file shown below: 
+<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/2.png">
+	
+The Liberty File also consists of the technology used for standard cells as in the above example it is CMOS, it also specifies the delay model, unit of time, unit of voltage, unit of resistance, and many other units.
+All the data i.e std cells delays, leakage power, capacitance is stored in form of lookup tables(LUTs). For each gate cell based on the number of inputs(N), there will be 2^N combinations, and for each combination leakage power, area, delay, and all related parameters are mentioned. 
+
+The timing file consists of many different variations of the same gate cells. As we move toward faster cell (cell with higher drive strength) the area and power increases. In liberty file area, power, timing values are given for same cell of different drive strength and it also consist if the inform about leakage power of all the possible logic of different configration shown below.
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/2.png">
+</details>
+
+<details>
+ <summary> Hierarchical vs Flat synthesis in Yosys </summary>
+Hierarchical synthesis : The basic flow of hierarchical design is Dividing a design into multiple blocks (i.e. sub-chips, sub-blocks, modules, hierarchical blocks, etc.) which can also be user defined. Hierarchial design has blocks, subblocks in an hierarchy.
+In Yosys we have done synthesis of a multimodule combinational circuit which consists of two sub_modules one that of ** AND ** gate and other of ** OR ** gate. Below is the RTL Design code of multimodules is gvien below:
+	<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/4.png">
+
+We do synthesis in yosys it generates the following gate level netlist :
+
+<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/5(synthesis).png">
+
+The yosys considers the module hierarchy and does mapping according to the instantiation i.e by using sub blocks.The netlist code for hierarchical implementation of the multiple_modules.
+```
+<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/7(synthesisize%20hier).png">
+In the netlist it can observed that separate modules namely sub_module1 sub_module2 are created  i.e submodules are getting instanstiated not the std cells present in library
+
+<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/6(show%20hier).png">
+
+Flat synthesis : In Flat synthesis the hierarchies the flattened out and every submodule is created using std cells. We apply flat synthesis on the same design mentioned above. The command used to perform Flat synthesis from yosys are as follows :
+
+--- read_liberty -lib <path of the .lib>
+
+--- read_verilog <RTL_file>
+
+--- synth -top <instance_name>
+
+--- abc -liberty <.lib_path>
+
+--- flatten
+
+--- write_verilog -noattr <.v_File_name>
+The synthesized circuit for a flattened netlist is shown in the below: 
+<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/8(synthesized%20op%20flat).png">
+<img width="1085" alt="lib" src="https://github.com/Avi991/Samsung-PD-training-/blob/e80dfe2463278a272ef026609f0bf2b1e7826dc4/Samsung_PD_%23day2/9(show%20flat).png">
+</details>
+
+<details>
+ <summary> Flip-flop Coding Styles </summary>
+
+ Flip-flops :A flip-flop is a sequential digital electronic circuit having two stable states that can be used to store one bit of binary data. Flip-flops are the fundamental building blocks of all memory devices.
+
+ The complexity of cobinational circuit increases the chance of glitch, hence FFs are used to avoid it and it stable output.
+
+ Asynchronous Reset D Flop: 
+ 
+ Here the output signal goes low when the reset signal is high , irrespective of the clock's edge(+ve,-ve or dual edge ).
+ RTL Design code of positive edge trigerred asynchronous reset D FF:
+ ```
+module dff_asyncres ( input clk ,  input async_reset , input d , output reg q );
+	always @ (posedge clk , posedge async_reset)
+	begin
+		if(async_reset)
+			q <= 1'b0;
+		else	
+			q <= d;
+	end
+endmodule
+```
+Its gtkwave :<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/b3717ddc1a24961d4e335d766f7df6fea792b6b1/Samsung_PD_%23day2/10(dff_async_gtk).png">
+
+Its Yosys synthesised netlist:
+<img width="1085" alt="lib1" src="https://github.com/Luffy-7744/Samsung-PD-Training-/blob/7b832441e73dd5c5bc078425a1f34ee4dea508fd/PD%23Day2/asyn_rst_synth.png">
+
+Asynchronous set D Flop:
+
+Here the output signal goes high when the reset signal is high , irrespective of the clock's edge(+ve,-ve or dual edge ).
+ RTL Design code of positive edge trigerred asynchronous set D FF:
+ ```
+module dff_async_set ( input clk ,  input async_set , input d , output reg q );
+	always @ (posedge clk , posedge async_set)
+	begin
+		if(async_set)
+			q <= 1'b1;
+		else
+			q <= d;
+	end
+endmodule
+```
+
+Its GTKwave :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/b3717ddc1a24961d4e335d766f7df6fea792b6b1/Samsung_PD_%23day2/11(async_set).png">
+
+Its Yosys synthesised netlist:
+
+we used **dfflibmap -liberty** <> command to look from only flop library to for d flip flops
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/12(map).png">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/13(dff%20net).png">
+
+Synchronous reset D Flop :
+
+The reset depend on the clock edge. Here the output signal goes low whenever the reset signal is high and at the clock edge(positive or negative)
+RTL Design code of positive edge trigerred synchronous reset D FF:
+```
+module dff_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+	always @ (posedge clk )
+	begin
+		if (sync_reset)
+			q <= 1'b0;
+		else	
+			q <= d;
+	end
+endmodule
+```
+
+Its GTKwave :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/11(async_set).png">
+
+Its Yosys synthesised netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/14(async%20set%20netl).png">
+</details>
+
+
+<details>
+ <summary> Optimization Techniques </summary>
+ The Optimization involves the reducing hardware in the design to improve area, power and speed. Two example where given:
+ 1. a*2
+Consider a case where 3 bit number is multiplied by 2 in this case we dont need any additional hardware and only needs connecting bits to the output and grounding the LSB bit,same is realized by yosys. When binary number is multiplied by 2^n then result will gave same number by appending zero in LSB by n times.
+RTL code:
+	
+```
+	module mul2 (input [2:0] a, output [3:0] y);
+	assign y = a * 2; // assign y={a,1'b0}
+	endmodule
+```
+
+Yosys Synthesis result : 
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/4aa1beeae13c1dcd880195cfe9758467617731a4/Samsung_PD_%23day2/15(mult%20%20synth).png">
+
+ 2. a*9
+Multiplying a 3 bit number by 9, gives results as concatination of same number twice {a,a}.
+a*[8+1]= {a,0,0,0} + a(3bit)={a,a}
+
+RTL code:
+
+```
+module mul8 (input [2:0] a, output [5:0] y);
+	assign y = a * 9; // assign y={a,a}
+endmodule
+```
+
+Yosys Synthesis result : 
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/4aa1beeae13c1dcd880195cfe9758467617731a4/Samsung_PD_%23day2/16(mult8).png">
+</details>
