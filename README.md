@@ -169,7 +169,6 @@ The synthesized circuit for a flattened netlist is shown in the below:
 
 <details>
  <summary> Flip-flop Coding Styles </summary>
-
  Flip-flops :A flip-flop is a sequential digital electronic circuit having two stable states that can be used to store one bit of binary data. Flip-flops are the fundamental building blocks of all memory devices.
 
  The complexity of cobinational circuit increases the chance of glitch, hence FFs are used to avoid it and it stable output.
@@ -190,7 +189,6 @@ module dff_asyncres ( input clk ,  input async_reset , input d , output reg q );
 endmodule
 ```
 Its gtkwave :<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/b3717ddc1a24961d4e335d766f7df6fea792b6b1/Samsung_PD_%23day2/10(dff_async_gtk).png">
-
 Its Yosys synthesised netlist:
 <img width="1085" alt="lib1" src="https://github.com/Luffy-7744/Samsung-PD-Training-/blob/7b832441e73dd5c5bc078425a1f34ee4dea508fd/PD%23Day2/asyn_rst_synth.png">
 
@@ -209,24 +207,20 @@ module dff_async_set ( input clk ,  input async_set , input d , output reg q );
 	end
 endmodule
 ```
-
 Its GTKwave :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/b3717ddc1a24961d4e335d766f7df6fea792b6b1/Samsung_PD_%23day2/11(async_set).png">
 
 Its Yosys synthesised netlist:
-
 we used **dfflibmap -liberty** <> command to look from only flop library to for d flip flops
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/12(map).png">
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/13(dff%20net).png">
-
-
 
 Its GTKwave :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/11(async_set).png">
 
 Its Yosys synthesised netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/14(async%20set%20netl).png">
-</details>
+
 
 Synchronous reset D Flop :
 
@@ -243,7 +237,6 @@ module dff_syncres ( input clk , input async_reset , input sync_reset , input d 
 	end
 endmodule
 ```
-
 Its GTKwave :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/d249e61b0031a5effcc73aa6e54e0459942414af/Samsung_PD_%23day2/synch%20res%20gtk.png">
 
@@ -251,9 +244,9 @@ Its Yosys synthesised netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/d249e61b0031a5effcc73aa6e54e0459942414af/Samsung_PD_%23day2/sync%20net.png">
 </details>
 
-
 <details>
  <summary> Optimization Techniques </summary>
+	
  The Optimization involves the reducing hardware in the design such that to improve area, power and speed. Two example where given:
  1. a*2
 Consider a case where 3 bit number is multiplied by 2 in this case we dont need any additional hardware and only needs connecting bits to the output and grounding the LSB bit,same is realized by yosys. When binary number is multiplied by 2^n then result will gave same number by appending zero in LSB by n times.
