@@ -176,8 +176,8 @@ The synthesized circuit for a flattened netlist is shown in the below:
 
  Asynchronous Reset D Flop: 
  
- Here the output signal goes low when the reset signal is high , irrespective of the clock's edge(+ve,-ve or dual edge ).
- RTL Design code of positive edge trigerred asynchronous reset D FF:
+ Here the output signal goes low when the reset signal is high , irrespective of the clock's edge(+ve,-ve edge ).
+ RTL code of positive edge trigerred asynchronous reset D FF:
  ```
 module dff_asyncres ( input clk ,  input async_reset , input d , output reg q );
 	always @ (posedge clk , posedge async_reset)
@@ -196,8 +196,8 @@ Its Yosys synthesised netlist:
 
 Asynchronous set D Flop:
 
-Here the output signal goes high when the reset signal is high , irrespective of the clock's edge(+ve,-ve or dual edge ).
- RTL Design code of positive edge trigerred asynchronous set D FF:
+Here the output signal goes high when the reset signal is high , irrespective of the clock's edge(+ve,-ve edge ).
+ RTL code of positive edge trigerred asynchronous set D FF:
  ```
 module dff_async_set ( input clk ,  input async_set , input d , output reg q );
 	always @ (posedge clk , posedge async_set)
@@ -219,21 +219,7 @@ we used **dfflibmap -liberty** <> command to look from only flop library to for 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/12(map).png">
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/13(dff%20net).png">
 
-Synchronous reset D Flop :
 
-The reset depend on the clock edge. Here the output signal goes low whenever the reset signal is high and at the clock edge(positive or negative)
-RTL Design code of positive edge trigerred synchronous reset D FF:
-```
-module dff_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
-	always @ (posedge clk )
-	begin
-		if (sync_reset)
-			q <= 1'b0;
-		else	
-			q <= d;
-	end
-endmodule
-```
 
 Its GTKwave :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/5dac4460dd9d997d4620d6b16521449a1ec30edd/Samsung_PD_%23day2/11(async_set).png">
@@ -245,7 +231,7 @@ Its Yosys synthesised netlist:
 
 <details>
  <summary> Optimization Techniques </summary>
- The Optimization involves the reducing hardware in the design to improve area, power and speed. Two example where given:
+ The Optimization involves the reducing hardware in the design such that to improve area, power and speed. Two example where given:
  1. a*2
 Consider a case where 3 bit number is multiplied by 2 in this case we dont need any additional hardware and only needs connecting bits to the output and grounding the LSB bit,same is realized by yosys. When binary number is multiplied by 2^n then result will gave same number by appending zero in LSB by n times.
 RTL code:
