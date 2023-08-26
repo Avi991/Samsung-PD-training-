@@ -276,3 +276,270 @@ Yosys Synthesis result :
 <img width="1085" alt="lib8" src="https://github.com/Avi991/Samsung-PD-training-/blob/4aa1beeae13c1dcd880195cfe9758467617731a4/Samsung_PD_%23day2/16(mult8).png">
 
 </details>
+
+## Day-3- Combinational and sequential optmizations
+
+<details>
+ <summary> Combinational Optimization </summary>
+Optimising the combinational logic circuit is squeezing the logic to get the most optimized digital design so that the circuit finally is area and power efficient. This is achieved by the synthesis tool using various techniques and gives us the most optimized circuit.
+Command to optimize the circuit by yosys is yosys> opt_clean -purge
+We have done synthesis using yosys for few examples:
+
+
+```
+module opt_check (input a , input b , output y);
+	assign y = a?b:0;
+endmodule
+```
+yosys generated gui:
+<img width="1085" alt="lib1" src="">
+
+*Example 2*
+```
+module opt_check2 (input a , input b , output y);
+	assign y = a?1:b;
+endmodule
+```
+yosys generated gui:
+<img width="1085" alt="lib1" src="">
+
+*Example 3*
+```
+module opt_check3 (input a , input b, input c , output y);
+	assign y = a?(c?b:0):0;
+endmodule
+```
+yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+*Example 4*
+```
+module opt_check4 (input a , input b , input c , output y);
+	assign y = a?(b?(a & c ):c):(!c);
+endmodule
+```
+yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+Generated nelist:
+<img width="1085" alt="lib1" src="g">   
+
+*Example 5*
+Here there is multiple modules present so we will try to check whether those module are being used or not and we use flatten for submudules
+```
+module sub_module1(input a , input b , output y);
+	 assign y = a & b;
+	endmodule
+
+	module sub_module2(input a , input b , output y);
+	 assign y = a^b;
+	endmodule
+
+	module multiple_module_opt(input a , input b , input c , input d , output y);
+	wire n1,n2,n3;
+	sub_module1 U1 (.a(a) , .b(1'b1) , .y(n1));
+	sub_module2 U2 (.a(n1), .b(1'b0) , .y(n2));
+	sub_module2 U3 (.a(b), .b(d) , .y(n3));
+
+	assign y = c | (b & n1); 
+	endmodule
+```
+yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+Generated nelist:
+<img width="1085" alt="lib1" src="">  
+
+*Example 6*
+
+```
+module sub_module(input a , input b , output y);
+	assign y = a & b;
+endmodule
+
+module multiple_module_opt2(input a , input b , input c , input d , output y);
+	wire n1,n2,n3;
+	sub_module U1 (.a(a) , .b(1'b0) , .y(n1));
+	sub_module U2 (.a(b), .b(c) , .y(n2));
+	sub_module U3 (.a(n2), .b(d) , .y(n3));
+	sub_module U4 (.a(n3), .b(n1) , .y(y));
+endmodule
+```
+yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+Generated nelist:
+<img width="1085" alt="lib1" src="">  
+</details>
+
+<details>
+ <summary> Sequential Optimization </summary>
+There are various techniques for Sequential Logic Optimization
+
+    - Sequentialal constant propagation
+
+    - Advanced
+
+        - State Optimization
+
+        - Retiming
+
+        - Sequential Logic cloning
+
+ Sequential Constant Propogation
+
+Consider a case where asynchronous reset D Flip-flop is fed with d = 0(i.e GND) always so the output will always be 0 irrespective of the timing or circuit.
+
+ Advanced
+
+State Optimisation: This is optimisation of unused state. Using this technique we can come up with most optimised state machine.
+
+Cloning : It is an optimization technique that duplicates a cell to reduce the load on heavily loaded cell. This technique is usually preffered while performing PHYSICAL AWARE SYNTHESIS. Lets consider a flop A which is connected to flop B and flop C through a combination logic. If B and C are placed far from A in the flooerplan, there is a routing path delay. To avoid this, we connect A to two intermediate flops and then from these flops the output is sent to B and C thereby decreasing the delay. This process is called cloning since we are generating two new flops with same functionality as A.
+
+Retiming : Sequential circuits can be optimised by retiming. The combinational section of the circuitry is unaffected as it only rearranges the registers in the circuit. It is a powerful sequential optimization technique used to move registers across the combinational logic or to optimize the number of registers to improve performance via power-delay trade-off, without changing the input-output behavior of the circuit.
+
+*Example 1*
+```
+module dff_const2(input clk, input reset, output reg q);
+	always @(posedge clk, posedge reset)
+	begin
+		if(reset)
+			q <= 1'b1;
+		else
+			q <= 1'b1;
+	end
+endmodule
+```
+GTK Wave:
+<img width="1085" alt="lib1" src="">   
+
+
+
+Yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+*Example 2*
+```
+module dff_const2(input clk, input reset, output reg q);
+	always @(posedge clk, posedge reset)
+	begin
+		if(reset)
+			q <= 1'b1;
+		else
+			q <= 1'b1;
+	end
+endmodule
+```
+
+
+
+Yosys generated gui:
+<img width="1085" alt="lib1" src="">
+
+*Example 3*
+```
+module dff_const3(input clk, input reset, output reg q);
+	reg q1;
+
+	always @(posedge clk, posedge reset)
+	begin
+		if(reset)
+		begin
+			q <= 1'b1;
+			q1 <= 1'b0;
+		end
+		else
+		begin
+			q1 <= 1'b1;
+			q <= q1;
+		end
+	end
+	endmodule
+```
+
+GTK Wave:
+<img width="1085" alt="lib1" src="">   
+
+
+
+Yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+*Example 4*
+```
+module dff_const4(input clk, input reset, output reg q);
+	reg q1;
+
+	always @(posedge clk, posedge reset)
+	begin
+		if(reset)
+		begin
+			q <= 1'b1;
+			q1 <= 1'b1;
+		end
+	else
+		begin
+			q1 <= 1'b1;
+			q <= q1;
+		end
+	end
+	endmodule
+```
+
+GTK Wave:
+<img width="1085" alt="lib1" src="">   
+
+
+
+Yosys generated gui:
+<img width="1085" alt="lib1" src="">   
+
+*Example 5*
+```
+module dff_const5(input clk, input reset, output reg q);
+	reg q1;
+	always @(posedge clk, posedge reset)
+		begin
+			if(reset)
+			begin
+				q <= 1'b0;
+				q1 <= 1'b0;
+			end
+		else
+			begin
+				q1 <= 1'b1;
+				q <= q1;
+			end
+		end
+	endmodule
+```
+GTK Wave:
+<img width="1085" alt="lib1" src="">   
+
+
+
+Yosys generated gui:
+<img width="1085" alt="lib1" src=""> 
+</details>
+
+
+<details>
+ <summary> Optimization Examples </summary>
+	
+*Example 1*
+```
+   module counter_opt (input clk , input reset , output q);
+   reg [2:0] count;
+   assign q = count[0];
+   always @(posedge clk ,posedge reset)
+   begin
+   	if(reset)
+   		count <= 3'b000;
+   	else
+   		count <= count + 1;
+   end
+   endmodule
+```
+   
+Yosys generated gui:
+<img width="1085" alt="lib1" src=""> 
