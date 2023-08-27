@@ -281,18 +281,18 @@ Yosys Synthesis result :
 
 <details>
  <summary> Combinational Optimization </summary>
-Optimising the combinational logic circuit is squeezing the logic to get the most optimized digital design so that the circuit finally is area and power efficient. This is achieved by the synthesis tool using various techniques and gives us the most optimized circuit.
-Command to optimize the circuit by yosys is yosys> opt_clean -purge
+Optimising the combinational logic circuit means squeezing the logic to get the most optimized digital design so that optimized circuit area and power is saved. Various techniques and gives us the most optimized circuit.Implemented using synthesis tools
+Command to optimize the circuit by yosys is ** yosys> opt_clean -purge ** to remove unused nets
 We have done synthesis using yosys for few examples:
-
+*Example 1*
 
 ```
 module opt_check (input a , input b , output y);
 	assign y = a?b:0;
 endmodule
 ```
-yosys generated gui:
-<img width="1085" alt="lib1" src="">
+yosys generated netlist :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt1.png">
 
 *Example 2*
 ```
@@ -300,8 +300,8 @@ module opt_check2 (input a , input b , output y);
 	assign y = a?1:b;
 endmodule
 ```
-yosys generated gui:
-<img width="1085" alt="lib1" src="">
+yosys generated netlist :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt2.png">
 
 *Example 3*
 ```
@@ -309,8 +309,8 @@ module opt_check3 (input a , input b, input c , output y);
 	assign y = a?(c?b:0):0;
 endmodule
 ```
-yosys generated gui:
-<img width="1085" alt="lib1" src="">   
+yosys generated netlist :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt3.png">   
 
 *Example 4*
 ```
@@ -318,14 +318,11 @@ module opt_check4 (input a , input b , input c , output y);
 	assign y = a?(b?(a & c ):c):(!c);
 endmodule
 ```
-yosys generated gui:
-<img width="1085" alt="lib1" src="">   
-
-Generated nelist:
-<img width="1085" alt="lib1" src="g">   
+yosys generated netlist :
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt4.png">   
 
 *Example 5*
-Here there is multiple modules present so we will try to check whether those module are being used or not and we use flatten for submudules
+Here there is multiple modules present so we will verify whether those module are being used or not and we use flatten for submudules
 ```
 module sub_module1(input a , input b , output y);
 	 assign y = a & b;
@@ -344,11 +341,8 @@ module sub_module1(input a , input b , output y);
 	assign y = c | (b & n1); 
 	endmodule
 ```
-yosys generated gui:
-<img width="1085" alt="lib1" src="">   
-
 Generated nelist:
-<img width="1085" alt="lib1" src="">  
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt1.png">  
 
 *Example 6*
 
@@ -365,11 +359,9 @@ module multiple_module_opt2(input a , input b , input c , input d , output y);
 	sub_module U4 (.a(n3), .b(n1) , .y(y));
 endmodule
 ```
-yosys generated gui:
-<img width="1085" alt="lib1" src="">   
 
 Generated nelist:
-<img width="1085" alt="lib1" src="">  
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt2.png">  
 </details>
 
 <details>
@@ -386,15 +378,15 @@ There are various techniques for Sequential Logic Optimization
 
         - Sequential Logic cloning
 
- Sequential Constant Propogation
+Sequential Constant Propogation
 
-Consider a case where asynchronous reset D Flip-flop is fed with d = 0(i.e GND) always so the output will always be 0 irrespective of the timing or circuit.
+For understanding we took asynchronous reset D Flip-flop is fed with d = 0(i.e GND) always so the output will always be 0 irrespective of the clock or circuit.
 
- Advanced
+Advanced
 
 State Optimisation: This is optimisation of unused state. Using this technique we can come up with most optimised state machine.
 
-Cloning : It is an optimization technique that duplicates a cell to reduce the load on heavily loaded cell. This technique is usually preffered while performing PHYSICAL AWARE SYNTHESIS. Lets consider a flop A which is connected to flop B and flop C through a combination logic. If B and C are placed far from A in the flooerplan, there is a routing path delay. To avoid this, we connect A to two intermediate flops and then from these flops the output is sent to B and C thereby decreasing the delay. This process is called cloning since we are generating two new flops with same functionality as A.
+Cloning : It is an optimization technique that replicates a cell to reduce the load on heavily loaded cell. This technique is usually preffered while performing PHYSICAL AWARE SYNTHESIS. Lets consider a flop A which is connected to flop B and flop C through a combination logic. If B and C are placed far from A in the floorplan, there is a routing path delay. To avoid this, we connect A to two intermediate flops and then from these flops the output is sent to B and C thereby decreasing the delay. This phenomenon is called cloning since we are generating two new flops with same functionality as A.
 
 Retiming : Sequential circuits can be optimised by retiming. The combinational section of the circuitry is unaffected as it only rearranges the registers in the circuit. It is a powerful sequential optimization technique used to move registers across the combinational logic or to optimize the number of registers to improve performance via power-delay trade-off, without changing the input-output behavior of the circuit.
 
@@ -411,12 +403,11 @@ module dff_const2(input clk, input reset, output reg q);
 endmodule
 ```
 GTK Wave:
-<img width="1085" alt="lib1" src="">   
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst1(gtkwave).png">   
 
 
-
-Yosys generated gui:
-<img width="1085" alt="lib1" src="">   
+Yosys generated netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst(net).png">   
 
 *Example 2*
 ```
@@ -430,11 +421,12 @@ module dff_const2(input clk, input reset, output reg q);
 	end
 endmodule
 ```
+GTK Wave:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst2(gtkwave).png">
 
 
-
-Yosys generated gui:
-<img width="1085" alt="lib1" src="">
+Yosys generated netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst2(net).png">
 
 *Example 3*
 ```
@@ -458,12 +450,11 @@ module dff_const3(input clk, input reset, output reg q);
 ```
 
 GTK Wave:
-<img width="1085" alt="lib1" src="">   
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst3(gtkwave).png">   
 
 
-
-Yosys generated gui:
-<img width="1085" alt="lib1" src="">   
+Yosys generated netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst3(net).png">   
 
 *Example 4*
 ```
@@ -487,12 +478,11 @@ module dff_const4(input clk, input reset, output reg q);
 ```
 
 GTK Wave:
-<img width="1085" alt="lib1" src="">   
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst4(gtkwave).png">   
 
 
-
-Yosys generated gui:
-<img width="1085" alt="lib1" src="">   
+Yosys generated netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst4.png">   
 
 *Example 5*
 ```
@@ -514,12 +504,11 @@ module dff_const5(input clk, input reset, output reg q);
 	endmodule
 ```
 GTK Wave:
-<img width="1085" alt="lib1" src="">   
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffcosnt5(gtkwave).png">   
 
 
-
-Yosys generated gui:
-<img width="1085" alt="lib1" src=""> 
+Yosys generated netlist:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst5(net).png"> 
 </details>
 
 
@@ -541,5 +530,8 @@ Yosys generated gui:
    endmodule
 ```
    
-Yosys generated gui:
-<img width="1085" alt="lib1" src=""> 
+GTK wave:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/gtkwave(counter%20opt).png"> 
+
+Yosys generated netlist
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/count_opt(netlist).png">
