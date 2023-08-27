@@ -278,6 +278,7 @@ Yosys Synthesis result :
 </details>
 
 ## Day-3- Combinational and sequential optmizations
+![dffconst(net)](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/43154f44-cfb6-459d-ae97-45873fef14df)
 
 <details>
  <summary> Combinational Optimization </summary>
