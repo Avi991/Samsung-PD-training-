@@ -402,7 +402,7 @@ Cloning : It is an optimization technique that replicates a cell to reduce the l
 
 Retiming : Sequential circuits can be optimised by retiming. The combinational section of the circuitry is unaffected as it only rearranges the registers in the circuit. It is a powerful sequential optimization technique used to move registers across the combinational logic or to optimize the number of registers to improve performance via power-delay trade-off, without changing the input-output behavior of the circuit.
 
-*Example 1*
+**Example 1**
 ```
 module dff_const2(input clk, input reset, output reg q);
 	always @(posedge clk, posedge reset)
@@ -422,7 +422,7 @@ Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst(net).png">   
 As we know the above code is for a d flipflop with an asynchronous reset this is used to reset the system asynchronously and later the system comes into normal oprtaion for next 1 clk that is synchronously so this system cannot be further optimized and a flipflop is generated 
 
-*Example 2*
+**Example 2**
 ```
 module dff_const2(input clk, input reset, output reg q);
 	always @(posedge clk, posedge reset)
@@ -442,7 +442,7 @@ Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst2(net).png">
 From the output we can say the optimization can be done as the q value is always 1 hence no flop is generated and the optimization is done
 
-*Example 3*
+**Example 3**
 ```
 module dff_const3(input clk, input reset, output reg q);
 	reg q1;
@@ -470,7 +470,7 @@ GTK Wave:
 Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst3(net).png">   
 
-*Example 4*
+**Example 4**
 ```
 module dff_const4(input clk, input reset, output reg q);
 	reg q1;
@@ -498,7 +498,7 @@ GTK Wave:
 Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst4.png"> 
 
-*Example 5*
+**Example 5**
 ```
 module dff_const5(input clk, input reset, output reg q);
 	reg q1;
@@ -530,7 +530,7 @@ No scope of further optimization as the outputs a constant value is seen in all 
 <details>
  <summary> Optimization Examples </summary>
 	
-*Example 1*
+**Example 1**
 ```
    module counter_opt (input clk , input reset , output q);
    reg [2:0] count;
