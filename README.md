@@ -551,3 +551,5 @@ GTK wave:
 
 Yosys generated netlist
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/count_opt(netlist).png">
+As the 0th bit is only used for the output hence during the synthesis only one flipflop is generated with inverter for the toggle oprtaion 
+Remaining bits are unused so their respective flops are not generated
