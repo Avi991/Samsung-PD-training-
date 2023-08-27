@@ -354,7 +354,8 @@ module sub_module1(input a , input b , output y);
 	endmodule
 ```
 Generated nelist:
-<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt1.png">  
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt1.png"> 
+Sub module 1 is an AND gate , Sub module 2 is an OR gate once optimization is done
 
 **Example 6**
 
@@ -373,7 +374,7 @@ endmodule
 ```
 
 Generated nelist:
-<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt2.png">  
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt2.png">   Sub module is an and gate after realization output comes out to be zero
 </details>
 
 <details>
