@@ -286,8 +286,8 @@ Optimising the combinational logic circuit means squeezing the logic to get the 
 Command to optimize the circuit by yosys is ** yosys> opt_clean -purge ** to remove unused nets
 We have done synthesis using yosys for few examples:
 	![dffconst(net)](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/43154f44-cfb6-459d-ae97-45873fef14df)
-*Example 1*
 
+**Example 1**
 ```
 module opt_check (input a , input b , output y);
 	assign y = a?b:0;
@@ -295,8 +295,9 @@ endmodule
 ```
 yosys generated netlist :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt1.png">
+From the output we inferred that above mux implementation can be optimized to two input AND gate
 
-*Example 2*
+**Example 2**
 ```
 module opt_check2 (input a , input b , output y);
 	assign y = a?1:b;
@@ -304,17 +305,19 @@ endmodule
 ```
 yosys generated netlist :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt2.png">
+From the output we inferred that above mux implementation can be optimized to two input OR gate which is also realised using inverter and NAND gate as stacking of PMOS will result in more area
 
-*Example 3*
+**Example 3**
 ```
 module opt_check3 (input a , input b, input c , output y);
 	assign y = a?(c?b:0):0;
 endmodule
 ```
 yosys generated netlist :
-<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt3.png">   
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt3.png"> 
+From the output we inferred that above mux implementation can be optimized to 3 input gate
 
-*Example 4*
+**Example 4**
 ```
 module opt_check4 (input a , input b , input c , output y);
 	assign y = a?(b?(a & c ):c):(!c);
@@ -322,9 +325,16 @@ endmodule
 ```
 yosys generated netlist :
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/opt4.png">   
+From the output we inferred that above mux implementation can be optimized to two input xnor gate
 
-*Example 5*
-Here there is multiple modules present so we will verify whether those module are being used or not and we use flatten for submudules
+**Example 5**
+Here there is multiple modules present so we will verify whether those module are being used or not and we use flatten for submudules commands to perform that
+**read_liberty -lib <library_path>**
+**read_verilog <verilog_file>**
+**synth -top <module_name>**
+**opt_clean -purge**
+**abc -liberty <library_path>**
+**flatten**
 ```
 module sub_module1(input a , input b , output y);
 	 assign y = a & b;
@@ -346,7 +356,7 @@ module sub_module1(input a , input b , output y);
 Generated nelist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/mult_opt1.png">  
 
-*Example 6*
+**Example 6**
 
 ```
 module sub_module(input a , input b , output y);
@@ -410,6 +420,7 @@ GTK Wave:
 
 Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst(net).png">   
+As we know the above code is for a d flipflop with an asynchronous reset this is used to reset the system asynchronously and later the system comes into normal oprtaion for next 1 clk that is synchronously so this system cannot be further optimized and a flipflop is generated 
 
 *Example 2*
 ```
@@ -429,6 +440,7 @@ GTK Wave:
 
 Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst2(net).png">
+From the output we can say the optimization can be done as the q value is always 1 hence no flop is generated and the optimization is done
 
 *Example 3*
 ```
@@ -484,7 +496,7 @@ GTK Wave:
 
 
 Yosys generated netlist:
-<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst4.png">   
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst4.png"> 
 
 *Example 5*
 ```
@@ -511,6 +523,7 @@ GTK Wave:
 
 Yosys generated netlist:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/dffconst5(net).png"> 
+No scope of further optimization as the outputs a constant value is seen in all conditions therefore two flipflops getting generated
 </details>
 
 
