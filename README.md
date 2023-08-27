@@ -285,6 +285,7 @@ Yosys Synthesis result :
 Optimising the combinational logic circuit means squeezing the logic to get the most optimized digital design so that optimized circuit area and power is saved. Various techniques and gives us the most optimized circuit.Implemented using synthesis tools
 Command to optimize the circuit by yosys is ** yosys> opt_clean -purge ** to remove unused nets
 We have done synthesis using yosys for few examples:
+	![dffconst(net)](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/43154f44-cfb6-459d-ae97-45873fef14df)
 *Example 1*
 
 ```
