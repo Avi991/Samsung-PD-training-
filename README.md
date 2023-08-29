@@ -596,6 +596,7 @@ always @(sel)                  always @(*)
 ```
 If i0 and i1 change in activity will not be reflected in always block.
 To avoid the synthesis and simulation mismatch. It is very important to check the behaviour of the circuit first and then match it with the expected output seen in simulation and make sure there are no synthesis and simulation mismatches. This is why we use GLS.
+</details>
 
 <details>
 <summary> LABs </summary>
