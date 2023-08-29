@@ -553,3 +553,126 @@ Yosys generated netlist
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9220aa9dc26021df6e5a1b6ada51b54e987adb1f/Samsung_PD_%23day3/count_opt(netlist).png">
 As the 0th bit is only used for the output hence during the synthesis only one flipflop is generated with inverter for the toggle oprtaion 
 Remaining bits are unused so their respective flops are not generated
+
+## Day-4- GLS Blocking vs Non-Blocking And Synthesis-Simulation Mismatch 
+<details>
+<summary> GLS Concepts And Flow Using Iverilog </summary>
+
+-- What is GLS- Gate Level Simulation?:
+GLS is generating the simulation output by running test bench with netlist file generated from synthesis as design under test. Netlist is logically same as RTL code, hence, same test bench can be used for it.
+
+-- Why GLS?:
+We perform this to verify logical correctness of the design after synthesizing it. 
+
+If GLS is run with delay annotion then it can be used for timing analysis 
+
+**Synthesis Simulation Mismatch** 
+
+Synthesis simulation mismatch denotes the discrepancy between the actual behavior of a circuit as simulated during design and its real-world performance after synthesizing the design. 
+
+Synthesis simulation mismatched are mainly caused because of the following reasons 
+
+- Missing sensitivity list
+- Blocking vs Non Blocking assignments
+- Non standard verilog code
+
+**Missing sensitivity list**
+The absence of a complete sensitivity list in VLSI design can give rise to problems. In hardware description languages (HDL) like Verilog, a sensitivity list is utilized to specify the inputs that should activate the execution of a specific process or code block. Inadequate or missing signals in the sensitivity list can lead to inaccurate or unforeseen behavior of the circuit during synthesis or simulation. Ensuring an accurate representation of inputs impacting the logic within a process is vital.
+
+As the synthesizer does not look for sensitivity list and it looks only statements in the procedural block , it infers correct circuit and if we simulate the netlist code , there will be synthesis simulation mismatch. In to order tackle this issue this issue it is important to check the behaviour of the circuit first and then match it with the expected output seen in the simulation. 
+
+**Blocking Vs Non Blocking Assignments**
+
+Blocking statements execute the will wait for the current one to finish.i.e. sequentially inside the always block. 
+Non-Blocking statements execute all the assignment parallelly inside a always block.First all the RHS is evaluated and then assigned
+This will give mismatch as sometimes, improper use of blocking statements can create latches. 
+
+Missing sensitivity list in always block:
+Lets take example of mux having inputs as i0,i1 and sel and output as y.
+```
+always @(sel)                  always @(*)
+//It will infer a latch        // It will infer a mux.
+```
+If i0 and i1 change in activity will not be reflected in always block.
+To avoid the synthesis and simulation mismatch. It is very important to check the behaviour of the circuit first and then match it with the expected output seen in simulation and make sure there are no synthesis and simulation mismatches. This is why we use GLS.
+
+<details>
+<summary> LABs </summary>
+	
+**Example 1**
+
+```
+module ternary_operator_mux (input i0 , input i1 , input sel , output y);
+   assign y = sel?i1:i0;
+endmodule
+```
+Gtkwave :
+<img width="1085" alt="lib1" src="">
+
+Hardware
+<img width="1085" alt="lib1" src="">
+
+Yosys result: 
+<img width="1085" alt="lib1" src="">
+
+GLS Simulation:
+I used the below commands to carry out GLS of ternary_operator_mux.v:
+```
+iverilog <path to verilog model: ../mylib/verilog_model/primitives.v> <path to sky130_fd_sc_hd__tt_025C_1v80.lib: ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib> <name netlist: ternary_operator_mux_net.v> <name testbench: tb_ternary_operator_mux.v>
+./a.out
+gtkwave tb_ternary_operator_mux.vdc
+```
+
+<img width="1085" alt="lib1" src="">
+In this example there is no mismatch between the RTL Design simulated wave and Netlist simulated wave.
+
+**Example 2**
+```
+module bad_mux (input i0 , input i1 , input sel , output reg y);
+	always @ (sel)
+	begin
+		if(sel)
+			y <= i1;
+		else 
+			y <= i0;
+	end
+endmodule
+```
+Gtkwave:
+<img width="1085" alt="lib1" src="">
+
+Hardware
+<img width="1085" alt="lib1" src="">
+
+Yosys result: 
+<img width="1085" alt="lib1" src="">
+
+GLS Simulation:
+<img width="1085" alt="lib1" src=">
+
+From the output we can infer the netlist simulation which corrects the bad_mux design which was only changing waveform when sel was triggered while for a mux to work properly it should be sensitivity to all the input signals. No change in activities of input signal is recorded
+
+**Example 3**
+```
+module blocking_caveat (input a , input b , input  c, output reg d); 
+reg x;
+always @ (*)
+	begin
+	d = x & c;
+	x = a | b;
+end
+endmodule
+```
+
+Gtkwave:
+<img width="1085" alt="lib1" src="">
+
+Hardware
+<img width="1085" alt="lib1" src="">
+
+Yosys result: 
+<img width="1085" alt="lib1" src="">
+
+GLS Simulation:
+<img width="1085" alt="lib1" src="">
+
