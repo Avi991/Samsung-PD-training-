@@ -609,13 +609,13 @@ module ternary_operator_mux (input i0 , input i1 , input sel , output y);
 endmodule
 ```
 Gtkwave :
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/rtlgtk1.png">
 
 Hardware
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/ter_mux2.png">
 
 Yosys result: 
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/ter_net.png">
 
 GLS Simulation:
 I used the below commands to carry out GLS of ternary_operator_mux.v:
@@ -624,8 +624,8 @@ iverilog <path to verilog model: ../mylib/verilog_model/primitives.v> <path to s
 ./a.out
 gtkwave tb_ternary_operator_mux.vdc
 ```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/gls%20_ter.png">
 
-<img width="1085" alt="lib1" src="">
 In this example there is no mismatch between the RTL Design simulated wave and Netlist simulated wave.
 
 **Example 2**
@@ -641,16 +641,13 @@ module bad_mux (input i0 , input i1 , input sel , output reg y);
 endmodule
 ```
 Gtkwave:
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/badmux%20gtk.png">
 
 Hardware
-<img width="1085" alt="lib1" src="">
-
-Yosys result: 
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/badmux%20rep.png">
 
 GLS Simulation:
-<img width="1085" alt="lib1" src=">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/bad_gls%20gtk.png">
 
 From the output we can infer the netlist simulation which corrects the bad_mux design which was only changing waveform when sel was triggered while for a mux to work properly it should be sensitivity to all the input signals. No change in activities of input signal is recorded
 
@@ -667,14 +664,11 @@ endmodule
 ```
 
 Gtkwave:
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/blocking%20cav%20gtk.png">
 
 Hardware
-<img width="1085" alt="lib1" src="">
-
-Yosys result: 
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/block%20rep.png">
 
 GLS Simulation:
-<img width="1085" alt="lib1" src="">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/blockgtk_gls.png">
 
