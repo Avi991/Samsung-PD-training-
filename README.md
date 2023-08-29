@@ -601,7 +601,7 @@ To avoid the synthesis and simulation mismatch. It is very important to check th
 <details>
 <summary> LABs </summary>
 	
-**Example 1**
+**Case 1**
 
 ```
 module ternary_operator_mux (input i0 , input i1 , input sel , output y);
@@ -628,7 +628,7 @@ gtkwave tb_ternary_operator_mux.vdc
 
 In this example there is no mismatch between the RTL Design simulated wave and Netlist simulated wave.
 
-**Example 2**
+**Case 2**
 ```
 module bad_mux (input i0 , input i1 , input sel , output reg y);
 	always @ (sel)
@@ -650,8 +650,9 @@ GLS Simulation:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/bad_gls%20gtk.png">
 
 From the output we can infer the netlist simulation which corrects the bad_mux design which was only changing waveform when sel was triggered while for a mux to work properly it should be sensitivity to all the input signals. No change in activities of input signal is recorded
+On comapring the simulation reults it is observed that the RTL simulation and GLS is totally different
 
-**Example 3**
+**Case 3**
 ```
 module blocking_caveat (input a , input b , input  c, output reg d); 
 reg x;
@@ -662,6 +663,7 @@ always @ (*)
 end
 endmodule
 ```
+From the above code it's found that q0 value (previous) which is not updated which appears a flop delay hence the output is one clock cycle delayed which is observed in the simulation result 
 
 Gtkwave:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/blocking%20cav%20gtk.png">
@@ -672,3 +674,4 @@ Hardware
 GLS Simulation:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/blockgtk_gls.png">
 
+The GLS we can see the output is different from that of the Simulation result there is flop delay visible and we got the output to be a proper OR & AND gated output. To avoid this kind of issue we are supposed to run the GLS to make sure there are no Synthesis and SImulation mismatches
