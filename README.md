@@ -896,6 +896,28 @@ Key Points
 <details>
 <summary> Introduction to STA </summary>
 
+Delay in digital circuits is indeed dependent on input transition and output load. Let's explore how these factors affect delay:
+
+1. **Input Tran (Signal Slope):**
+
+   Definition: It refers to the rate of change of a digital input signal, often measured as the time it takes for the signal to transition from one logic level to another (e.g., from low to high or high to 
+     low).
+
+   - **Impact on Delay:**
+     Faster Transitions : A faster input transition (slope is more) results in lesser delay because it takes less time for the signal to reach the threshold voltage of the mosfet
+
+     Slower Transitions : Conversely, a slower input transition (slope is less) results in higher delay as it takes more time for the signal to cross the switching threshold.
+
+2. **Output Load (Capacitance):**
+
+   Definition : Output load, often represented as load capacitance , represents the electrical load that an output signal must drive. It includes the inherent capacitance of nets and the input capacitance of 
+ gates or components connected to the output.
+
+   - **Effect on Delay:**
+     High Load : A higher output load capacitance results in more delay, as it takes more time to charge or discharge capacitance, slowing down the signal transition.
+     
+     Less Load : A lesser output load capacitance leads to less delay, as there is less capacitance to charge or discharge.
+
 STA breaks down the design into time pathways before doing timing analysis. The following factors make up each time path:
 
 Startpoint: The beginning of a timing route in which data is launched by a clock edge or must be ready at a certain moment. Every startpoint must be a register clock pin or an input port.
@@ -906,8 +928,371 @@ Endpoint: When data is caught by a clock edge or when it needs to be provided at
 
 Static timing analysis calculates a maximum delay using the longest way and a minimum delay using the shortest path.
 
-A Setup time (Max Delay Constraint) refers to a design specification or requirement that imposes an upper limit on the delay a signal can experience while propagating through a specific path or circuit within an integrated circuit. Consider a example of 2 D flip flop connected with a combinational logic in between them.
+A Setup time (Max Delay Constraint) : It refers to a design specification or requirement that imposes an upper limit on the delay a signal can experience while propagating through a specific path or circuit within an integrated circuit. Consider a example of 2 registers connected with a combinational logic in between them.
 
-Tck >= Tcq + Tcomb + Tsu
+**Tclk >= Tcq + Tcomb + Tsu**
 
-Hold time (Min Delay constraint) refers to a design specification or requirement that sets a minimum allowable delay for a signal to propagate through a specific path or circuit within an integrated circuit. This constraint is used to ensure that certain signals within the circuit do not propagate too quickly, which can lead to timing violations and
+Hold time (Min Delay constraint) : It's the minimum time after the clock's rising edge when data must remain stable at the input of a flip-flop to prevent data corruption.
+
+**Thold < Tcq + Tcomb**
+
+**Timing Arc**
+
+ A timing arc defines the propagation of signals through logic gates/nets and defines a timing relationship between two related pins. Timing arc is one of the components of a timing path. Static timing analysis 
+ works on the concept of timing paths. 
+ 
+ Each path starts from either primary input or a register and ends at a primary output or a register. In-between, the path traverses through what are known as timing arcs. We can define a timing arc as an 
+ indivisible path/constraint from one pin to another that tells EDA tool to consider the path/relationship between the pins. As in purely combinational logic, AND, NAND, NOT, full adder cell etc. gates have 
+ arcs from each input pin to each output pin.
+
+ **Combinational Timing Arcs:** These arcs describe the propagation of signals through combinational logic elements like gates.
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b3431df4-1fe2-4bc3-b41c-a31b0d889505)
+
+ **Sequential Timing Arcs:** Sequential elements like flip-flops introduce clock signals into our design. Sequential timing arcs account for clock-to-Q delays, setup times, and hold times to ensure proper 
+   operation
+     ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/522ef9c8-40d5-4dab-8eec-ae5dd95294bd)
+
+   Timing paths in VLSI design are specific routes or signal paths within a digital circuit where the timing characteristics, including signal propagation delays, setup times, hold times, and clock-to-q delays, 
+   are analyzed to ensure the circuit's correct and reliable operation. These paths are crucial for timing analysis and play a central role in achieving the desired performance and functionality of the 
+   integrated circuit. Timing paths typically include a starting point (often a flip-flop or input pin), a set of logic gates and interconnections, and an ending point (another flip-flop or output pin).
+
+**Start points of timing path**
+
+Input ports
+Clock pins of regs
+End point of timing path
+
+Output ports
+D pin of D flip flop / D Latch
+Always the timing path start at one of the start point and ends at one of the end point
+
+Clock -> D (Reg 2 Reg)
+
+Clock -> Output port (I/O timing path)
+
+input port -> D (I/O timing path)
+
+input port -> Output port (These should not be present)
+
+<details>
+<summary> Labs </summary>
+Timing File (.lib) consists of ASCII representations of Timing, Area, and Power associated with the Standard cell. The Naming convention in the timing file follows PVT format (Process, Voltage, Temperature). For example, the standard library used in our case was sky130_fd_sc_hd_tt_025C_1v8, this name suggests that we are using 130 nm technology and the process is typical, temperature is 25C, and 1.8 V represents the voltage.
+The common part of Lib file contains
+- Library name and technology name
+- Units (of time, power, voltage, current, resistance and capacitance)
+- Value of operating condition ( process, voltage and temperature) – Max, Min and Typical 
+
+<img width="1085" alt="lib1" src="">
+
+Based on operating conditions there are three different lib files for Max, Min and Typical corners. In the second part of Lib file, it contains cell-specific information for each cell. 
+
+Cell-specific information in Lib file is mainly
+  Cell name
+  Pin name
+  Area of cell
+  Leakage power in respect of input pins logic state.
+
+Also It contains Pins details like
+  Pin name
+  Pin direction
+  Internal power
+  Capacitance
+  Rise capacitance
+  Fall Capacitance
+  Fanout load
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/ed9ec95d7da99f2c07912ebd2b3be4a10d103b0c/Samsung_PD_%23day7/1.png">
+
+A Look-Up Table (LUT) in a Liberty file is a component that defines the logical behavior and timing characteristics of a combinational logic cell within a digital library.LUT can be both with respect to timing as well as power
+
+index1[row] represents input transition , index2[column] represeents output load capacitance
+
+example of and2_1 gate index table
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/ed9ec95d7da99f2c07912ebd2b3be4a10d103b0c/Samsung_PD_%23day7/2.png">
+
+**Pin Attributes**
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/ed9ec95d7da99f2c07912ebd2b3be4a10d103b0c/Samsung_PD_%23day7/3(pin%20attributes).png">
+
+Sequential flops have clock pin as **true**
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/ed9ec95d7da99f2c07912ebd2b3be4a10d103b0c/Samsung_PD_%23day7/4(flop).png">
+
+**Unateness**
+A function is said to be unate if the rise transition on the positive unate input variable causes the ouput to rise or no change and vice versa.
+
+Negative unateness means cell output logic is inverted version of input logic. eg. In inverter having input A and output Y, Y is -ve unate w.r.t A. Positive unate means cell output logic is same as that of input.
+These +ve ad -ve unateness are constraints defined in library file and are defined for output pin w.r.t some input pin.
+
+A clock signal is positive unate if a rising edge at the clock source can only cause a rising edge at the register clock pin, and a falling edge at the clock source can only cause a falling edge at the register clock pin.
+
+A clock signal is negative unate if a rising edge at the clock source can only cause a falling edge at the register clock pin, and a falling edge at the clock source can only cause a rising edge at the register clock pin. In other words, the clock signal is inverted.
+
+A clock signal is not unate if the clock sense is ambiguous as a result of non-unate timing arcs in the clock path.
+
+Unnateness of D flip flop positive edge triggered
+
+```
+                related_pin : "CLK_N";
+                rise_transition ("del_1_7_7") {
+                    index_1("0.0100000000, 0.0230506000, 0.0531329000, 0.1224740000, 0.2823110000, 0.6507430000, 1.5000000000");
+                    index_2("0.0005000000, 0.0013189500, 0.0034792400, 0.0091778800, 0.0242103000, 0.0638642000, 0.1684670000");
+                    values("0.0232978000, 0.0295765000, 0.0465064000, 0.0946410000, 0.2265447000, 0.5754117000, 1.5026856000", \
+                        "0.0234848000, 0.0296225000, 0.0464747000, 0.0944869000, 0.2264113000, 0.5750624000, 1.5045718000", \
+                        "0.0233643000, 0.0295607000, 0.0464747000, 0.0945168000, 0.2263061000, 0.5753233000, 1.5028371000", \
+                        "0.0235687000, 0.0297767000, 0.0466145000, 0.0944561000, 0.2259604000, 0.5746931000, 1.5046934000", \
+                        "0.0235661000, 0.0295917000, 0.0466156000, 0.0945248000, 0.2261588000, 0.5747037000, 1.5006447000", \
+                        "0.0236305000, 0.0297841000, 0.0466114000, 0.0943436000, 0.2264104000, 0.5749078000, 1.5007792000", \
+                        "0.0234834000, 0.0296178000, 0.0466203000, 0.0946091000, 0.2266867000, 0.5748321000, 1.5022009000");
+                }
+                timing_sense : "non_unate";
+                timing_type : "falling_edge";
+            }
+```
+
+
+Unateness of D latch positive edge triggered
+```
+                related_pin : "GATE_N";
+                rise_transition ("del_1_7_7") {
+                    index_1("0.0100000000, 0.0230506000, 0.0531329000, 0.1224740000, 0.2823110000, 0.6507430000, 1.5000000000");
+                    index_2("0.0005000000, 0.0013104500, 0.0034345500, 0.0090016200, 0.0235923000, 0.0618331000, 0.1620580000");
+                    values("0.0290359000, 0.0360989000, 0.0537774000, 0.1023029000, 0.2327008000, 0.5800371000, 1.4992581000", \
+                        "0.0290669000, 0.0360541000, 0.0537217000, 0.1023566000, 0.2325888000, 0.5812102000, 1.5037938000", \
+                        "0.0289580000, 0.0359722000, 0.0537431000, 0.1023093000, 0.2327867000, 0.5797032000, 1.5054989000", \
+                        "0.0289144000, 0.0360224000, 0.0538419000, 0.1022993000, 0.2324767000, 0.5806629000, 1.5049062000", \
+                        "0.0289832000, 0.0360823000, 0.0537268000, 0.1023169000, 0.2327650000, 0.5794586000, 1.5054222000", \
+                        "0.0290149000, 0.0360945000, 0.0537585000, 0.1023309000, 0.2324873000, 0.5810031000, 1.4970503000", \
+                        "0.0289586000, 0.0360057000, 0.0538139000, 0.1022934000, 0.2326491000, 0.5787922000, 1.5045210000");
+                }
+                timing_sense : "non_unate";
+                timing_type : "falling_edge";
+            }
+```
+
+
+**Lab on .lib in dc_compiler**
+
+ **To print all the sequential gates**
+```
+dc_shell> echo $target_library 
+DC_WORKSHOP/lib/sky130_fd_sc_hd__tt_025C_1v80.db
+dc_shell> get_lib_cells */* -filter "is_sequential == true"
+{sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfbbn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfbbn_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfbbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfrbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfrbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfrtn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfrtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfrtp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfrtp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfsbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfsbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfstp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfstp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfstp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfxbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfxbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfxtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfxtp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dfxtp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlclkp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlclkp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlclkp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrbn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrbn_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrtn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrtn_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrtn_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrtp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlrtp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxbn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxbn_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxtn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxtn_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxtn_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlxtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__edfxbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__edfxtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_inputisolatch_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfbbn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfbbn_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfbbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfrbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfrbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfrtn_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfrtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfrtp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfrtp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfsbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfsbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfstp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfstp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfstp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfxbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfxbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfxtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfxtp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdfxtp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdlclkp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdlclkp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdlclkp_4 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sedfxbp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sedfxbp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sedfxtp_1 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sedfxtp_2 sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sedfxtp_4}
+```
+
+**To Prints the library linked**
+```
+dc_shell> list_lib
+Logical Libraries:
+-------------------------------------------------------------------------
+Library		File			Path
+-------		----			----
+  sky130_fd_sc_hd__tt_025C_1v80 sky130_fd_sc_hd__tt_025C_1v80.db /home/prakhar.g2/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/lib
+1
+```
+
+Ex 3 : the list of cells from the collection
+```
+dc_shell> foreach_in_collection my_lib_cell [get_lib_cells */*and*] {                                                                                                                                                                      set my_lib_cell_name [get_object_name $my_lib_cell];                                                                                                                                                               echo $my_lib_cell_name;                                                                                                                                                                                            }
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2_0
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2b_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2b_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and2b_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and3_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and3_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and3_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and3b_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and3b_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and3b_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4b_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4b_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4b_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4bb_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4bb_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__and4bb_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2_8
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2b_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2b_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand2b_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_2
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_4
+```
+
+
+**Prints the functionality of a particular cell**
+```
+dc_shell> foreach_in_collection my_pins [get_lib_pins sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/*] {
+set my_pin_name [get_object_name $my_pins];
+set pin_dir [get_lib_attribute $my_pin_name direction];
+echo $my_pin_name $pin_dir;
+}
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/A'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/A 1
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/B'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/B 1
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/C'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/C 1
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/D'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/D 1
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y 2
+dc_shell> get_lib_attribute sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y function
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y'. 
+(!A) | (!B) | (!C) | (!D)
+```
+**To find the output pin name and its functionality for multiple cells**
+
+First make vim file by name my_script.tcl , then inside gvim file write :
+```
+set my_list [list sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4 \
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1 ]
+
+
+
+#For each cell in  the list, find the output pin name and its functionality
+
+
+foreach my_cell $my_list {
+foreach_in_collection my_lib_pin [get_lib_pins ${my_cell}/*] {
+set my_lib_pin_name [get_object_name $my_lib_pin];
+set a [get_lib_attribute $my_lib_pin_name direction];
+if {$a > 1} {
+set fn [get_lib_attribute $my_lib_pin_name function];
+echo $my_lib_pin_name $a $fn;
+}
+}
+
+}
+```
+Then Source the file 
+
+dc_shell> source my_script.tcl
+
+```
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1/A'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_1/Y 2 (!A) | (!B) | (!C)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2/A'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_2/Y 2 (!A) | (!B) | (!C)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4/A'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3_4/Y 2 (!A) | (!B) | (!C)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_1/Y 2 (A_N) | (!B) | (!C)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_2/Y 2 (A_N) | (!B) | (!C)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand3b_4/Y 2 (A_N) | (!B) | (!C)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/A'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_1/Y 2 (!A) | (!B) | (!C) | (!D)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/A'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_2/Y 2 (!A) | (!B) | (!C) | (!D)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/A'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4_4/Y 2 (!A) | (!B) | (!C) | (!D)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_1/Y 2 (A_N) | (!B) | (!C) | (!D)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_2/Y 2 (A_N) | (!B) | (!C) | (!D)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/B'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4b_4/Y 2 (A_N) | (!B) | (!C) | (!D)
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/A_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/B_N'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/C'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/D'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/Y'. 
+Performing get_lib_attribute on library object 'sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/Y'. 
+sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__nand4bb_1/Y 2 (A_N) | (B_N) | (!C) | (!D)
+```
+Everywhere its showing its pin name and functionality.
+Similarly , We can do for other attributes like area, capacitance, clock etc.
+To find the attributes :
+
+dc_shell> list_attributes -app > a
+
+dc_shell> sh gvim a &
+</details>
