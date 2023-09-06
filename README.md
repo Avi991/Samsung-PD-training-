@@ -975,6 +975,7 @@ Clock -> Output port (I/O timing path)
 input port -> D (I/O timing path)
 
 input port -> Output port (These should not be present)
+</details>
 
 <details>
 <summary> Labs </summary>
