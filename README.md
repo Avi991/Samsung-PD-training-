@@ -676,6 +676,8 @@ GLS Simulation:
 
 The GLS we can see the output is different from that of the Simulation result there is flop delay visible and we got the output to be a proper OR & AND gated output. To avoid this kind of issue we are supposed to run the GLS to make sure there are no Synthesis and SImulation mismatches
 
+</details>
+
 ## Day-6-Introduction to logic synthesis in DC
 
 <details>
@@ -716,7 +718,6 @@ Power Optimization : Power consumption is a significant concern in modern IC des
 Design Closure : During the design process, designers use Liberty files to guide the synthesis, placement, and routing of standard cells. The data in these files helps achieve design closure by ensuring that the design meets performance, power, and area targets.
 
 Variability Handling : Variability in manufacturing processes can impact the behavior of standard cells. Liberty files may include data for different process corners to account for manufacturing variations.
-
 
 
 **Constraints**
