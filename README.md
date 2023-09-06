@@ -675,3 +675,239 @@ GLS Simulation:
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/a8fc691a86189ac01811737e55d04458dbb4ec4a/Samsung_PD_%23day%204/blockgtk_gls.png">
 
 The GLS we can see the output is different from that of the Simulation result there is flop delay visible and we got the output to be a proper OR & AND gated output. To avoid this kind of issue we are supposed to run the GLS to make sure there are no Synthesis and SImulation mismatches
+
+## Day-6-Introduction to logic synthesis in DC
+
+<details>
+<summary> Introduction </summary>
+
+**Synthesis**
+-RTL to Gate level translation.
+
+-The design is converted inta gate and connections are made betn the gates.
+
+-INPUT to Synthesis :     (1) RTL    (2) .lib
+
+**Contents of .lib**
+A typical Liberty file contains detailed information about the behaviour of standard cells, including :
+    *Timing Information : This includes delay, transition and capacitance values associated with the standard cells. Timing information specifies how the cells behave under different input conditions.
+    
+    *Optimization : Synthesis tools perform optimization to improve the design's performance, area, and power consumption.Logic optimization algorithms identify redundant logic and simplify the gate-level 
+     representation to achieve a more efficient implementation.
+     
+    *Technology Mapping : During synthesis, the design is mapped to a specific target technology library that contains the available gates and flip-flops for the manufacturing process being used (e.g., 28nm, 
+      7nm, etc.).The choice of gates from the library is critical in determining the final characteristics of the integrated circuit.
+      
+    *Power Information : Liberty file also provides data on power consumption , including static power and dynamic power characteristics. This information is crucial for optimizing the power consumption in IC.
+  
+    *Functional Behaviour : Descriptions of the logical functionality of standard cells, such as input and output pins and logical equations and any additional attributesthat define their operation.
+    
+    *Operating Conditions : Liberty files may include information about different operating condition in terms of process , voltage and temperature under which all cells are characterized.
+     
+    *Output for Further Stages : The gate-level netlist produced by synthesis serves as the input for subsequent stages of the design flow, including physical design, place-and-route, and manufacturing.
+    
+
+**Need of Liberty files**:
+
+Timing Analysis : EDA tools use Liberty files to perform static timing analysis, ensuring that the IC design meets specified timing constraints. This is critical for achieving desired performance targets.
+
+Power Optimization : Power consumption is a significant concern in modern IC design. Liberty files provide power data that allows designers to optimize power usage and meet energy efficiency goals.
+
+Design Closure : During the design process, designers use Liberty files to guide the synthesis, placement, and routing of standard cells. The data in these files helps achieve design closure by ensuring that the design meets performance, power, and area targets.
+
+Variability Handling : Variability in manufacturing processes can impact the behavior of standard cells. Liberty files may include data for different process corners to account for manufacturing variations.
+
+
+
+**Constraints**
+Constraints are the instructions that the designer apply during various step in VLSI chip implementation, such as logic synthesis, clock tree synthesis, Place and Route, and Static Timing Analysis. They define what the tools can or cannot do with the design or how the tool behaves. In VLSI design, constraints are essential parameters and limitations that guide the development process to ensure that the resulting integrated circuits (ICs) meet specific performance, timing, and functionality requirements. These constraints play a crucial role in achieving a successful VLSI design.
+
+</details>
+
+<details>
+<summary> DC Complier </summary>
+
+Design Compiler ,  is a high-level synthesis tool developed by Synopsys, a leading provider of EDA solutions. It plays a pivotal role in the process of designing complex integrated circuits (ICs) and is an integral part of modern VLSI design flows.
+
+Important terms used
+
+- Synopsys Design Constraints(SDC) : These are the design constraints which are supplied to DC to enable appropriate optimization suitable for achieving the best implementation.
+- .lib : Design Library which contains the Standard cells.
+- .db : Same as .lib but in a different format. DC understands libraries in .db format
+- .ddc : Synopsys propreitary format for storing the design information. DC can write out and read in DDC.
+- Design : RTL files which has the behavioral model of the design.
+
+```
+        Step 1     Read STD Cell/tech.lib
+			 
+	Step 2	Read Design (Verilog and Design.lib)
+			 
+	Step 3	Read SDC
+			 
+	Step 4	Link the Design
+			 
+	Step 5	Synthesize
+			 
+        Step 6  Generate Report and analyse QoR
+			 
+        Step 7  Write out the Netlist
+```
+
+The DC compiler does not understand .lib , so the .lib is converted to .db format. lib format is for user reference.
+
+</details>
+
+<details>
+<summary> Labs on DC Complier </summary>
+
+ Invoking dc_shell. Then we echo target library and link_library which returns an vitual library named as your library, which needs to be set.
+```
+ echo $target_library
+ echo $link_library
+```
+ 
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/2.png">
+
+The RTL design code is 
+```
+module lab1_flop_with_en ( input res , input clk , input d , input en , output reg q);
+always @ (posedge clk , posedge res)
+begin
+	if(res)
+		q <= 1'b0;
+	else if(en)
+		q <= d;	
+end
+endmodule
+```
+Synthesis of this design code can be done using the following commands
+```
+read_verilog <path of design file>
+read_db <path of .db>
+write -f verilog -out <net_filename>
+```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/1.png">
+Below is the screenshot of the output window after compile This generates the netlist file but it consists of some seqgen library as shown in the figure and not the .db file even though we have read the .db file, This is beacuse we didn't set link and target library,
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/2.png">
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/3.png">
+
+
+To set the link_library and target_library we use the following commands:
+```
+set target_library <path of .db>
+set link_library { * path of the .db }
+link
+compile
+write -f verilog -out <net_filename>
+```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/5.1.png">
+The generated netlist
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/6.png">
+
+**Comparing the both the netlist before and after proper mapping of library files**
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/9.png">
+
+**Labs on Design Vision**
+To launch Design Vision we need to enable c shell and then give design Vision:
+```
+csh
+design_vision
+```
+After launching the design_vison first we need to the net to .ddc which is read by Design_vision tool which can be done by using the below command
+```
+set target_library /Path_to_library(.db)
+set link_library {* /Path_to_library(.db)}
+link
+compile
+write -f verilog -out file.v
+write -f ddc -out file.ddc
+
+```
+Then we can start GUI and then read the .ddc file generated above. This ddc file contains all the information of the tool memory of that particular session. ddc is synopys proprietary format i.e it can be read only br synopsys tools.When the .db is read it automatically reads the linked .db file.
+If we have an RTL design that we want to synthesize and we have the Verilog code available, we would typically use read_verilog to start the synthesis process. However, if we have a DDC-formatted design from a previous run or from another tool in the Synopsys toolchain, we would use read_ddc to work with that design in Design Compiler's GUI or command-line environment.
+When we click lab1 and then schematic we get the schematic view of the Design show below:
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/243be2c0a382f6f00b0ca5a9868387bb46d55db9/Samsung_PD_%23day6/11.png">
+
+**Lab on DC Setup**
+The .synopys_dc.setup file for the above example of mux and d flip flop is as follows :
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2a5a8c27-4485-4be0-8d3f-e1148c4fa01c)
+
+```
+set target_library /home/aviral.s/DC_WORKSHOP/lib/sky130_fd_sc_hd_tt_025c_1v80.db
+set link_library {* $target_library }
+```
+</details>
+
+
+<details>
+<summary> Labs on TCL </summary>
+Tcl (Tool Command Language) is a scripting language used for automating tasks. In EDA, it's used to automate design processes. Here are loops in Tcl:
+	
+1. While Loop:
+while is used for repeating a block of code as long as a condition is true.
+
+Example:
+
+```
+set i 0
+while {$i < 5} {
+    puts "Iteration $i"
+    incr i
+	}
+```
+
+2. For Loop:
+for is used for iterating over a range or a list.
+
+Example:
+```
+for {set i 0} {$i < 5} {incr i} {
+    puts "Iteration $i"
+}
+```
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b9492c99-82c1-4260-ae77-3eda1b29ad0a)
+
+**Example**
+These codes can be written in tickle file
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/dee74a60-34c2-43ab-bfd8-ea4f7bbc9c86)
+
+Result
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/530cfe98-a82a-4071-93f3-00a36a580271)
+
+Key Points
+1. set is used for creating and storing information in the variables
+2. We use $ to use any variable that is set when required to be seen as operating
+3. Square brackets are used for nesting of commands in TCL.
+4. Make sure there are spaces before "{" and after "}" to avoid any errors
+5. Wrong manipulation might lead to infinite loop so make sure you use the variables properly.
+6. "\" is used if we need write in next line in tcl file but to be considered as continuation of the current line according to the code.
+7. foreach_in_collection is specific to synopsys not common in TCL.
+8. We can differentiate between list and collection by printing them if it has {} at start and end it is a collection else it is a list.
+
+</details>
+
+
+## Day-7-Basic of STA
+
+<details>
+<summary> Introduction to STA </summary>
+
+STA breaks down the design into time pathways before doing timing analysis. The following factors make up each time path:
+
+Startpoint: The beginning of a timing route in which data is launched by a clock edge or must be ready at a certain moment. Every startpoint must be a register clock pin or an input port.
+
+Combinational logic network: It includes elements with no internal state or memory. AND, OR, XOR, and inverter elements are allowed in combinational logic, but flip-flops, latches, registers, and RAM are not.
+
+Endpoint: When data is caught by a clock edge or when it needs to be provided at a specified moment, this is the end of a timing path. A register data input pin or an output port must be present at each endpoint.
+
+Static timing analysis calculates a maximum delay using the longest way and a minimum delay using the shortest path.
+
+A Setup time (Max Delay Constraint) refers to a design specification or requirement that imposes an upper limit on the delay a signal can experience while propagating through a specific path or circuit within an integrated circuit. Consider a example of 2 D flip flop connected with a combinational logic in between them.
+
+Tck >= Tcq + Tcomb + Tsu
+
+Hold time (Min Delay constraint) refers to a design specification or requirement that sets a minimum allowable delay for a signal to propagate through a specific path or circuit within an integrated circuit. This constraint is used to ensure that certain signals within the circuit do not propagate too quickly, which can lead to timing violations and
