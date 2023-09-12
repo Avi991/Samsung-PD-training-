@@ -1503,8 +1503,8 @@ dc_shell> echo $link_library
   Linking design 'lab8_circuit'
   Using the following designs and libraries:
   --------------------------------------------------------------------------
-  lab8_circuit                /home/aviral.s/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/verilog_files/lab8_circuit.db
-  sky130_fd_sc_hd__tt_025C_1v80 (library) /home/prakhar.g2/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/lib/sky130_fd_sc_hd__tt_025C_1v80.db
+  lab8_circuit   /home/aviral.s/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/verilog_files/lab8_circuit.db
+  sky130_fd_sc_hd__tt_025C_1v80 (library) /home/aviral.s/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/lib/sky130_fd_sc_hd__tt_025C_1v80.db
 
 
 **dc_shell> compile_ultra**
@@ -1515,43 +1515,12 @@ Analyzing: "/home/aviral.s/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorks
 Library analysis succeeded.
 Information: Evaluating DesignWare library utilization. (UISN-27)
 
-============================================================================
-| DesignWare Building Block Library  |         Version         | Available |
-============================================================================
-| Basic DW Building Blocks           | T-2022.03-DWBB_202203.4 |     *     |
-| Licensed DW Building Blocks        | T-2022.03-DWBB_202203.4 |     *     |
-============================================================================
-
-====================================================================================================
-| Flow Information                                                                                 |
-----------------------------------------------------------------------------------------------------
-| Flow         | Design Compiler WLM                                                               |
-| Comand Line  | compile_ultra                                                                     |
-====================================================================================================
-| Design Information                                      | Value                                  |
-====================================================================================================
-| Number of Scenarios                                     | 0                                      |
-| Leaf Cell Count                                         | 8                                      |
-| Number of User Hierarchies                              | 0                                      |
-| Sequential Cell Count                                   | 3                                      |
-| Macro Count                                             | 0                                      |
-| Number of Power Domains                                 | 0                                      |
-| Number of Path Groups                                   | 1                                      |
-| Number of VT Class                                      | 0                                      |
-| Number of Clocks                                        | 0                                      |
-| Number of Dont Touch Cells                              | 0                                      |
-| Number of Dont Touch Nets                               | 0                                      |
-| Number of Size Only Cells                               | 0                                      |
-| Design with UPF Data                                    | false                                  |
-====================================================================================================
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f6fd4cf1-7a3d-4883-bd0f-f95a1ca1a90a)
 
 
 **Listing ports in design**
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/4(ports%20list).png
-
-<img width="1085" alt="lib1" src="
-
 
 ```
 dc_shell> get_ports 
@@ -1574,7 +1543,7 @@ out_clk
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/5(ports%20dir).png">
 ```
-dc_shell> foreach_in_collection my_port [get_ports *] {                                                                                                                                                                                                                    set my_port_name [get_object_name $my_port];
+dc_shell> foreach_in_collection my_port [get_ports *] {                                                                                                                                                                            set my_port_name [get_object_name $my_port];
                  set dir [get_attribute [get_ports $my_port_name] direction];
                  echo $my_port_name $dir;
                  }                                                                                                                                                                                               
