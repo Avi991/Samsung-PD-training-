@@ -1298,3 +1298,939 @@ dc_shell> list_attributes -app > a
 
 dc_shell> sh gvim a &
 </details>
+
+
+## Day-8 -ADVANCED CONSTRAINTS 
+
+<details>
+<summary>Clock & Timing Terminologies</summary>
+
+
+Before understanding the terms related to clock.First we"ll look the sources of clocks used in general
+ 
+Clock Generators they generate clock signals from which we control the timing of digital operations within the IC. Clock generators are designed to produce clock signals with attributes such as frequency,duty cycle,and phase,to meet the timing requirements of design
+
+**Types of clock generators**
+
+    - Oscillators: These are widely used as clock generators. They generate continuous periodic signals without an external input. Common types include RC oscillators, LC oscillators, and crystal oscillators.
+
+    - Phase-Locked Loops (PLLs): PLLs are versatile clock generators that can generate clock signals with adjustable frequency and phase. They are often used for clock synchronization and multiplication.
+
+    - Ring Oscillators: These are simple but effective oscillators often used for generating clock signals with relatively low frequencies.
+
+    - Crystal Oscillators: They are highly stable and accurate oscillators that use piezoelectric crystals to generate clock signals.
+
+ Clock is constrained ??  
+ 
+ Actually clock period gets constrained , which in turn limits the combinational delay 
+ i.e 
+
+   **Tclk [Clock period] >= Tc2q [contamination Delay] + Tcomb [Combination Delay] + Tsu [Setup Time]**
+
+   **Tcomb <= Tclk - (Tc2q + Tsu)**
+
+ 
+In practical clock never arrives at  two flip flops at same time.Therwe will always be some difference and that difference in clock arrival is called skew.
+
+ **Global Clock Skew**
+ 
+ Global clock skew refers to the difference in arrival times of a clock signal at various points across the entire chip. It affects all elements of the chip and can lead to synchronization issues between different clock domains. Managing global       clock skew is a critical aspect of clock distribution in large and complex integrated circuits. Global skew can be reduced by careful clock tree synthesis and by minimizing the length of critical paths in the design.
+
+ **Local Clock Skew**
+ 
+ Local clock skew is specific to a particular region or block within the chip. It can result from variations in the lengths of wires or traces that carry the clock signal to different parts of a block. Local skew is often easier to manage than        global skew because it affects a smaller portion of the chip. Techniques like buffer insertion and clock gating can be used to mitigate local clock skew.
+
+ Furthermore it can be classified as
+          
+	  Positive Skew: Positive skew occurs when clock signals arrive at clock pin later than the ideal clock edge. It results in setup time violations.
+          
+	  Negative Skew: Negative skew occurs when clock signals arrive at clock pin earlier than the ideal clock edge at different destinations. It result in hold time violations.
+   </details>
+
+ <details>
+<summary>Clock Tree Distribution Model</summary>
+
+	 
+The clock distribution network ensures that the clock signal is delivered accurately and with minimal skew to all the sequential elements (like flip-flops) within the chip. Important aspect considering while modeling a clock distribution network in a design:
+
+ **Clock Source:** 
+    Determine the source of the clock signal, whether it's generated on-chip or received from an external source,such as oscillator.
+   
+ **Clock Domain:** 
+    Identify and partition the design into clock domains if multiple clock frequencies or asynchronous clock domains are involved.
+
+ **Clock Tree Synthesis (CTS):** 
+    Use CTS tools to automatically generate a clock distribution network that meets the design requirements.
+   
+ **Clock Buffers:**
+    Design clock buffers to drive the clock signal through the clock distribution network. Sizing and placing these buffers is very crucial as per the requirement we insert in the path.
+   
+ **Clock Routing:**
+    Plan the routing of clock lines carefully to minimize wirelength and optimize signal delivery. Clock lines should be short and of equal length.
+   
+ **Clock Distribution Topology:**
+ Choose an appropriate topology for the clock distribution network. Common topologies include tree, mesh, or hybrid structures, depending on the chip's layout and size. There are two models H-TREE , I-TREE . Mostly H-TREE is incorporated in the      design
+  
+ **Clock Synchronization:**
+     Implement clock synchronization techniques when dealing with multiple clock domains, ensuring that data is correctly transferred between domains.
+
+ **Clock Domain Crossing (CDC):**
+     Handle clock domain crossing issues, where data crosses between different clock domains.Synchronization is required.It will help in avoiding metastability
+
+ **Clock Redundancy:**
+     Introduce redundancy in the clock network to improve reliability and fault tolerance.
+
+Designing a clock distribution network to ensure proper functioning and performance of the integrated circuit.
+
+Practical aspects with respect to clock. Source latency, network latency, clock period, and different types of jitter (duty cycle jitter and period jitter) in the context of VLSI clock design:
+
+**Source Latency:**
+    Source latency refers to the delay introduced by the clock source, which could be an on-chip oscillator or an external clock input. This latency includes the time it takes for the clock signal to propagate from the source to the point where it enters the clock distribution network. Minimizing source latency is essential to ensure that the clock arrives at the clock distribution network with minimal delay.
+
+ **Network Latency:**
+    Network latency is the cumulative delay introduced by the clock distribution network as the clock signal propagates from the source to the various clock pins (e.g., flip-flops). It includes the delay through clock buffers, wires, and routing resources. Minimizing network latency is crucial to ensure that all clock sinks receive the clock signal within the required time window.
+
+ **Clock Period:**
+    The clock period, often denoted as T_clk, is the time interval between consecutive rising or falling edges of the clock signal. It is inversely related to the clock frequency (f_clk) by the equation T_clk = 1 / f_clk. The clock period directly affects the maximum achievable operating frequency of the chip and the timing constraints of the design. Designers must ensure that the clock period meets the setup and hold time requirements of the flip-flops.
+
+ **Jitter:**
+    Jitter is the variation in the timing of clock edges compared to their ideal or expected positions. It can be caused by various factors and can manifest in different forms such as temprature , noise , process variations .
+
+Commands used in synopsys for modelling the clock
+
+ **`create_clock`**:
+   
+    This command is used to define clock signals in the design.
+
+    
+ **Syntax**
+     
+     ```tcl
+     create_clock -period <clock_period> -name <clock_name> [get_pins <clock_port>]
+     ```
+       clock_period: Specifies the clock period in nanoseconds.
+       clock_name : Assigning a name to the clock signal.
+
+   **Working**:
+     - The `create_clock` until and unless we don't define. Error will be there no clock found
+     - It is essential for correctly setting up constraints for the design's clock network.
+
+
+ **`set_clock_latency -source`**:
+
+    This command sets the source latency for a clock signal.
+
+   **Syntax**:
+   
+     ```tcl
+     set_clock_latency -source <latency_value> [get_clocks <clock_name>]
+     ```
+     latency_value: Specifies the source latency in nanoseconds.
+     clock_name: Specifies the clock to which the source latency is applied (optional if not explicitly defined in `create_clock`).
+
+**Working**:
+      Source latency accounts for the delay introduced by the clock source (e.g., oscillator) before the clock signal reaches the chip.
+    
+
+**`set_clock_latency (network)`**:
+
+   This command sets network latency for a clock signal.
+ 
+ **Syntax**:
+ 
+     ```tcl
+     set_clock_latency -network <latency_value> [get_clocks <clock_name>]
+     ```
+   latency_value : Specifies the network latency in nanoseconds.
+    
+**Working**:
+     Network latency represents the cumulative delay introduced by the clock distribution network (buffers, wires, routing).
+    
+
+**`set_clock_uncertainty (setup or hold)`**:
+    
+     These commands set the uncertainty (jitter and skew) for setup or hold analysis.
+
+    **Syntax**:
+     ```tcl
+     set_clock_uncertainty -setup <uncertainty_value> -hold <uncertainty_value> [get_clocks <clock_name>]
+     ```
+     uncertainty_value: Specifies the uncertainty (jitter and skew) in nanoseconds for setup or hold analysis.
+  
+
+   - **Working**:
+
+      Setup uncertainty holds  for variations in clock arrival times, affecting flip-flop data input setup times.
+      Hold uncertainty holds for variations in clock and data arrival times, affecting flip-flop data input hold times.
+      Jitter represents random variations in clock edges, and skew represents systematic variations in clock arrival times.
+     
+ **`report_clocks`**:
+        This command generates a report of clock-related information.
+
+    **Syntax**:
+     ```tcl
+     report_clocks [-sort_by {name | period | latency}]
+     ```
+  **Working**:
+      The `report_clocks` command provides information about the defined clocks in the design, including their periods and latencies.
+
+      </details>
+     
+   
+</details>
+
+
+<details>
+<summary> Labs on Advanced Constrains </summary>
+
+**Checking the target and link Library**
+```
+dc_shell> echo $target_library 
+DC_WORKSHOP/lib/sky130_fd_sc_hd__tt_025C_1v80.db
+
+dc_shell> echo $link_library 
+*$target_library
+```
+**Reading and linking verilog file**
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/1(design%20under%20analysis).png">
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/2.png">
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/3(compile).png">
+
+
+  Linking design 'lab8_circuit'
+  Using the following designs and libraries:
+  --------------------------------------------------------------------------
+  lab8_circuit                /home/aviral.s/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/verilog_files/lab8_circuit.db
+  sky130_fd_sc_hd__tt_025C_1v80 (library) /home/prakhar.g2/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/lib/sky130_fd_sc_hd__tt_025C_1v80.db
+
+
+**dc_shell> compile_ultra**
+Loading db file '/home/synopsys/DC/syn_vT-2022.03-SP5-1/libraries/syn/dw_foundation.sldb'
+Warning: DesignWare synthetic library dw_foundation.sldb is added to the synthetic_library in the current command. (UISN-40)
+Information: Performing power optimization. (PWR-850)
+Analyzing: "/home/aviral.s/Samsung-PD-Training-/sky130RTLDesignAndSynthesisWorkshop/DC_WORKSHOP/lib/sky130_fd_sc_hd__tt_025C_1v80.db"
+Library analysis succeeded.
+Information: Evaluating DesignWare library utilization. (UISN-27)
+
+============================================================================
+| DesignWare Building Block Library  |         Version         | Available |
+============================================================================
+| Basic DW Building Blocks           | T-2022.03-DWBB_202203.4 |     *     |
+| Licensed DW Building Blocks        | T-2022.03-DWBB_202203.4 |     *     |
+============================================================================
+
+====================================================================================================
+| Flow Information                                                                                 |
+----------------------------------------------------------------------------------------------------
+| Flow         | Design Compiler WLM                                                               |
+| Comand Line  | compile_ultra                                                                     |
+====================================================================================================
+| Design Information                                      | Value                                  |
+====================================================================================================
+| Number of Scenarios                                     | 0                                      |
+| Leaf Cell Count                                         | 8                                      |
+| Number of User Hierarchies                              | 0                                      |
+| Sequential Cell Count                                   | 3                                      |
+| Macro Count                                             | 0                                      |
+| Number of Power Domains                                 | 0                                      |
+| Number of Path Groups                                   | 1                                      |
+| Number of VT Class                                      | 0                                      |
+| Number of Clocks                                        | 0                                      |
+| Number of Dont Touch Cells                              | 0                                      |
+| Number of Dont Touch Nets                               | 0                                      |
+| Number of Size Only Cells                               | 0                                      |
+| Design with UPF Data                                    | false                                  |
+====================================================================================================
+
+
+**Listing ports in design**
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/4(ports%20list).png
+
+<img width="1085" alt="lib1" src="
+
+
+```
+dc_shell> get_ports 
+{rst clk IN_A IN_B OUT_Y out_clk}
+# returns all the ports present in the design
+
+
+dc_shell> foreach_in_collection my_port [get_ports *] {
+set my_port_name [get_object_name $my_port];
+echo $my_port_name;
+}
+rst
+clk
+IN_A
+
+OUT_Y
+out_clk
+```
+**Listing port with direction**
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/5(ports%20dir).png">
+```
+dc_shell> foreach_in_collection my_port [get_ports *] {                                                                                                                                                                                                                    set my_port_name [get_object_name $my_port];
+                 set dir [get_attribute [get_ports $my_port_name] direction];
+                 echo $my_port_name $dir;
+                 }                                                                                                                                                                                               
+rst in
+clk in
+IN_A in
+IN_B in
+OUT_Y out
+out_clk out
+```
+**4. Listing Cells in design**
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/6(ref%20name%20of%20cell).png">
+
+```
+dc_shell> get_cells *
+ {REGA_reg REGB_reg REGC_reg U9 U10 U11 U12 U13 U14}
+
+By default system gives hierarchical cells:
+dc_shell> get_cells * -hier -filter "is_hierarchical == false"
+{REGA_reg REGB_reg REGC_reg U9 U10 U11 U12 U13 U14}
+
+
+For listing Reference cells :
+
+dc_shell> foreach_in_collection my_cell [get_cells * -hier] {
+ set my_cell_name [get_object_name $my_cell];
+ set rname [get_attribute [get_cells $my_cell_name] ref_name];
+echo $my_cell_name $rname;
+}
+
+REGA_reg sky130_fd_sc_hd__dfrtp_1
+REGB_reg sky130_fd_sc_hd__dfrtp_1
+REGC_reg sky130_fd_sc_hd__dfrtp_1
+U9 sky130_fd_sc_hd__clkinv_1
+U10 sky130_fd_sc_hd__clkinv_1
+U11 sky130_fd_sc_hd__nor2_1
+U12 sky130_fd_sc_hd__a21oi_1
+U13 sky130_fd_sc_hd__clkinv_1
+U14 sky130_fd_sc_hd__nand2_1
+
+```
+
+Now we convert our design into ddc
+
+dc_shell> write -f ddc -out verilog_files/lab8_circuit.ddc
+
+Then open design_vision gui in another tab read ddc file of lab8.
+The schematic of lab8_circuit.ddc as gvien below:
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/7(design%20schematic%20and%20net%20connection).png">
+
+```
+design_vision> foreach_in_collection my_pin [all_connected n5] {
+set pin_name [get_object_name $my_pin];
+set dir [get_attribute [get_pins $pin_name] direction];
+echo $pin_name $dir;
+}
+U11/Y out
+U13/A in
+U12/B1 in
+```
+**Getting Pin of Design**
+
+```
+dc_shell> get_pin *
+{REGA_reg/D REGA_reg/CLK REGA_reg/RESET_B REGA_reg/Q REGB_reg/D REGB_reg/CLK REGB_reg/RESET_B REGB_reg/Q REGC_reg/D REGC_reg/CLK REGC_reg/RESET_B REGC_reg/Q U9/A U9/Y U10/A U10/Y U11/A U11/B U11/Y U12/A1 U12/A2 U12/B1 U12/Y U13/A U13/Y U14/A U14/B U14/Y}
+
+Listing it vertically:
+dc_shell> foreach_in_collection my_pin [get_pins *] {
+set pin_name [get_object_name $my_pin];
+echo $pin_name;
+}
+REGA_reg/D
+REGA_reg/CLK
+REGA_reg/RESET_B
+REGA_reg/Q
+REGB_reg/D
+REGB_reg/CLK
+REGB_reg/RESET_B
+REGB_reg/Q
+REGC_reg/D
+REGC_reg/CLK
+REGC_reg/RESET_B
+REGC_reg/Q
+U9/A
+U9/Y
+U10/A
+U10/Y
+U11/A
+U11/B
+U11/Y
+U12/A1
+U12/A2
+U12/B1
+U12/Y
+U13/A
+U13/Y
+U14/A
+U14/B
+U14/Y
+```
+If pin is input pin  the list it:
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/073235cdc409365758081db5def941b84631488a/Samsung_PD_%23day%208/2(find%20clock%20pin).png">
+
+After Sourcing tcl file we get this result:
+```
+dc_shell> source  query_clock_pin.tcl 
+REGA_reg/CLK
+REGB_reg/CLK
+REGC_reg/CLK
+```
+**Creating Clock**
+
+```
+dc_shell> create_clock -name MYCLK -per 10 [get_ports clk]
+1
+dc_shell> get_clocks *
+{MYCLK}
+
+
+## Reporting Clock
+dc_shell> report_clock *
+Information: Updating graph... (UID-83)
+ 
+****************************************
+Report : clocks
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 15:12:44 2023
+****************************************
+
+Attributes:
+    d - dont_touch_network
+    f - fix_hold
+    p - propagated_clock
+    G - generated_clock
+    g - lib_generated_clock
+
+Clock          Period   Waveform            Attrs     Sources
+--------------------------------------------------------------------------------
+MYCLK           10.00   {0 5}                         {clk}
+--------------------------------------------------------------------------------
+1
+
+dc_shell> get_attribute [get_ports out_clk] clocks --------> It tells what are clocks reaching the pin.
+{MYCLK}                       
+dc_shell> get_attribute [get_ports out_clk] clock ---------> It tells is the pin meant to be a clock pin or not.
+Warning: Attribute 'clock' does not exist on port 'out_clk'. (UID-101)
+```
+Creating different types of clock :
+```
+dc_shell> create_clock -name MYCLK -per 10 [get_ports clk] -wave {5 10} -----> Clock with rising edge at 5 and falling edge at 10. 50% duty cucle.
+dc_shell> create_clock -name MYCLK -per 10 [get_ports clk] -wave {0 2.5} -----> Clock with rising edge at 0 and falling edge at 2.5. 25% duty cycle.
+dc_shell> create_clock -name MYCLK -per 10 [get_ports clk] -wave {15 20} ----> rising edge at 15, before 15ns no clock.
+```
+
+To remove clock :
+
+dc_shell> remove_clock <clock_name>
+
+**Report_timing**
+
+In report timing it says (Path is unconstrained) because clock is not present.
+So, we create a clock first...
+```
+dc_shell> create_clock -name MYCLK -per 10 [get_ports clk]
+1
+
+
+dc_shell> report_timing -to REGC_reg/D
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 15:54:55 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: REGB_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Endpoint: REGC_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             0.00       0.00
+  REGB_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00       0.00 r
+  REGB_reg/Q (sky130_fd_sc_hd__dfrtp_1)                   0.29       0.29 r
+  U14/Y (sky130_fd_sc_hd__nand2_1)                        0.04       0.34 f
+  REGC_reg/D (sky130_fd_sc_hd__dfrtp_1)                   0.00       0.34 f
+  data arrival time                                                  0.34
+
+  clock MYCLK (rise edge)                                10.00      10.00
+  clock network delay (ideal)                             0.00      10.00
+  REGC_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00      10.00 r
+  library setup time                                     -0.12       9.88
+  data required time                                                 9.88
+  --------------------------------------------------------------------------
+  data required time                                                 9.88
+  data arrival time                                                 -0.34
+  --------------------------------------------------------------------------
+  slack (MET)                                                        9.55
+```
+This report timing will show the arival time and required time with slack. It will not show uncertanity , input and output external delay, latency because we have not modeled it yet.
+
+```
+dc_shell> set_clock_latency -source 2 [get_clocks MYCLK]
+1
+dc_shell> set_clock_latency 1 [get_clocks MYCLK]
+1
+dc_shell> set_clock_uncertainty -setup 0.5 [get_clocks MYCLK]
+1
+dc_shell> set_clock_uncertainty -hold 0.5 [get_clocks MYCLK]
+1
+```
+
+**FOR  SETUP**
+```
+dc_shell> report_timing -to REGC_reg/D 
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 16:02:40 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: REGB_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Endpoint: REGC_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             3.00       3.00            { changed from 0 to 3 clock network latency =source latency + nwetwork latency = 2 + 1=3}
+  REGB_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00       3.00 r
+  REGB_reg/Q (sky130_fd_sc_hd__dfrtp_1)                   0.29       3.29 r
+  U14/Y (sky130_fd_sc_hd__nand2_1)                        0.04       3.34 f
+  REGC_reg/D (sky130_fd_sc_hd__dfrtp_1)                   0.00       3.34 f
+  data arrival time                                                  3.34
+
+  clock MYCLK (rise edge)                                10.00      10.00
+  clock network delay (ideal)                             3.00      13.00            {changed from 0 to 3 clock network latency =source latency + nwetwork latency = 2 + 1=3}
+  clock uncertainty                                      -0.50      12.50            {Uncertanity is getting subtracted}
+  REGC_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00      12.50 r
+  library setup time                                     -0.12      12.38
+  data required time                                                12.38
+  --------------------------------------------------------------------------
+  data required time                                                12.38
+  data arrival time                                                 -3.34
+  --------------------------------------------------------------------------
+  slack (MET)                                                        9.05        --------------------> slack went down from 9.55 to 9.05
+```
+
+
+**FOR HOLD**
+
+```
+dc_shell> report_timing -to REGC_reg/D -delay_type min
+ 
+****************************************
+Report : timing
+        -path full
+        -delay min
+        -max_paths 1
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 16:09:25 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: REGA_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Endpoint: REGC_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: min
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             3.00       3.00
+  REGA_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00       3.00 r
+  REGA_reg/Q (sky130_fd_sc_hd__dfrtp_1)                   0.29       3.29 r
+  U14/Y (sky130_fd_sc_hd__nand2_1)                        0.04       3.33 f
+  REGC_reg/D (sky130_fd_sc_hd__dfrtp_1)                   0.00       3.33 f
+  data arrival time                                                  3.33
+
+  clock MYCLK (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             3.00       3.00
+  clock uncertainty                                       0.50       3.50     {Here Uncertainity is getting added}
+  REGC_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00       3.50 r
+  library hold time                                      -0.05       3.45
+  data required time                                                 3.45
+  --------------------------------------------------------------------------
+  data required time                                                 3.45
+  data arrival time                                                 -3.33
+  --------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -0.12
+```
+   
+**8. Modeling IO delays**
+
+When we do report_timing -from **IN_A** we get path is unconstrained. We set IO Constrains :
+```
+dc_shell> set_input_delay -max 5 -clock [get_clocks MYCLK] [get_ports IN_A]
+1
+dc_shell> set_input_delay -max 5 -clock [get_clocks MYCLK] [get_ports IN_B]
+1
+dc_shell> set_input_delay -min 1 -clock [get_clocks MYCLK] [get_ports IN_B]
+1
+dc_shell> set_input_delay -min 1 -clock [get_clocks MYCLK] [get_ports IN_A]
+1
+dc_shell> set_input_transition -max 0.3 [get_ports IN_A]
+1
+dc_shell> set_input_transition -max 0.3 [get_ports IN_B]
+1
+dc_shell> set_input_transition -min 0.1 [get_ports IN_B]
+1
+dc_shell> set_input_transition -min 0.1 [get_ports IN_A]
+1
+```
+
+We get report_timing as :
+
+FOR SETUP :
+
+```
+dc_shell> report_timing -from IN_A -trans -net -cap -nosplit 
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -nets
+        -max_paths 1
+        -transition_time
+        -capacitance
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 16:20:38 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: IN_A (input port clocked by MYCLK)
+  Endpoint: REGA_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: max
+
+  Point                                       Fanout       Cap     Trans      Incr       Path
+  ----------------------------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                                     0.00       0.00
+  clock network delay (ideal)                                                 3.00       3.00
+  input external delay                                                        5.00       8.00 f
+  IN_A (in)                                                         0.30      0.00       8.00 f
+  IN_A (net)                                    2         0.00                0.00       8.00 f
+  U11/Y (sky130_fd_sc_hd__nor2_1)                                   0.16      0.22       8.22 r
+  n5 (net)                                      2         0.01                0.00       8.22 r
+  U13/Y (sky130_fd_sc_hd__clkinv_1)                                 0.05      0.07       8.29 f
+  N0 (net)                                      1         0.00                0.00       8.29 f
+  REGA_reg/D (sky130_fd_sc_hd__dfrtp_1)                             0.05      0.00       8.29 f
+  data arrival time                                                                      8.29
+
+  clock MYCLK (rise edge)                                                    10.00      10.00
+  clock network delay (ideal)                                                 3.00      13.00
+  clock uncertainty                                                          -0.50      12.50
+  REGA_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                                     0.00      12.50 r
+  library setup time                                                         -0.13      12.37
+  data required time                                                                    12.37
+  ----------------------------------------------------------------------------------------------
+  data required time                                                                    12.37
+  data arrival time                                                                     -8.29
+  ----------------------------------------------------------------------------------------------
+                                                                                         4.08   ----------------> Setup slack is reduced due input trans.
+
+```
+
+FOR HOLD : 
+```
+dc_shell> report_timing -from IN_A -trans -net -cap -nosplit -delay_type min
+ 
+****************************************
+Report : timing
+        -path full
+        -delay min
+        -nets
+        -max_paths 1
+        -transition_time
+        -capacitance
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 16:25:15 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: IN_A (input port clocked by MYCLK)
+  Endpoint: REGB_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: min
+
+  Point                                       Fanout       Cap     Trans      Incr       Path
+  ----------------------------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                                     0.00       0.00
+  clock network delay (ideal)                                                 3.00       3.00
+  input external delay                                                        1.00       4.00 r
+  IN_A (in)                                                         0.10      0.00       4.00 r
+  IN_A (net)                                    2         0.00                0.00       4.00 r
+  U12/Y (sky130_fd_sc_hd__a21oi_1)                                  0.04      0.07       4.07 f
+  N1 (net)                                      1         0.00                0.00       4.07 f
+  REGB_reg/D (sky130_fd_sc_hd__dfrtp_1)                             0.04      0.00       4.07 f
+  data arrival time                                                                      4.07
+
+  clock MYCLK (rise edge)                                                     0.00       0.00
+  clock network delay (ideal)                                                 3.00       3.00
+  clock uncertainty                                                           0.50       3.50
+  REGB_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                                     0.00       3.50 r
+  library hold time                                                          -0.05       3.45
+  data required time                                                                     3.45
+  ----------------------------------------------------------------------------------------------
+  data required time                                                                     3.45
+  data arrival time                                                                     -4.07
+  ----------------------------------------------------------------------------------------------
+  slack (MET)                                                                            0.62
+
+```
+Setting Output Delay 
+
+```
+dc_shell> set_output_delay -max 5 -clock [get_clock MYCLK] [get_ports OUT_Y]
+1
+dc_shell> set_output_delay -min 1 -clock [get_clock MYCLK] [get_ports OUT_Y]
+1
+```
+Report timing :
+
+```
+dc_shell> report_timing -to OUT_Y -cap -trans -nosplit
+Information: Updating design information... (UID-85)
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -transition_time
+        -capacitance
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 16:30:24 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: REGC_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Endpoint: OUT_Y (output port clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: max
+
+  Point                                          Cap     Trans      Incr       Path
+  ------------------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                           0.00       0.00
+  clock network delay (ideal)                                       3.00       3.00
+  REGC_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00      0.00       3.00 r
+  REGC_reg/Q (sky130_fd_sc_hd__dfrtp_1)         0.00      0.04      0.34       3.34 f
+  U10/Y (sky130_fd_sc_hd__clkinv_1)             0.00      0.01      0.03       3.36 r
+  OUT_Y (out)                                             0.01      0.00       3.36 r
+  data arrival time                                                            3.36
+
+  clock MYCLK (rise edge)                                          10.00      10.00
+  clock network delay (ideal)                                       3.00      13.00
+  clock uncertainty                                                -0.50      12.50
+  output external delay                                            -5.00       7.50
+  data required time                                                           7.50
+  ------------------------------------------------------------------------------------
+  data required time                                                           7.50
+  data arrival time                                                           -3.36
+  ------------------------------------------------------------------------------------
+  slack (MET)                                                                  4.14
+```
+
+After setting load
+```
+dc_shell> set_load -max 0.4 [get_ports OUT_Y]
+1
+dc_shell> set_load -min 0.1 [get_ports OUT_Y]
+1
+```
+
+Report Timing
+
+```
+dc_shell> report_timing -to OUT_Y -cap -trans -nosplit
+ 
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+        -transition_time
+        -capacitance
+Design : lab8_circuit
+Version: T-2022.03-SP5-1
+Date   : Tue Sep 12 16:33:26 2023
+****************************************
+
+Operating Conditions: tt_025C_1v80   Library: sky130_fd_sc_hd__tt_025C_1v80
+Wire Load Model Mode: top
+
+  Startpoint: REGC_reg (rising edge-triggered flip-flop clocked by MYCLK)
+  Endpoint: OUT_Y (output port clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: max
+
+  Point                                          Cap     Trans      Incr       Path
+  ------------------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                           0.00       0.00
+  clock network delay (ideal)                                       3.00       3.00
+  REGC_reg/CLK (sky130_fd_sc_hd__dfrtp_1)                 0.00      0.00       3.00 r
+  REGC_reg/Q (sky130_fd_sc_hd__dfrtp_1)         0.00      0.05      0.30       3.30 r
+  U10/Y (sky130_fd_sc_hd__clkinv_1)             0.40      3.07      2.32       5.62 f
+  OUT_Y (out)                                             3.07      0.00       5.62 f
+  data arrival time                                                            5.62
+
+  clock MYCLK (rise edge)                                          10.00      10.00
+  clock network delay (ideal)                                       3.00      13.00
+  clock uncertainty                                                -0.50      12.50
+  output external delay                                            -5.00       7.50
+  data required time                                                           7.50
+  ------------------------------------------------------------------------------------
+  data required time                                                           7.50
+  data arrival time                                                           -5.62
+  ------------------------------------------------------------------------------------
+  slack (MET)                                                                  1.88
+
+```
+
+Due to increase in load from 0 to 0.4 the transition time icreased, due to which we have more delay. Slack is also reduced. 
+
+ **Generated Clock**
+
+ 	A generated clock, in the context of digital design and VLSI (Very Large Scale Integration), refers to a clock signal that is derived or generated from a primary clock source 		rather than being the primary clock signal itself. Generated clocks are used for various purposes in digital circuits and can have different frequencies, phases, or 			characteristics compared to the original clock source. Here are some common use cases for generated clocks:
+
+- *Frequency Division*: Generated clocks are often used to create lower-frequency clocks from a higher-frequency master clock. This is achieved by dividing the frequency of the primary clock using digital counters or dividers. It allows different parts of the circuit to operate at slower clock speeds for power savings or to meet timing requirements.
+
+- *Frequency Multiplication*: Conversely, generated clocks can be used to create higher-frequency clocks from a lower-frequency source. This is often done using PLLs (Phase-Locked Loops) or DLLs (Delay-Locked Loops). Frequency multiplication is useful for driving specific high-speed components or meeting timing constraints.
+
+- *Clock Skew Control*: Generated clocks can be employed to control clock skew, which is the variation in arrival times of clock signals across the chip. By generating clocks with adjusted phases, designers can minimize clock skew and ensure that data is captured reliably in flip-flops and latches.
+  
+- *Clock Gating* : Clock gating is a power-saving technique where clocks to certain parts of the circuit are enabled or disabled dynamically based on activity. Generated clocks can be used to control clock gating circuits, allowing for efficient power management by turning off clocks when they are not needed.
+
+- *Clock Domain Isolation* : In complex designs, different sections of a chip may operate in separate clock domains. Generated clocks can be used to create domain-specific clocks, enabling isolated operation with respect to clock signals. This is essential for managing timing constraints and avoiding issues associated with crossing clock domains.
+
+- *Synchronization* : When signals need to cross from one clock domain to another, synchronization is required to prevent data corruption. Generated clocks can be used to create synchronization signals and ensure proper data transfer between domains.
+
+
+The command to create a generated clock is 
+
+create_generated_clock -name <name_of_generated_clock> - master <master_clock_name> -source \[<master_clock_definition_point>] -div <value> \[<generated_clock_definition_point>]
+
+Here a generated clock namely MYGEN_CLK is created , we can see that its attribute is G
+
+<img  width="1085" alt="listattri1" src= "">
+
+
+when we report timing we get respect to MYCLK
+
+<img  width="1085" alt="listattri1" src= "">
+
+when we add constraints to the MYGEN_CLK we get timing with repect to MYGEN_CLK
+
+set_clock_latency -max 1 \[get_clocks MYGEN_CLK}
+
+set_output_delay -max 5 \[get_ports OUT_Y] -clock \[get_clocks MYGEN_CLK]
+
+set_output_delay -min 1 \[get_ports OUT_Y] -clock \[get_clocks MYGEN_CLK]
+
+<img  width="1085" alt="listattri1" src= "h">
+
+
+The design used for this experiment is as follows
+
+```ruby
+
+module lab8 circuit (input rst, input clk , input IN_A , input IN_B , output OUT_Y , output out_clk output reg out_div_clk)
+reg REGA, REGB , REGC ;
+always @ (posedge clk , posedge rst )
+begin
+	if(rst)
+	begin
+		REGA <= 1'b0 ;
+		REGB <= 1'b0 ;
+		REGC <= 1'b0 ;
+		out_div_clk <= 1'b0 ;
+	end
+	else
+	begin
+		REGA= IN_A | IN_B;
+		REGB<- IN_A ^ IN_B;
+		REGC <= !(REGA & REGB) ;
+		out_div_clk <= ~out_div_clk
+	end
+end
+
+assign OUT_Y = ~REGC ;
+
+assign out_clk = clk;
+
+endmodule
+```
+Loading the new design 
+
+<img  width="1085" alt="listattri1" src= "">
+
+Instead of writting constraints everytime we can create a .tcl program and then source it
+
+```ruby
+create_clock -name MYCLK -per 10 [get_ports clk];
+set_clock_latency -source 2 [get_clocks MYCLK];
+set_clock_latency 1 [get_clocks MYCLK];
+set_clock_uncertainty -setup 0.5 [get_clocks MYCLK];
+set_clock_uncertainty -hold 0.1 [get_clocks MYCLK];
+set_input_delay -max 4 -clock [get_clocks MYCLK] [get_ports IN_A];
+set_input_delay -max 4 -clock [get_clocks MYCLK] [get_ports IN_B];
+set_input_delay -min 1 -clock [get_clocks MYCLK] [get_ports IN_A];
+set_input_delay -min 1 -clock [get_clocks MYCLK] [get_ports IN_B];
+set_input_transition -max 0.4 [get_ports IN_A];
+set_input_transition -max 0.4 [get_ports IN_B];
+set_input_transition -min 0.1 [get_ports IN_A];
+set_input_transition -min 0.1 [get_ports IN_B];
+create_generated_clock -name MYGEN_CLK -master MYCLK -source [get_ports clk] -div 1 [get_ports out_clk];
+create_generated_clock -name MYGEN_DIV_CLK -master MYCLK -source [get_ports clk] -div 2 [get_ports out_div_clk]; 
+set_output_delay -max 4 -clock [get_clocks MYGEN_CLK] [get_ports OUT_Y];
+set_output_delay -min 1 -clock [get_clocks MYGEN_CLK] [get_ports OUT_Y];
+set_load -max 0.4 [get_ports OUT_Y];
+set_load -min 0.1 [get_ports OUT_Y];
+
+```
