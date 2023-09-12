@@ -2137,19 +2137,29 @@ Due to increase in load from 0 to 0.4 the transition time icreased, due to which
 
  **Generated Clock**
 
- 	A generated clock, in the context of digital design and VLSI (Very Large Scale Integration), refers to a clock signal that is derived or generated from a primary clock source 		rather than being the primary clock signal itself. Generated clocks are used for various purposes in digital circuits and can have different frequencies, phases, or 			characteristics compared to the original clock source. Here are some common use cases for generated clocks:
+A generated clock  refers to a clock signal that is derived or generated from a primary clock source rather than being the primary clock signal itself. 
 
-- *Frequency Division*: Generated clocks are often used to create lower-frequency clocks from a higher-frequency master clock. This is achieved by dividing the frequency of the primary clock using digital counters or dividers. It allows different parts of the circuit to operate at slower clock speeds for power savings or to meet timing requirements.
+**Frequency Division**: 
 
-- *Frequency Multiplication*: Conversely, generated clocks can be used to create higher-frequency clocks from a lower-frequency source. This is often done using PLLs (Phase-Locked Loops) or DLLs (Delay-Locked Loops). Frequency multiplication is useful for driving specific high-speed components or meeting timing constraints.
+Generated clocks are often used to create lower-frequency clocks from a higher-frequency master clock. This is achieved by dividing the frequency of the primary clock using digital counters or dividers. It allows different parts of the circuit to operate at slower clock speeds for power savings or to meet timing requirements.
 
-- *Clock Skew Control*: Generated clocks can be employed to control clock skew, which is the variation in arrival times of clock signals across the chip. By generating clocks with adjusted phases, designers can minimize clock skew and ensure that data is captured reliably in flip-flops and latches.
+**Frequency Multiplication**: 
+
+Conversely, generated clocks can be used to create higher-frequency clocks from a lower-frequency source. This is often done using PLLs (Phase-Locked Loops) or DLLs (Delay-Locked Loops). Frequency multiplication is useful for driving specific high-speed components or meeting timing constraints.
+
+**Clock Skew Control**: 
+
+Generated clocks can be employed to control clock skew, which is the variation in arrival times of clock signals across the chip. By generating clocks with adjusted phases, designers can minimize clock skew and ensure that data is captured reliably in flip-flops and latches.
   
-- *Clock Gating* : Clock gating is a power-saving technique where clocks to certain parts of the circuit are enabled or disabled dynamically based on activity. Generated clocks can be used to control clock gating circuits, allowing for efficient power management by turning off clocks when they are not needed.
+**Clock Gating** : Clock gating is a power-saving technique where clocks to certain parts of the circuit are enabled or disabled dynamically based on activity. Generated clocks can be used to control clock gating circuits, allowing for efficient power management by turning off clocks when they are not needed.
 
-- *Clock Domain Isolation* : In complex designs, different sections of a chip may operate in separate clock domains. Generated clocks can be used to create domain-specific clocks, enabling isolated operation with respect to clock signals. This is essential for managing timing constraints and avoiding issues associated with crossing clock domains.
+**Clock Domain Isolation** : 
 
-- *Synchronization* : When signals need to cross from one clock domain to another, synchronization is required to prevent data corruption. Generated clocks can be used to create synchronization signals and ensure proper data transfer between domains.
+In complex designs, different sections of a chip may operate in separate clock domains. Generated clocks can be used to create domain-specific clocks, enabling isolated operation with respect to clock signals. This is essential for managing timing constraints and avoiding issues associated with crossing clock domains.
+
+**Synchronization** : 
+
+When signals need to cross from one clock domain to another, synchronization is required to prevent data corruption. Generated clocks can be used to create synchronization signals and ensure proper data transfer between domains.
 
 
 The command to create a generated clock is 
@@ -2158,12 +2168,12 @@ create_generated_clock -name <name_of_generated_clock> - master <master_clock_na
 
 Here a generated clock namely MYGEN_CLK is created , we can see that its attribute is G
 
-<img  width="1085" alt="listattri1" src= "">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7aad20b4-ccc3-47d0-9163-da35a933bc95)
 
 
-when we report timing we get respect to MYCLK
+Report timing we get respect to MYCLK
 
-<img  width="1085" alt="listattri1" src= "">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2f22858f-1109-4531-9c1b-42b67f0b9a57)
 
 when we add constraints to the MYGEN_CLK we get timing with repect to MYGEN_CLK
 
@@ -2173,13 +2183,9 @@ set_output_delay -max 5 \[get_ports OUT_Y] -clock \[get_clocks MYGEN_CLK]
 
 set_output_delay -min 1 \[get_ports OUT_Y] -clock \[get_clocks MYGEN_CLK]
 
-<img  width="1085" alt="listattri1" src= "h">
-
-
 The design used for this experiment is as follows
 
-```ruby
-
+```
 module lab8 circuit (input rst, input clk , input IN_A , input IN_B , output OUT_Y , output out_clk output reg out_div_clk)
 reg REGA, REGB , REGC ;
 always @ (posedge clk , posedge rst )
@@ -2206,13 +2212,9 @@ assign out_clk = clk;
 
 endmodule
 ```
-Loading the new design 
+Instead of writting constraints everytime we can create a .tcl script and then source it evrerytime
 
-<img  width="1085" alt="listattri1" src= "">
-
-Instead of writting constraints everytime we can create a .tcl program and then source it
-
-```ruby
+```
 create_clock -name MYCLK -per 10 [get_ports clk];
 set_clock_latency -source 2 [get_clocks MYCLK];
 set_clock_latency 1 [get_clocks MYCLK];
@@ -2234,3 +2236,187 @@ set_load -max 0.4 [get_ports OUT_Y];
 set_load -min 0.1 [get_ports OUT_Y];
 
 ```
+The report_timing after sourcing the tcl script
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/61196011-e453-48f7-881a-aaa67ccad3e9)
+
+When we give report_port -verbose
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/197bd233-491a-4707-8b7c-faee883b09a1)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/253f1ac0-2f23-4622-839e-bf7ce8e90066)
+
+When we give set_input_delay -max 3 -clock <clock_name>  [<definition_point>]
+
+  Here -max 3 implies that the data arrives 3 ns late compared to clock
+
+  set_input_delay -max -3 -clock <clock_name>  [<definition_point>]
+
+  Here the data is arriving 3 ns before the rising edge which helps in setup time
+
+  so negative max relaxes the path in case of setup
+
+  Positive max tightens the path in case of setup
+
+  In case of hold it is the opposite case negative min tightens the path and positive min relaxes the path.
+
+  The command for max_latency is
+
+  set_max_latency <value> -from \[<source_port_name>] -to \[<destination_port_name>]
+
+  The command for creating virtual clock
+
+  create_clock -name <virtual_clock_name> -period <value>
+
+  For virtual clock there is no latency and no clock defination point 
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/51f7afe4-47e3-4b90-9d74-d59889aca6fe)
+
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7f76130e-f5dd-4eb3-93b1-e5ad73cb5f6c)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/97382e37-33b1-4c21-b600-38d0733fc49a)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e7923dc7-a397-4e84-8960-997ac963aae0)
+
+
+
+<details>
+<summary>Virtual Clock and Set Max delay Constraints</summary>
+
+**Creating a Virtual Clock with `create_clock`**:
+
+In Synopsys Design Constraints (SDC), you can define a virtual clock using the `create_clock` command by specifying a period of 10 units. This effectively creates a virtual clock with a specified period.
+
+**Syntax**:
+```tcl
+create_clock -name virtual_clk -period 10
+```
+-name <clock_name>: Assigns a name to the virtual clock, in this case, "virtual_clk."
+-period <period_value>: Specifies the clock period, which is set to 10 units in this example.
+
+**Working**:
+
+The `create_clock` command is typically used to define clock signals in a digital design.
+In this case, we are using it to create a virtual clock, which is a clock that doesn't have a physical source but is defined for timing analysis purposes.
+We specify a name for the virtual clock, "virtual_clk," to uniquely identify it in the design.
+ The `-period` option sets the clock period to 10 units. While this period value is provided, keep in mind that in the context of a virtual clock, this period doesn't represent a real clock period but is used as an abstract timing constraint for paths associated with this virtual clock.
+
+**Using `set_max_delay` with Virtual Clocks**:
+
+Once you have defined a virtual clock, you can use the `set_max_delay` command to specify timing constraints for paths related to this virtual clock. For example, if you want to set a maximum delay of 15 units for a specific path associated with the virtual clock "virtual_clk," you can use the following command:
+
+```tcl
+set_max_delay -from <source> -to <destination> 15 -clock virtual_clk
+```
+
+ from source: Specifies the source point in the design.
+ -to destination: Specifies the destination point in the design.
+ delay_value : Specifies the maximum allowable delay, in this case, 15 units.
+ -clock virtual_clk : Associates this timing constraint with the virtual clock "virtual_clk."
+
+**Rise and Fall Delays**:
+
+In addition to setting maximum delays, you can also specify rise and fall delays using the `set_max_delay` command. Rise and fall delays represent the maximum time a signal is allowed to transition from a logic low (0) to a logic high (1) or vice versa. These constraints are important for ensuring proper signal transitions in your design.
+
+To set a maximum rise delay of 5 units and a maximum fall delay of 3 units for a path associated with the virtual clock "virtual_clk," you can use the following commands:
+
+```tcl
+set_max_delay -from <source> -to <destination> 5 -clock virtual_clk -rise
+set_max_delay -from <source> -to <destination> 3 -clock virtual_clk -fall
+```
+
+- `-rise`: Specifies that you are setting a maximum rise delay.
+- `-fall`: Specifies that you are setting a maximum fall delay.
+
+By applying these constraints, you ensure that signal transitions on paths related to the virtual clock meet the specified timing requirements, contributing to the overall reliability and performance of your design.
+</details>
+
+
+<details>
+<summary>Lab on the above concept</summary>
+
+Let us consider the design shown below
+	
+```
+module lab8_circuit (input rst, input clk , input IN_A , input IN_B , output OUT_Y , output out_clk);
+reg REGA , REGB , REGC ; 
+
+always @ (posedge clk , posedge rst)
+begin
+	if(rst)
+	begin
+		REGA <= 1'b0;
+		REGB <= 1'b0;
+		REGC <= 1'b0;
+	end
+	else
+	begin
+		REGA <= IN_A | IN_B;
+		REGB <= IN_A ^ IN_B;
+		REGC <= !(REGA & REGB); 
+	end
+end
+
+assign OUT_Y = ~REGC;
+
+assign out_clk = clk;
+
+endmodule
+
+```
+Commands used to run the Synthesis are
+
+```
+#configure .synopsys_dc.setup
+read_verilog lab8_circuit.v
+link
+compile_ultra
+write -f ddc -out lab8_circuit.ddc
+```
+
+Apart from the verilog code used above we have also used the modified version of it which is mentioned below
+
+```
+module lab8_circuit (input rst, input clk , input IN_A , input IN_B , output OUT_Y , output out_clk , output reg out_div_clk , input IN_C , input IN_D , output OUT_Z );
+reg REGA , REGB , REGC ; 
+
+always @ (posedge clk , posedge rst)
+begin
+	if(rst)
+	begin
+		REGA <= 1'b0;
+		REGB <= 1'b0;
+		REGC <= 1'b0;
+		out_div_clk <= 1'b0;
+	end
+	else
+	begin
+		REGA <= IN_A | IN_B;
+		REGB <= IN_A ^ IN_B;
+		REGC <= !(REGA & REGB);
+		out_div_clk <= ~out_div_clk; 
+	end
+end
+
+assign OUT_Y = ~REGC;
+
+assign out_clk = clk;
+assign OUT_Z = IN_C ^ IN_D ;
+
+
+endmodule
+```
+![schematic (1)](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6a9fa376-2d5d-4fc3-a9e9-eb04777eaf3d)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/40a2016a-13a9-4db0-b541-e3c2eb752f79)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7ccf3236-0384-498d-a6af-ba2a53338017)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0d6d49e9-61fd-4953-b943-c6b2ce7e9866)
+
+
+
+
+
+
+</details>
