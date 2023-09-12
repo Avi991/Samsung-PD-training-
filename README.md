@@ -2247,6 +2247,7 @@ When we give set_input_delay -max 3 -clock <clock_name>  [<definition_point>]
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e7923dc7-a397-4e84-8960-997ac963aae0)
 
+![schematic (1)](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6a9fa376-2d5d-4fc3-a9e9-eb04777eaf3d)
 
 
 <details>
@@ -2375,13 +2376,36 @@ assign OUT_Z = IN_C ^ IN_D ;
 
 endmodule
 ```
-![schematic (1)](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6a9fa376-2d5d-4fc3-a9e9-eb04777eaf3d)
 
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/40a2016a-13a9-4db0-b541-e3c2eb752f79)
+Information on all the clocks is given below
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/81229ce8-e3e1-428f-91ac-015223ccb682)
 
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7ccf3236-0384-498d-a6af-ba2a53338017)
+ Since we have not compiled the design the path to OUT_Z is still unconstrained as shown:
 
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0d6d49e9-61fd-4953-b943-c6b2ce7e9866)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6063c39c-02c7-46d4-a549-487ca51e1722)
+
+
+We will constraint the path to OUT_Z by using the virtual clock: <br>
+
+```
+set_input_delay -max 5 [get_ports IN_C] -clock [get_clocks MYVCLK];
+set_input_delay -max 5 [get_ports IN_D] -clock [get_clocks MYVCLK];
+set_output_delay -max 4.9 [get_ports OUT_Z] -clock [get_clocks MYVCLK];
+```
+ Time period of the clock to 10 ns. Now out of 10 ns, 5 ns for input delay and 4.9 ns is used up by the output path. So out of 10ns only 100 ps is left for the combinational delay of the XOR gate between IN_A, IN_C to OUT_Z. From report XOR gate needs 120 ps, but only 100 ps is available for the combination logic, therefore slack is not met.
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/84b1f179-56ea-4d8d-b548-a620cc31aa2a)
+
+
+ Now we will compile the design to optimise to fix slack violation as shown
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9a30d0ac-a0af-4b7b-a45e-19f3bf1e87a0)
+
+
+It is noted that the input and the output delays are with respect to virtual clock now as shown
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0baaaeb0-edc6-45ee-874e-51fede331ea8)
+
 
 
 
