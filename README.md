@@ -2406,15 +2406,18 @@ It is noted that the input and the output delays are with respect to virtual clo
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0baaaeb0-edc6-45ee-874e-51fede331ea8)
 
+</details>
+
 
 </details>
 
-## Day-9 -0
+
+## Day-9 OPTIMIZATION
 
 <details>
- <summary>Introduction to Combinational and Sequential Optimization</summary>
+<summary>Introduction to Combinational and Sequential Optimization</summary>
 
- VLSI optimization which is done to improve the design's power consumption, area utilization, timing.
+VLSI optimization which is done to improve the design's power consumption, area utilization, timing.
 
  The goals of optimization :
 
@@ -2476,9 +2479,9 @@ Optimizing unloaded outputs typically involves reduction of power consumption , 
                     
 </details>
 
-<details>
 
- <summary> Labs on Sequential and Combinational Optimization </summary>
+<details>
+<summary> Labs on Sequential and Combinational Optimization </summary>
 
  1. **Opt_check**
     
@@ -2620,7 +2623,6 @@ In such case we can use the following command to prevent constant sequential pro
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/30b6e064-f015-4610-8992-7ff627ff4850)
 
-
 **dff_const3**
 ```
 module dff_const3(input clk, input reset, output reg q);
@@ -2669,7 +2671,6 @@ endmodule
 ```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/37027cdc-bdc6-402b-b80c-850ed66bf851)
 
-
 **dff_const5**
 ```
 module dff_const5(input clk, input reset, output reg q);
@@ -2704,7 +2705,9 @@ end
 
 endmodule
 ```
+
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/83915d25-3f94-47ba-855f-fc1499a9872e)
+
 
 </details>
 
@@ -2728,6 +2731,7 @@ Boundary optimization is often an iterative process. Designers may need to make 
 **Lab**
 
 RTL Design code
+
 ```
 module check_boundary (input clk , input res , input [3:0] val_in , output reg [3:0] val_out);
 wire en;
@@ -2782,16 +2786,14 @@ Register retiming is a technique used in design to optimize the performance of d
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2223e83c-614e-4563-aa4e-977952db5716)
 
-
 Command used for retiming in the synthesis
 ```
 compile_ultra -retime
 ```
-
+ame
 **Lab**
 
 Consider a example in which a 4-bit multiplier multiplying two 4-bit numbers and three 8-bit registers through which data is propagated to output.
-
 ```
 module check_reg_retime (input clk , input [3:0] a, input [3:0] b , output [7:0] c , input reset);
 
@@ -2800,9 +2802,6 @@ assign mult = a * b;
 reg [7:0] q1;
 reg [7:0] q2;
 reg [7:0] q3;
-
-
-
 
 always @ (posedge clk , posedge reset)
 begin
@@ -2823,11 +2822,6 @@ assign c = q3;
 
 endmodule
 ```
-
-Reading the design 
-
-
-
 The schematic before retime
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/70c81ab7-1ed8-402e-b6a6-0a97a13518d4)
@@ -2875,8 +2869,6 @@ Consider a below example, which contains more number of outputs to be connected 
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/abeb0616-c238-47ef-b881-0af045e2a337)
 
-
-
 **Lab**
 
 RTL Design code
@@ -2910,7 +2902,6 @@ assign cnt_roll = (cnt == 3'b111);
 
 endmodule
 ```
-
 The Design before isolating the ports 
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f5cac34c-226f-475c-9405-0f27804b643a)
@@ -2954,9 +2945,6 @@ begin
 	else 
 		valid <= en;
 end
-
-
-
 always @ (posedge clk , posedge res)
 begin
 	if(res)
@@ -2967,7 +2955,6 @@ end
 
 endmodule
 ```
-
 The tcl file for constraints
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9d0ab020-0de3-40f1-98a4-acd8cd053dda)
@@ -3042,4 +3029,6 @@ set_false_path -from [get_pins output_reg/Q] -to [get_pins input_reg/D]
 ```
 
 In this example, the `output_reg` and `input_reg` represent the source and destination registers of the false path, respectively. The `-from` and `-to` options specify the pins of these registers. By applying this false path constraint, you inform the synthesis tool that this particular path should not be considered for timing analysis, helping you achieve better control and optimization of your design.
+</details>
+
 </details>
