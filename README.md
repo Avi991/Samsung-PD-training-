@@ -2407,9 +2407,615 @@ It is noted that the input and the output delays are with respect to virtual clo
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0baaaeb0-edc6-45ee-874e-51fede331ea8)
 
 
+</details>
+
+## Day-9 -0
+
+<details>
+ <summary>Introduction to Combinational and Sequential Optimization</summary>
+
+ VLSI optimization which is done to improve the design's power consumption, area utilization, timing.
+
+ The goals of optimization :
+
+ **Cost based Optimization**
+     Optimize till cost is met at the same time taking care over optimization of one goal should'nt harm other goals.
+     
+ **Performance Optimization**
+      
+   Speed :-
+      Improve the operational speed of the IC by minimizing delays, optimizing critical paths, and ensuring that the design meets specified timing requirements.
+      
+  Throughput :-
+      Enhance the overall system throughput by optimizing data flow and minimizing bottlenecks in the circuit.
+
+ **Power Optimization**
+
+        Dynamic Power :-
+	          Minimize dynamic power consumption to extend battery life in portable devices and reduce power dissipation in data centers.
+        Static Power :- 
+	          Reduce static power (leakage power) to lower overall power consumption when the IC is in standby or idle mode.
+
+This logic optimizations are mainly of two types:
+
+  -->  Combinational logic optimizations.
+
+            Constant propagation (Direct optimization)
+
+            Squeezing the logic to get optimized version of the output saving area as well as power
+
+  -->  Sequential logic optimizations.
+
+       Basic
+           Sequential Constant propagation
+           
+	   Retiming 
+	         Retiming is done when there is requirement distribution of the combinational logic between the  flip flops
+           
+	   Unused Flop Removal 
+           
+	   Clock Gating
+
+  	Advanced
+           State Optimization 
+           Sequential logic cloning :  [Logic cloning is done during physical aware synthesis when there is a huge positive slack is present]
+
+
+    
+ **Optimization of Unloaded Outputs**
+
+Optimizing unloaded outputs typically involves reduction of power consumption , area, delay for unused or idle pins . It refers to flip-flops whose outputs are not connected to any subsequent logic gates or do not affect the functionality of the overall circuit. so these flip flops can be removed thus retaining the function and reducing the area , power of the design.
+
+**Controlling sequential optimization**
+
+**- compile_seqmap_propagate_constants** If this parameter is not set to true, the sequential constant propagating circuits are retained in circuit and not optimized.
+
+**- compile_delete_unloaded_sequential_cells** If this parameter is not set to true, it doesn't remove the counter cells as discussed, it retains all counters in the circuit.
+
+**- compile_register_replication** If this parameter is set to true, this replicates the registers in cloning optimization so that timing is met.
+                    
+</details>
+
+<details>
+
+ <summary> Labs on Sequential and Combinational Optimization </summary>
+
+ 1. **Opt_check**
+    
+    The RTL code of the opt_check is as follows
+    ```
+    module opt_check (input a , input b , input c , output y1, output y2);
+	wire a1;
+	assign y1 = a?b:0;
+	assign y2 = ~((a1 & b) | c);
+	assign a1 = 1'b0;
+    endmodule
+    ```
+    The above code optimized to a simple AND gate after optimization
+
+      ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6f0a16d5-1074-4e25-8323-17c8582ac286)
+
+      ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/79909207-c9dd-4f2d-a346-46f989791062)
+
+ 2. **Opt_check2**
+
+   The RTL code of the opt_check is as follows
+    ```
+   module opt_check2 (input a , input b , output y);
+	assign y = a?1:b;
+   endmodule
+    ```
+    After optimization it result in a simple OR gate
+
+     ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9569cd29-4f10-42a6-8ecb-e7ef4ca7359b)
+
+3. **Opt_check3**
+   
+    The RTL code of the opt_check is as follows
+    ```
+   module opt_check3 (input a , input b, input c , output y);
+	assign y = a?(c?b:0):0;
+   endmodule
+    ```
+  The above code is actually supposed to get two multiplexers but after the optimization breaks down into 3 input AND gate as shown below
+
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d838e21d-69bd-4572-85d5-c14075568e3e)
+
+4. **Opt_check4**
+   
+   The RTL code of the opt_check is as follows
+    ```
+   module opt_check4 (input a , input b , input c , output y);
+ 	assign y = a?(b?(a & c ):c):(!c);
+   endmodule
+    ```
+     Finally it optimized to XNOR gate
+
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/760c0e5c-03cd-423a-a15b-abb8fd8f6454)
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d1ab7238-d78c-480b-8d54-e32cb02a5f14)
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/ded64aa4-8d0f-494b-841e-bdb436eaf34a)
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/769be8db-047f-47c7-bebf-e8e5c6971b8c)
+
+**Resource Sharing**
+
+ Consider the example 
+ ```
+module resource_sharing_mult_check (input [3:0] a , input [3:0] b, input [3:0] c , input [3:0] d, output [7:0] y  , input sel);
+	assign y = sel ? (a*b) : (c*d);
+
+endmodule
+```
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d5520240-ab8d-4631-b23e-563ad0b1d59e)
+
+The timing report without constraint to the design are as follows
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/4130e92d-d76e-4136-b4c6-8f9046571605)
+
+when constraining design with max_delay 2.5 ns 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f2bd1695-c0e9-43a6-aa85-cefcf58e1283)
+
+After optimization
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/1fefb331-4d0e-4551-a8f6-cb30ccd1993e)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/00448b3b-a051-4185-b2ef-7662474086d6)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7b93010f-a530-4515-8315-d1d473f9075e)
+
+**set_max_area 800**
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5232a718-5879-4169-ae23-02bd5af0b933)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8f0ac7e6-002d-4383-8935-1cb8f91ca0a4)
+
+
+**Lab Sequential logic Optimizations**
+
+In this optimization sequential constant propagation 1 traverses finally . But we can't directly connect VDD as due to noise logic may degrade hence we use TIE cells
+
+Tie cells
+
+Tie cells also known as tie-high and tie-low cells, are components used in design to ensure that fixed signal value are held at a logic level either 1 or 0 regardless of input condition. These cells are particularly useful in preventing floating or undefined states in digital circuit.
+
+ **dff_const**
+  ```ruby
+   module dff_const1(input clk, input reset, output reg q);
+	always @(posedge clk, posedge reset)
+	begin
+		if(reset)
+			q <= 1'b0;
+		else
+			q <= 1'b1;
+	end
+
+  endmodule
+  ```
+As it is not a sequential constant we see the flops are present in logic
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/44d65d34-2b0d-4629-b6e4-0e24f98bc4e8)
+
+**dff_const2**
+```
+module dff_const2(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b1;
+	else
+		q <= 1'b1;
+end
+
+endmodule
+```
+It is a sequential constant propagation so th flops are optimized also we could also see TIE cell
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8b8a3ff1-391d-4f4a-9f42-857636593b3d)
+
+If design rquirement is such that we want Flip flops or intermediate modules need to be intact we don't need to optimize the circuit
+
+In such case we can use the following command to prevent constant sequential propagation
+
+**set compile_seqmap_propagate_constants false**
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/30b6e064-f015-4610-8992-7ff627ff4850)
+
+
+**dff_const3**
+```
+module dff_const3(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+This is not an example of sequential constant propagation
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8ae92186-7fac-463d-b237-9a84dff7a6b1)
+
+**dff_const4**
+```
+module dff_const4(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b1;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/37027cdc-bdc6-402b-b80c-850ed66bf851)
+
+
+**dff_const5**
+```
+module dff_const5(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+        begin
+		q <= 1'b0;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+begin
+		q <= 1'b0;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+
+endmodule
+```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/83915d25-3f94-47ba-855f-fc1499a9872e)
+
+</details>
+
+<details>
+<summary>Special optimization</summary>
+
+**Boundary Optimization**
+
+The optimization of boundaries or interfaces between different components or modules within a design.
+
+Aspect of Boundary optimization 
+
+Placement Algorithms: Boundary optimization involves using placement algorithms to determine the optimal physical location of each module on the chip's layout. These algorithms consider factors like signal interconnect lengths, wire delays, and minimizing congested areas on the chip.
+
+Routing Considerations : After placement, routing algorithms are used to create the physical wires that connect the module boundaries. Proper routing is essential for meeting timing constraints and minimizing power consumption.Following manhattan algorithm
+
+Design Rules : Boundary optimization must adhere to manufacturing design rules and constraints imposed by the semiconductor fabrication process. These rules govern factors like minimum feature sizes, metal layers, and spacing requirements to ensure the manufacturability of the chip.
+
+Boundary optimization is often an iterative process. Designers may need to make trade-offs between area, power, and timing to achieve the desired performance goals.
+
+**Lab**
+
+RTL Design code
+```
+module check_boundary (input clk , input res , input [3:0] val_in , output reg [3:0] val_out);
+wire en;
+internal_module u_im (.clk(clk) , .res(res) , .cnt_roll(en));
+
+always @ (posedge clk , posedge res)
+begin
+	if(res)
+		val_out <= 4'b0;
+	else if(en)
+		val_out <= val_in;	
+end
+endmodule
+
+module internal_module (input clk , input res , output cnt_roll);
+reg [2:0] cnt;
+
+always @(posedge clk , posedge res)
+begin
+	if(res)
+		cnt <= 3'b0;
+	else
+		cnt <= cnt + 1;
+end
+
+assign cnt_roll = (cnt == 3'b111);
+
+endmodule
+```
+Loading the design and compiling
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/89704c5a-1ad4-49cd-bc55-889cf0244d16)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/61707ba0-e51d-4adb-8374-d096c8c57f32)
+
+No boundary , Entire design is optimized
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6cb01c28-b2a4-46be-9c70-e8f73a7234c8)
+
+If we don't want boundary optimization then we need to use the below command
+
+**set_boundary_optimization <name_pin> false**
+
+example : *set_boundary_optimization u_im false*
+
+The following image shows the design with hierarchical module u_im in the design.
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/222527eb-dadb-4e9f-a4ae-7bff62509b65)
+
+**Register Retiiming**
+
+Register retiming is a technique used in design to optimize the performance of digital circuits by rearranging the registers in the circuit without changing its functionality. The primary goal of register retiming is to minimize the critical path delay, which is the longest path in the circuit from an input to an output.
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2223e83c-614e-4563-aa4e-977952db5716)
+
+
+Command used for retiming in the synthesis
+```
+compile_ultra -retime
+```
+
+**Lab**
+
+Consider a example in which a 4-bit multiplier multiplying two 4-bit numbers and three 8-bit registers through which data is propagated to output.
+
+```
+module check_reg_retime (input clk , input [3:0] a, input [3:0] b , output [7:0] c , input reset);
+
+wire [7:0] mult;
+assign mult = a * b;
+reg [7:0] q1;
+reg [7:0] q2;
+reg [7:0] q3;
 
 
 
+
+always @ (posedge clk , posedge reset)
+begin
+	if(reset)
+	begin
+		q1 <= 8'b0;
+		q2 <= 8'b0;
+		q3 <= 8'b0;
+	end
+	else
+	begin
+		q1 <= mult;
+		q2 <= q1;
+		q3 <= q2;
+	end
+end
+assign c = q3;
+
+endmodule
+```
+
+Reading the design 
+
+
+
+The schematic before retime
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/70c81ab7-1ed8-402e-b6a6-0a97a13518d4)
+
+After giving constraint to the design with the given specs when we give report_timing we get violated report on the input side of design
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/69942cc8-bbf6-4c64-be1f-085c60ea0f22)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/c279844e-8996-428f-8555-07aab4314484)
+
+In order to rectify this we retime it using following command
+
+**compile_ultra -retime**
+
+The violation are reduces and is now only on output path
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/cdbf2dbd-93b0-4cea-86c0-5d2e2140549a)
+
+The multiplier used in this has the following design
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/700bc775-9cb0-4c05-8946-f0685c85339d)
+
+
+**Isolating Output ports**
+
+In VLSI isolating output ports often refers to ensuring that the output signals of a circuit or module are properly isolated and do not interfere with each other or with other parts of the system. This isolation is crucial for maintaining signal integrity, reducing noise, and preventing unintended interactions.
+
+Output port isolation in VLSI design:
+
+1. **Output Ports**: In VLSI design, an integrated circuit typically includes multiple output ports, which are points where the circuit provides data or information to the external world. These output ports can be connected to various external devices or other parts of the circuit.
+
+2. **Signal Integrity**: In a complex IC, signals on different output ports may have different requirements, such as timing, voltage levels, and signal quality. Undesirable interactions between these signals can lead to signal integrity issues, including noise, glitches, and crosstalk.
+
+3. **Output Port Isolation**: Output port isolation is the practice of designing the circuit in such a way that the signals on one output port do not interfere with or affect the signals on another output port. This is achieved by implementing various isolation techniques:
+
+   - **Physical Separation**: Physically separating the output buffers associated with different output ports can reduce the chances of signal interference. This may involve placing output buffers in different areas of the chip or on separate metal layers.
+
+   - **Buffer Design**: Careful selection of buffer types and configurations can help reduce interference. For example, using differential signaling (such as LVDS or differential ECL) can improve noise immunity compared to single-ended signaling.
+
+   - **Shielding**: Adding shielding structures, such as metal layers or well-taps, around sensitive output ports can help block electromagnetic interference (EMI) and minimize crosstalk.
+
+   - **Timing Constraints**: Properly defining and enforcing timing constraints for different output ports can prevent timing violations and ensure that signals do not overlap or cause setup and hold time violations.
+
+Consider a below example, which contains more number of outputs to be connected after implementation of design, this may cause a violation of internal delays as cell delay is a function of load capacitance. Inorder to avoid internal failure, we isolate by inserting a buffer at output port. So, the buffer drives the external load.Now, the internal paths are decoupled from output paths.
+
+![image](https://github.com/AbhishekChinchani/Samsung_pd/assets/142480501/c0ccce07-236a-4fa6-bd14-c783b30961f3)
+
+
+**Lab**
+
+RTL Design code
+```ruby
+module check_boundary (input clk , input res , input [3:0] val_in , output reg [3:0] val_out);
+wire en;
+internal_module u_im (.clk(clk) , .res(res) , .cnt_roll(en));
+
+always @ (posedge clk , posedge res)
+begin
+	if(res)
+		val_out <= 4'b0;
+	else if(en)
+		val_out <= val_in;	
+end
+endmodule
+
+
+module internal_module (input clk , input res , output cnt_roll);
+reg [2:0] cnt;
+
+always @(posedge clk , posedge res)
+begin
+	if(res)
+		cnt <= 3'b0;
+	else
+		cnt <= cnt + 1;
+end
+
+assign cnt_roll = (cnt == 3'b111);
+
+endmodule
+```
+
+The Design before isolating the ports 
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_sch_dv_zoom.png">
+
+The timing report before isolating ports
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_report_withoutbuf.png">
+
+The command for isolating ports
+
+*set_isolate_ports -type buffer \[all_outputs]*
+
+The Design after isolating the ports
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_sch_withb.png">
+
+The timing report after isolating the port
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_report_withbuf_reg0d.png">
+
+
+
+**Multicycle path**
+
+A multicycle path in VLSI (Very Large Scale Integration) design refers to a timing path within a digital circuit where a signal takes multiple clock cycles to propagate from a source register (or flip-flop) to a destination register. This is in contrast to a single-cycle path where the signal must propagate and settle within a single clock cycle.
+
+Multicycle paths are typically encountered in digital designs when specific timing constraints or requirements allow for signals to have longer propagation delays. These paths are often used for various purposes, including achieving certain functionalities, optimizing critical paths, or accommodating variations in clocking schemes.
+
+
+For a single cycle path, the setup check is done at the consecutive edge of the flop and hold is done at the same edge of the flop. Hold is always checked edge before setup. For a half cycle path, the setup check is done at the subsequent fall edge of the flop and hold is done at the previous falling edge of the flop. In a half cycle path, setup is very stringent and hold is relaxed. Fir a multicycle path, the -setup switch specifies the number of cycles after the launch edge, it needs to check setup and the -hold switch specifies the number of cycles the launch edge moves to check with capture.
+
+**Lab**
+
+The RTL design code 
+```ruby
+module mcp_check (input clk , input res  , input [7:0] a , input [7:0] b, input en , output reg [15:0] prod);
+
+reg valid; 
+
+always @ (posedge clk , posedge res)
+begin
+	if(res)
+		valid <= 1'b0;
+	else 
+		valid <= en;
+end
+
+
+
+always @ (posedge clk , posedge res)
+begin
+	if(res)
+		prod <= 16'b0;
+	else if (valid)
+		prod <= a * b;
+end
+
+endmodule
+```
+
+The tcl file for constraints
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_tcl35.png">
+
+The report before optimization
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_viol_heavy.png">
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_viol_heavy_with_compile.png">
+
+Now using the command 
+
+set_multicycle_path -setup 2 -to prod_reg\[*]/D -from \[all_inputs] 
+
+The input report timing 
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_prodregd.png">
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_prodregdtoinp.png">
+
+When we give report_timing -delay min we get the violated report as we have only optimized setup path and not hold path
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_min.png">
+
+Then optimizing the hold path by the following command
+
+set_multicycle_path -hold 1 -to prod_reg\[*]/D -from \[all_inputs] -to prod_reg\[*]/D 
+
+report_timing after optimizing hold path
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_min_met.png">
+
+But the output slack is not met , because high load on the output side
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_outload_viol_rep.png">
+
+By isolating the port we can rectify this
+
+<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_final_met.png">
+
+
+**False_paths**
+
+In VLSI  design and digital circuit timing analysis, *False paths* refer to paths within the circuit that, while physically existent, do not need to meet timing constraints. These paths are "false" in the sense that they are not relevant for circuit operation or performance, and as such, they are ignored during timing analysis. False paths are important to identify because they can significantly simplify the timing analysis process, making it more efficient and accurate.
+
+</details>
 
 
 </details>
