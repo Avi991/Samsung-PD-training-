@@ -2702,13 +2702,9 @@ begin
 		q <= q1;
 	end
 end
-
 endmodule
-```
-
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/83915d25-3f94-47ba-855f-fc1499a9872e)
-
-
+```
 </details>
 
 <details>
@@ -2731,7 +2727,6 @@ Boundary optimization is often an iterative process. Designers may need to make 
 **Lab**
 
 RTL Design code
-
 ```
 module check_boundary (input clk , input res , input [3:0] val_in , output reg [3:0] val_out);
 wire en;
@@ -2760,7 +2755,7 @@ end
 assign cnt_roll = (cnt == 3'b111);
 
 endmodule
-```
+
 Loading the design and compiling
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/89704c5a-1ad4-49cd-bc55-889cf0244d16)
@@ -2768,7 +2763,6 @@ Loading the design and compiling
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/61707ba0-e51d-4adb-8374-d096c8c57f32)
 
 No boundary , Entire design is optimized
-
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6cb01c28-b2a4-46be-9c70-e8f73a7234c8)
 
 If we don't want boundary optimization then we need to use the below command
@@ -2790,7 +2784,7 @@ Command used for retiming in the synthesis
 ```
 compile_ultra -retime
 ```
-ame
+
 **Lab**
 
 Consider a example in which a 4-bit multiplier multiplying two 4-bit numbers and three 8-bit registers through which data is propagated to output.
