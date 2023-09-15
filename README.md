@@ -2873,13 +2873,14 @@ Output port isolation in VLSI design:
 
 Consider a below example, which contains more number of outputs to be connected after implementation of design, this may cause a violation of internal delays as cell delay is a function of load capacitance. Inorder to avoid internal failure, we isolate by inserting a buffer at output port. So, the buffer drives the external load.Now, the internal paths are decoupled from output paths.
 
-![image](https://github.com/AbhishekChinchani/Samsung_pd/assets/142480501/c0ccce07-236a-4fa6-bd14-c783b30961f3)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/abeb0616-c238-47ef-b881-0af045e2a337)
+
 
 
 **Lab**
 
 RTL Design code
-```ruby
+```
 module check_boundary (input clk , input res , input [3:0] val_in , output reg [3:0] val_out);
 wire en;
 internal_module u_im (.clk(clk) , .res(res) , .cnt_roll(en));
@@ -2912,39 +2913,36 @@ endmodule
 
 The Design before isolating the ports 
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_sch_dv_zoom.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f5cac34c-226f-475c-9405-0f27804b643a)
 
 The timing report before isolating ports
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_report_withoutbuf.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/cab91262-12e8-4d5d-8d26-6ffb006d3325)
 
 The command for isolating ports
 
-*set_isolate_ports -type buffer \[all_outputs]*
+**set_isolate_ports -type buffer \[all_outputs]**
 
 The Design after isolating the ports
-
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_sch_withb.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7dd7ea74-0d7e-4029-a071-f4612c956464)
 
 The timing report after isolating the port
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab7a_report_withbuf_reg0d.png">
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/68bdeff5-b694-4698-9e0c-1367b2b19e6d)
 
 
 **Multicycle path**
 
-A multicycle path in VLSI (Very Large Scale Integration) design refers to a timing path within a digital circuit where a signal takes multiple clock cycles to propagate from a source register (or flip-flop) to a destination register. This is in contrast to a single-cycle path where the signal must propagate and settle within a single clock cycle.
+A multicycle path in design refers to a timing path within a digital circuit where a signal takes multiple clock cycles to propagate from a source register (or flip-flop) to a destination register. This is in contrast to a single-cycle path where the signal must propagate and settle within a single clock cycle.
 
 Multicycle paths are typically encountered in digital designs when specific timing constraints or requirements allow for signals to have longer propagation delays. These paths are often used for various purposes, including achieving certain functionalities, optimizing critical paths, or accommodating variations in clocking schemes.
 
-
-For a single cycle path, the setup check is done at the consecutive edge of the flop and hold is done at the same edge of the flop. Hold is always checked edge before setup. For a half cycle path, the setup check is done at the subsequent fall edge of the flop and hold is done at the previous falling edge of the flop. In a half cycle path, setup is very stringent and hold is relaxed. Fir a multicycle path, the -setup switch specifies the number of cycles after the launch edge, it needs to check setup and the -hold switch specifies the number of cycles the launch edge moves to check with capture.
+For a single cycle path, the setup check is done at the consecutive edge of the flop and hold is done at the same edge of the flop. Hold is always checked edge before setup. For a half cycle path, the setup check is done at the subsequent fall edge of the flop and hold is done at the previous falling edge of the flop. In a half cycle path, setup is very tight and hold is relaxed. For a multicycle path, the -setup switch specifies the number of cycles after the launch edge, it needs to check setup and the -hold switch specifies the number of cycles the launch edge moves to check with capture.
 
 **Lab**
 
 The RTL design code 
-```ruby
+```
 module mcp_check (input clk , input res  , input [7:0] a , input [7:0] b, input en , output reg [15:0] prod);
 
 reg valid; 
@@ -2972,50 +2970,76 @@ endmodule
 
 The tcl file for constraints
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_tcl35.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9d0ab020-0de3-40f1-98a4-acd8cd053dda)
 
 The report before optimization
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_viol_heavy.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/bbdd170d-16e3-4531-bbf6-c683b2daabc7)
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_viol_heavy_with_compile.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8a86403a-a3f2-4779-b230-fa9e6ab975e8)
 
 Now using the command 
 
-set_multicycle_path -setup 2 -to prod_reg\[*]/D -from \[all_inputs] 
+**set_multicycle_path -setup 2 -to prod_reg\[*]/D -from \[all_inputs]**
 
 The input report timing 
-
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_prodregd.png">
-
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_prodregdtoinp.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/656e8fdd-1154-403d-bde0-603e10630149)
 
 When we give report_timing -delay min we get the violated report as we have only optimized setup path and not hold path
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_min.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b0f1c73a-a885-4c13-aaa8-3bb81bb6b68e)
 
 Then optimizing the hold path by the following command
 
 set_multicycle_path -hold 1 -to prod_reg\[*]/D -from \[all_inputs] -to prod_reg\[*]/D 
 
 report_timing after optimizing hold path
-
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_rep_min_met.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0c6d50bb-9aa2-4d79-8a04-87313a61460d)
 
 But the output slack is not met , because high load on the output side
-
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_outload_viol_rep.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/070308f6-d44a-4207-87ff-27be0470f1b9)
 
 By isolating the port we can rectify this
 
-<img  width="1085" alt="hand_writ_exam" src="https://github.com/AbhishekChinchani/Samsung_pd/blob/5959a04f9aaf466128753d1e090a12cef3096ac5/day9/lab8_final_met.png">
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/33941330-c0b5-4666-80a3-3a6df20600bf)
 
+**FALSE PATH**
 
-**False_paths**
+A false path constraint is a timing constraint used in design during synthesis to inform the synthesis tool that a particular path in the design should not be considered for timing analysis. False path constraints are applied to paths that are not relevant for the overall functionality or timing of the circuit, and they help improve synthesis and optimization results by excluding these paths from the timing analysis process. False path constraints are especially useful when dealing with paths that are not critical to the circuit's operation and should not be optimized for timing.
 
-In VLSI  design and digital circuit timing analysis, *False paths* refer to paths within the circuit that, while physically existent, do not need to meet timing constraints. These paths are "false" in the sense that they are not relevant for circuit operation or performance, and as such, they are ignored during timing analysis. False paths are important to identify because they can significantly simplify the timing analysis process, making it more efficient and accurate.
+Here's how you can apply a false path constraint using Synopsys Design Constraints (SDC),  command:
 
-</details>
+**SDC Command for Applying a False Path Constraint:**
 
+```tcl
+set_false_path -from <source_pins> -to <destination_pins> [-through <through_pins>]
+```
 
+- `set_false_path`: This command is used to specify that a particular path should be treated as a false path.
+
+- `-from <source_pins>`: Replace `<source_pins>` with the list of source pins or elements for the path you want to designate as a false path. These are typically the output pins of certain elements in your design.
+
+- `-to <destination_pins>`: Replace `<destination_pins>` with the list of destination pins or elements for the path you want to designate as a false path. These are typically the input pins of certain elements in your design.
+
+- `-through <through_pins>` (optional): If you want to specify that the path is a false path only when it goes through specific pins or elements, you can use this option to specify those pins or elements.
+
+**Explanation:**
+A false path constraint is applied to tell the synthesis tool and timing analysis tools (like static timing analyzers) that a particular path should be ignored during timing analysis. This means that the tools will not consider this path when calculating setup times, hold times, or other timing characteristics.
+
+False paths are often used for the following reasons:
+
+1. **Irrelevant Paths**: In complex designs, there may be paths that are not critical for the circuit's operation, such as debug paths, bypass paths, or paths that are intentionally designed for slower operation. Applying a false path constraint allows you to exclude these paths from timing analysis.
+
+2. **Optimization Control**: By marking certain paths as false paths, you can prevent the synthesis tool from applying aggressive optimization techniques that might negatively impact the circuit's performance. This is especially useful when dealing with sensitive paths that should not be overly optimized.
+
+3. **Tool Efficiency**: Excluding non-critical paths from timing analysis can improve tool efficiency and reduce analysis time, especially in large designs.
+
+ Apply a false path constraint in SDC:
+
+```tcl
+# Specify that the path from the output "output_reg" to the input "input_reg" is a false path
+set_false_path -from [get_pins output_reg/Q] -to [get_pins input_reg/D]
+```
+
+In this example, the `output_reg` and `input_reg` represent the source and destination registers of the false path, respectively. The `-from` and `-to` options specify the pins of these registers. By applying this false path constraint, you inform the synthesis tool that this particular path should not be considered for timing analysis, helping you achieve better control and optimization of your design.
 </details>
