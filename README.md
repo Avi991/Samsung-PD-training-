@@ -2704,7 +2704,7 @@ begin
 end
 endmodule
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/83915d25-3f94-47ba-855f-fc1499a9872e)
-```
+
 </details>
 
 <details>
@@ -2755,7 +2755,7 @@ end
 assign cnt_roll = (cnt == 3'b111);
 
 endmodule
-
+```
 Loading the design and compiling
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/89704c5a-1ad4-49cd-bc55-889cf0244d16)
@@ -2781,9 +2781,9 @@ Register retiming is a technique used in design to optimize the performance of d
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2223e83c-614e-4563-aa4e-977952db5716)
 
 Command used for retiming in the synthesis
-```
-compile_ultra -retime
-```
+
+**compile_ultra -retime**
+
 
 **Lab**
 
@@ -2992,9 +2992,7 @@ Here's how you can apply a false path constraint using Synopsys Design Constrain
 
 **SDC Command for Applying a False Path Constraint:**
 
-```tcl
 set_false_path -from <source_pins> -to <destination_pins> [-through <through_pins>]
-```
 
 - `set_false_path`: This command is used to specify that a particular path should be treated as a false path.
 
@@ -3017,16 +3015,11 @@ False paths are often used for the following reasons:
 
  Apply a false path constraint in SDC:
 
-```tcl
+tcl
 # Specify that the path from the output "output_reg" to the input "input_reg" is a false path
-set_false_path -from [get_pins output_reg/Q] -to [get_pins input_reg/D]
-```
+set_false_path -from \[get_pins output_reg/Q] -to \[get_pins input_reg/D]
+
 
 In this example, the `output_reg` and `input_reg` represent the source and destination registers of the false path, respectively. The `-from` and `-to` options specify the pins of these registers. By applying this false path constraint, you inform the synthesis tool that this particular path should not be considered for timing analysis, helping you achieve better control and optimization of your design.
 </details>
 
-</details>
-
-
-
-</details>
