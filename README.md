@@ -3226,3 +3226,42 @@ By using the `-max paths -nworst` options, you can quickly focus on the most cri
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6b67bba0-d0bf-43e8-b99d-e29397ec5e00)
 
 </details>
+
+## Day-11 SOC
+ <details>
+ <summary>SoC</summary>
+**Describing chip used in Oneplus Nord CE 2 LITE is Snapdragon 695**
+
+The Qualcomm Snapdragon 695 is a mid-range mobile system-on-a-chip (SoC) designed and manufactured by Qualcomm. It was announced in 2021 and was part of Qualcomm's Snapdragon 6-series, which is known for offering a good balance between performance and power efficiency.
+
+**CPU Architecture:**
+The Snapdragon 695 features a  Qualcomm Kryo 619 CPU, which is an octa-core processor.It features 8 Kryo 660 called cores (64-Bit capable) that are divided in two clusters. A fast cluster of two cores with up to 2.2 GHz based on the ARM Cortex-A78 design. Compared to the previous SD690, the SD695 is now manufactured in 6nm (instead of 8nm) and offers a higher clocked performance cluster. However, the SD695 only supports Wi-Fi 5 instead of Wi-Fi 6 of the SD690.  It's divided into two clusters:
+
+ **1x high-performance core**: This core is designed to handle demanding tasks and offers high single-threaded performance.
+ **1x power-efficient core**: This core is optimized for power efficiency to handle light tasks and improve battery life.
+ **6x power-efficient cores**: These cores are used for general-purpose computing and background tasks, balancing performance and efficiency.
+
+**GPU:**
+he Qualcomm Adreno 619 is a mobile graphics card for mid-range smartphones and tablets (mostly Android based). It is included in the Qualcomm Snapdragon 750G SoCs and based on the Adreno 600 architecture (like the Adreno 630, which should be fully compatible in software). The performance is 60% better compared to the Adreno 612 graphics card and in our benchmarks on par with the 700 series cards.
+
+**Connectivity:**
+In addition to the 8 CPU cores, the SoC integrates a lower mid range Adreno 619 GPU, a X51 5G radio (up to 2.5 Gbits download, no mmWave), a 802.11ac (Wi-Fi 5, 8x8 sounding, Dual Band, 2x2), a Bluetooth 5.2 radio, satellite positioning (GPS, QZSS, GLONASS, SBAS, Beidou and Galileo) and a video engine (support for H.265, H.264, VP8 and VP9).
+
+**AI and Machine Learning:**
+The Snapdragon 695 includes an AI Engine that supports on-device AI and machine learning tasks.long-standing prowess in AI is thoughtfully incorporated into the Snapdragon 695, steering enhancements from smart imaging techniques to predictive user-interface responses.It can handle functions like image recognition, voice recognition, and various AI-driven enhancements for camera and gaming experiences.
+
+**Camera and Multimedia:**
+The SoC supports cameras with impressive capabilities. It can handle up to a 108-megapixel single camera or a 36-megapixel dual-camera setup. It also supports 4K video capture and playback, HDR10+ content, and HEIF image format for efficient storage.
+
+**Display Support:**
+The Snapdragon 695 supports Full HD+ displays with high refresh rates, making it suitable for mid-range smartphones with smooth and responsive screens.
+
+**Battery Efficiency:**
+Qualcomm's chipsets are known for their power efficiency, and the Snapdragon 695 is no exception. The combination of CPU and GPU cores, AI optimizations, and the integrated 5G modem is designed to strike a balance between performance and battery life.
+
+**Manufacturing Process:**
+Depending on the exact model of processor CPUs are built using 6nm tech node
+
+
+
+</details>
