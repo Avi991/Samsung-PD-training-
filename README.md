@@ -3023,3 +3023,206 @@ set_false_path -from \[get_pins output_reg/Q] -to \[get_pins input_reg/D]
 In this example, the `output_reg` and `input_reg` represent the source and destination registers of the false path, respectively. The `-from` and `-to` options specify the pins of these registers. By applying this false path constraint, you inform the synthesis tool that this particular path should not be considered for timing analysis, helping you achieve better control and optimization of your design.
 </details>
 
+
+## Day-10-Quality Checks
+
+<details>
+ <summary> Introduction </summary>
+
+**Sanity checks:**
+
+Sanity checks in VLSI serve as a checkpoint to decide whether the testing for design-build may proceed or not. The main purpose of this testing is to ensure that the changes or planned features are operating as intended. To ensure that the input received from the library team and synthesis team is correct or not. If we are not doing these checks then it creates problems in later stages of design.
+
+      Design/netlist checks
+      SDC checks
+     Library checks
+
+Design checks:
+To check if current design is consistent or not
+It checks the quality of netlist and identifies:
+      
+       Undriven input ports
+       Unloaded outputs
+       Floating pins
+       Multidriven nets 
+       Unconstrained pins 
+       Pin mismatch counts between an instance and its reference
+       Tristate buses with non-tristate drivers
+       Wire loops across hierarchies
+ 
+ **check_design** command 
+ 
+Checks for multi driven nets, floating nets/pins, empty modules.
+Pins mismatch, cells or instances without I/O pins/ports etc. 
+
+SDC Checks:
+
+* If any unconstrained paths exist in the design then PNR tool will not optimize that path, so these checks are used to report unconstrained paths 
+* Checks whether the clock is reaching to all the clock pin of the flip-flop.
+* Check if multiple clock are driving same registers
+* Check unconstrained endpoints 
+* Port missing input/output delay.
+* Port missing slew/load constraints.
+
+**check_timing** command
+
+Library checks:
+
+It checks the quality of Physical and logical library
+
+**check_library**
+This command shows the library type & its version, units of time, capacitance, leakage power, and current. It shows the number of cells missing, the number of metal or pins missing in the physical and logical library.
+
+
+**Propagation Delay :**
+Propagation delay, in the context of digital electronics and integrated circuits, refers to the time it takes for an electrical signal to travel from the input of a digital logic gate or circuit to its output. It is a critical parameter in digital design because it affects the speed and performance of the circuit. Propagation delay is typically measured in time units, such as nanoseconds (ns) or picoseconds (ps), and it depends on various factors, including the specific technology used, the length of interconnecting wires, and the complexity of the circuit.
+
+**Rising Edge Propagation Delay (tplh)**: This is the time it takes for the output signal to transition from a low (0) to a high (50% of Vdd crossing) level after the input signal has made a similar transition.
+
+**Falling Edge Propagation Delay (tphl)**: This is the time it takes for the output signal to transition from a high (50% of Vdd crossing) to a low (0) level after the input signal has made a similar transition.
+
+##Some Command Usage
+
+
+Before using those commands some basic steps
+
+In Design Compiler tool  we load our design, and we check the design
+
+Ensure that you have compiled your design with the necessary constraints files.
+
+Run the timing analysis by entering the **report_timing** command in the Design Compiler command-line interface. Here's a basic syntax:
+
+   report_timing -from <source> -to <destination>
+   
+   You can also add additional options and constraints to refine the analysis, such as specifying clock constraints, input delays, and output delays.
+
+ **View the Report**: Design Compiler will generate a timing report that includes information about setup time, hold time, clock-to-q delays, and more. You can view this report in the shell or append it to a file for complete scenario
+
+Here's a simplified example of how to use the `report_timing` command:
+
+
+# Analyze the timing from input signal A to output signal Z
+report_timing -from A -to Z
+
+By using the `report_timing` command, you can look for timing violations and make necessary optimizations to meet your design's timing requirements, ensuring that it is functioning correctly at the specified clock frequency.
+
+The `report_timing` command in Synopsys Design Compiler is a powerful tool for analyzing the timing characteristics of a synthesized digital design. It provides various options to specify which timing paths or constraints you want to analyze. Let's break down the key options you mentioned:
+
+1. `-from <source>`: Start point for timing analysis. You can use a specific signal name or a logical expression to define the source. For example:
+
+  **report_timing -from input_IN**
+
+   This command will analyze timing paths starting from the signal named input_IN.
+
+3. `-to <destination>`: This option specifies the destination signal or path up to which you want to analyze timing. Similar to the `-from` option, you can use a signal name or logical expression. For example:
+
+ **report_timing -to output_OUT**
+
+  This command will analyze timing paths up to the signal named `output_Z`.
+
+**-fall_from <source>` and `-rise_from <source>** These options allow you to specify whether you want to analyze falling-edge or rising-edge timing paths from the given source. Timing analysis often considers both rising and falling edges of a clock signal, so you can use these options to focus on one edge if needed. For example:
+
+   report_timing -fall_from clk -to output_Q
+
+   This command will analyze falling-edge timing paths from the clock signal to the output signal output_Q.
+
+`-delay_type max/min`: These options specify whether you want to report the maximum or minimum delay for the timing paths being analyzed. Depending on your design goals, you may want to optimize for maximum delay (worst-case performance) or minimum delay (best-case performance). For example:
+
+   report_timing -from input_IN -to output_OUT -delay_type max
+   
+This command will report the maximum delay from `input_IN` to `output_OUT`.
+
+Now, let's combine these options in a more comprehensive example:
+
+```
+# Analyze the maximum falling-edge delay from input IN to output OUT
+report_timing -fall_from input_A -to output_Z -delay_type max
+```
+
+In this command, we are specifically interested in the worst-case (maximum) falling-edge delay from input_IN to output_OUT. This information can help identify critical timing paths that may need optimization to meet your design's performance requirements.
+
+By using various combinations of these options, you can customize your timing analysis to focus on specific aspects of your design and identify potential timing violations or optimization opportunities.
+
+The `report_timing` command with the `-max paths -nworst` options in Synopsys Design Compiler is used to report the paths with the maximum (worst-case) timing delays in a digital design. This command is particularly useful for identifying the most critical timing paths in your design, which can be crucial for meeting your design's performance requirements. Let's break down this command and explain its usage:
+
+
+`report_timing`: This is the main command for timing analysis in Design Compiler.
+
+`-max paths`: This option instructs Design Compiler to report the paths with maximum delays. 
+
+`-nworst`: This option specifies how many of the worst-case paths you want to report. You can specify a numerical value to limit the number of paths reported. For example, `-nworst 3` will report the 3 sluggiest paths.
+
+
+   ```shell
+   report_timing -max paths -nworst <number_of_paths>
+   ```
+
+<number_of_paths> : Specify the number of worst-case paths you want to report.
+
+4. **View the Report**: Design Compiler will generate a report listing the specified number of paths with the longest delays. This report will include information about the paths' starting points, ending points, and the timing constraints.
+
+ To use the `report_timing -max paths -nworst` command:
+
+```shell
+# Report the 5 worst-case timing paths in the design
+report_timing -max paths -nworst 5
+```
+
+In this example, the command will identify and report the five paths in your design with the maximum delays. Helps in location critical paths in your design that may require optimization 
+
+By using the `-max paths -nworst` options, you can quickly focus on the most critical timing paths in your design, allowing you to prioritize optimization efforts and make informed decisions about your design's overall performance.
+
+ **Report Many Critical Paths**:
+
+   ```shell
+   # Report the 20 worst-case timing paths in the design
+   report_timing -max paths -nworst 20
+   ```
+</details>
+
+<details>
+ <summary> LABs </summary>
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d4c10d72-f176-437c-8445-285de2905cff)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/11f9cd6f-cf0d-4de4-bcc0-e58309184568)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/67800a72-fc3b-4c87-8615-581ab3f3eaaf)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f280b6b0-7c6f-48fc-91d4-c2bd5c694270)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/eaf62a75-567a-4866-9edf-ca993c5b18ee)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9c13f691-7931-4e2e-964c-e2f1f2d8ef13)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b1a6aeda-0002-485e-81d1-afdd35cd72c3)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/27776866-b4a9-4040-a35f-18c7e938fd5f)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/509e8789-23d9-46b6-8efa-a687df30f143)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/bfee4a44-7d76-4062-95ef-d95325bff53a)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f303d70a-68e6-464f-a408-1ca21b0de225)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/56d946cf-d648-45ec-8165-35b39c58d0ff)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/1f6dbaa9-ee36-4291-b1e2-fb9f9515c8a5)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7ecfc2fd-754e-4cd5-872b-d658f59b5b61)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a3d33dd4-a49e-4805-b13a-e5e3cf1fd74f)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/25c34e32-4698-49e7-b67a-94eaaecf6c18)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/4a632416-1375-4bd0-97e3-afda4e6b7c2c)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/c13bd022-5499-4e2e-bb1b-714c668f0785)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b52bdb5b-8e60-4d47-bf83-ba6c037b0ca7)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/fb5d85a5-4c1b-4b78-9f6e-7eee425abbd2)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6b67bba0-d0bf-43e8-b99d-e29397ec5e00)
+
+</details>
