@@ -3306,6 +3306,57 @@ always #10 clk = ~clk;
 always #100 reset=0;
 endmodule
 ```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/66ea92aeb518fad0ed29622de9034fe2189ab2cc/Samsung_PD_%23day11/4(up%20counter).png">
 
+**DAC**
+TO model DAC commands used :-
 
+```
+iverilog avsddac.v avsddac_tb_test.v
+./a.out
+gtkwave avsddac_tb_test.vcd
+```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/66ea92aeb518fad0ed29622de9034fe2189ab2cc/Samsung_PD_%23day11/2(dac%20wave%20sim).png">
+
+**PLL**
  
+To model PLL commands used are:-
+```
+iverilog avsd_pll_1v8.v pll_tb.v
+./a.out
+gtkwave test.vcd
+```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/66ea92aeb518fad0ed29622de9034fe2189ab2cc/Samsung_PD_%23day11/1(pll%20wave%20sim).png">
+
+**RVMYTH**
+For rvmyth following is the command:-
+	
+```
+iverilog mythcore_test.v tb_mythcore_test.v 
+./a.out
+gtkwave tb_mythcore_test.vcd
+```
+```
+[aviral.s@ssirlab03 module]$ iverilog mythcore_test.v tb_mythcore_test.v 
+[aviral.s@ssirlab03 module]$ ./a.out
+VCD info: dumpfile tb_mythcore_test.vcd opened for output.
+[aviral.s@ssirlab03 module]$ gtkwave tb_mythcore_test.vcd
+```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/66ea92aeb518fad0ed29622de9034fe2189ab2cc/Samsung_PD_%23day11/3(mythcore%20wave%20simn).png">
+
+**VSDBABY SOC TOP MODULE**
+
+Interfacing all the modules following is the command:-
+```
+iverilog vsdbabysoc.v testbench.v avsdpll.v avsddac.v mythcore_test.v
+./a.out
+gtkwave dump.vcd
+```
+```
+[aviral.s@ssirlab03 module]$ iverilog vsdbabysoc.v testbench.v avsdpll.v avsddac.v mythcore_test.v
+[aviral.s@ssirlab03 module]$ ./a.out
+VCD info: dumpfile dump.vcd opened for output.
+[aviral.s@ssirlab03 module]$ gtkwave dump.vcd
+```
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/66ea92aeb518fad0ed29622de9034fe2189ab2cc/Samsung_PD_%23day11/4(soc%20wave%20sim).png">
