@@ -3261,7 +3261,51 @@ Qualcomm's chipsets are known for their power efficiency, and the Snapdragon 695
 
 **Manufacturing Process:**
 Depending on the exact model of processor CPUs are built using 6nm tech node
-
-
-
 </details>
+
+## Day-11 SOC
+ <details>
+ <summary>BabySOC MODEL</summary>
+
+ **RTL code for UP_COUNTER**
+
+```
+module up_counter (input clk , input reset, output reg [2:0] count);
+always @ (posedge clk , posedge reset)
+begin
+	if(reset)
+		count <= 4'b000;
+	else
+		count <= count + 1;
+end
+endmodule
+```
+**TEST BENCH for UP_COUNTER**
+
+```
+`timescale 1ns / 1ps
+module tb_upcounter;
+	reg clk, reset;
+	wire [2:0] count;
+
+      	up_counter uut (
+		.clk(clk),
+		.reset(reset),
+		.count(count)
+	);
+
+	initial begin
+	$dumpfile("tb_upcounter.vcd");
+	$dumpvars(0,tb_upcounter);
+        clk = 0;
+	reset = 1;
+	#2000 $finish;
+	end
+
+always #10 clk = ~clk;
+always #100 reset=0;
+endmodule
+```
+
+
+ 
