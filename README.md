@@ -3623,4 +3623,7 @@ VCD info: dumpfile dump.vcd opened for output.
 
 ```
 <img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/7e1e88e6540185a13156cac1038bbc76cca755e5/Samsung_PD_%23Day13/2(top%20module).png">
+
+**TOP MODULE SCHEMATIC**
+<img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9465b6d02719cebc2b7abd6b3e09ef4b28efa20c/Samsung_PD_%23Day13/5(top%20module%20schematic).png">
 </details>
