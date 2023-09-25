@@ -3360,3 +3360,267 @@ VCD info: dumpfile dump.vcd opened for output.
 ```
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/66ea92aeb518fad0ed29622de9034fe2189ab2cc/Samsung_PD_%23day11/4(soc%20wave%20sim).png">
+
+</details>
+
+## Day-13-Post-Synthesis Simulation of BabySoC
+
+<details>
+<summary> Post-Synthesis Simulation </summary>
+
+**Synthesis:**
+It's the  process of transforming a high-level description of a hardware design into a lower-level representation that comprises logic gates and flip-flops. 
+
+**Pre-Synthesis:** 
+The pre-synthesis phase in digital circuit design is a critical step that occurs before the actual synthesis process. It involves several intermediate steps making the design ready for synthesis, which leads to the creation of the physical hardware. 
+
+**Post-Synthesis:** 
+The post-synthesis phase in digital circuit design occurs after the synthesis process has translated the high-level RTL (Register-Transfer Level) design into a gate-level representation. This phase further optimizes the design, ensuring that it meets performance, area, and power constraints.
+
+We perform the pre and post synthesis to figure out is there any simulation and synthesis mismatch.
+
+ **Pre-Synthesis Simulation**
+   - **Functionality Check**: Pre-synthesis simulation is primarily focused on verifying the logical functionality of the design. It checks whether the design operates as intended based on the high-level    RTL(Register Transfer Level) description.
+   - **Early Validation**: It allows designers to find and correct logical errors and functional issues before the design is synthesized. This is crucial for identifying and fixing design flaws early in     the development cycle, which can save a lot of time and resources.
+   - **Fast Execution**: Pre-synthesis simulations are usually faster than post-synthesis simulations because they don't consider gate-level delays and are working in tandem with the original RTL code.
+
+ **Post-Synthesis Simulation**
+   - **Timing Analysis**: Post-synthesis simulation considers gate-level delays, which means it takes into account the actual propagation delays of logic gates, interconnects, and other physical components. This helps in analyzing the timing behavior of the design.
+   - **Accurate Timing Violation Detection**: It can detect and report timing violations such as setup and hold time violations, clock-to-q delays, and other timing-related issues. This is essential for ensuring that the design meets the required performance criteria.
+   - **Power Analysis**: Post-synthesis simulations can also provide insights into power consumption, which is important for battery-powered or low-power designs.
+   - **Realistic Behavior**: It provides a more realistic view of how the design will behave once implemented in hardware.
+
+ **Mismatch Detection**
+   - Both pre-synthesis and post-synthesis simulations are used to detect mismatches, but they focus on different aspects. Pre-synthesis simulation can identify logical mismatches early in the design phase, while post-synthesis simulation helps identify timing-related mismatches and issues caused by incorrect usage of operators and inference of latches.
+
+In summary, pre-synthesis simulation is essential for early design validation and catching logical errors, while post-synthesis simulation is crucial for ensuring that the design meets timing requirements and for obtaining a realistic view of how the design will perform in hardware. Both types of simulation are complementary and necessary for a comprehensive design verification process.
+
+**GLS: a brief introduction:** <br>
+   **Gate Level Perspective**: The term "gate level" refers to the netlist representation of a circuit, generated through logic synthesis.
+
+   **Comprehensive Netlist**: The netlist view encompasses a detailed connection list that includes gates and IP models, complete with their functional and timing characteristics.
+   
+   **Simulation Environments**: RTL simulation operates within a zero-delay environment, where events primarily occur on the active clock edge. On the other hand, GLS can be configured for zero delay but      is often utilized in unit delay or full timing modes.
+
+**Conversion of .lib to .db** it's required so that DC could read the library properly
+
+Git cone all the .lib files then convert it in .db using lc_shell :
+
+**For PLL lib file**
+Commands:
+```
+lc_shell> read_lib avsdpll.lib
+Reading '/home/aviral.s/ws_2/VSDBabySoC/src/lib/avsdpll.lib' ...
+Error: Line 54, Cell 'avsdpll', The '//pin' attribute/group name cannot be specified here. (LBDB-76)
+Error: Line 58, Cell 'avsdpll', /home/aviral.s/ws_2/VSDBabySoC/src/lib/avsdpll.lib: syntax error on line 58 at or near '}'. (PARSE-1)
+Error: Line 66, Cell 'avsdpll', The '//pin' attribute/group name cannot be specified here. (LBDB-76)
+Error: Line 70, Cell 'avsdpll', /home/aviral.s/ws_2/VSDBabySoC/src/lib/avsdpll.lib: syntax error on line 70 at or near '}'. (PARSE-1)
+Error: Line 72, Cell 'avsdpll', The '//pin' attribute/group name cannot be specified here. (LBDB-76)
+Error: Line 76, Cell 'avsdpll', /home/aviral.s/ws_2/VSDBabySoC/src/lib/avsdpll.lib: syntax error on line 76 at or near '}'. (PARSE-1)
+Warning: Line 18, Cell 'avsdpll', The 'area' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_output_pin_rise_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_inout_pin_fall_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_inout_pin_rise_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_fanout_load' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_slope_rise' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_output_pin_fall_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_intrinsic_rise' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_slope_fall' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_intrinsic_fall' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_inout_pin_cap' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_input_pin_cap' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_output_pin_cap' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 19, Cell 'avsdpll', pin 'CLK', The 'CLK' Pin/bus on the 'avsdpll' cell has no 'function' attribute.
+	The cell becomes a black box. (LIBG-16)
+
+Technology library 'avsdpll' read successfully
+1
+lc_shell> write_lib avsdpll -format db -output avsdpll.db
+Wrote the 'avsdpll' library to '/home/aviral.s/ws_2/VSDBabySoC/src/lib/avsdpll.db' successfully
+1
+lc_shell> ls
+.   avsddac.db	 avsdpll.db
+```
+**For DAC lib file**
+commands:
+```
+ lc_shell> read_lib avsddac.lib
+Reading '/home/aviral.s/ws_2/VSDBabySoC/src/lib/avsddac.lib' ...
+Warning: Line 27, Cell 'avsddac', The 'area' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_output_pin_rise_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_inout_pin_fall_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_inout_pin_rise_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_fanout_load' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_slope_rise' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_output_pin_fall_res' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_intrinsic_rise' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_slope_fall' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 1, The 'default_intrinsic_fall' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_inout_pin_cap' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_input_pin_cap' attribute is not specified. Using 1.00. (LBDB-172)
+Warning: Line 1, The 'default_output_pin_cap' attribute is not specified. Using 0.00. (LBDB-172)
+Warning: Line 28, Cell 'avsddac', pin 'OUT', The 'OUT' Pin/bus on the 'avsddac' cell has no 'function' attribute.
+	The cell becomes a black box. (LIBG-16)
+Warning: Overwriting an old technology library '/home/aviral.s/ws_2/VSDBabySoC/src/lib/avsddac.db' file with a new one. (UIL-2)
+1
+lc_shell> write_lib avsddac -format db -output avsddac.db
+Wrote the 'avsddac' library to '/home/aviral.s/ws_2/VSDBabySoC/src/lib/avsddac.db' successfully
+1
+lc_shell> read_lib a
+avsddac.db
+```
+</details>
+
+<details>
+	<summary>Post-Synthesis of UP_COUNTER</summary> 
+
+ **Gate level Simulation of 3-bit UP_COUNTER** 
+
+The following are the sequence of steps for simulating the output:
+
+```
+iverilog <netlist_file_name> <testbench>
+./a.out
+gtkwave <vcd_file_name>
+
+module up_counter (input clk , input reset, output reg [2:0] count);
+always @ (posedge clk , posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+endmodule
+```
+**Synthesis of UP_COUNTER using DC shell:** 
+The following are the sequence of steps:
+```
+set target_library <path_of_the_target_library>
+set linl_library {* <path_of_the_target_library>}
+read_verilog <file_name.v>
+link
+compile_ultra
+write -f verilog -out up_counter_net.v // this file will be used when we'll simulate by dumping netlist and test bench of counter
+write -f ddc -out up_counter.ddc
+design_vision> read_ddc up_counter.ddc
+```
+<img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/7e1e88e6540185a13156cac1038bbc76cca755e5/Samsung_PD_%23Day13/3(up%20counter%20schematic).png">
+
+The 'iverilog' command utilizes the simulated gate-level netlist and the same testbench for post-synthesis simulation. 
+Running './a.out' generates a VCD format file corresponding to the netlist, which can be viewed using 'gtkwave'.
+
+```
+[aviral.s@ssirlab03 module]$ iverilog -DFUNCTIONAL -DUNIT_DELAY=#1 up_counter_net.v tb_up_count.v primitives.v sky130_fd_sc_hd.v 
+[aviral.s@ssirlab03 module]$ ./a.out
+VCD info: dumpfile tb_upcounter.vcd opened for output.
+[aviral.s@ssirlab03 module]$ gtkwave tb_upcounter.vcd
+
+GTKWave Analyzer v3.3.61 (w)1999-2014 BSI
+```
+
+The post-simulation output is as follows
+<img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/7e1e88e6540185a13156cac1038bbc76cca755e5/Samsung_PD_%23Day13/4(up%20counter%20gls).png">
+<img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/7e1e88e6540185a13156cac1038bbc76cca755e5/Samsung_PD_%23day11/4(up%20counter).png">
+Thus the exact match between the post-synthesis and pre-synthesis outputs verifies the logical correctness of the design.
+
+</details>
+
+<details>
+	<summary>Post Synthesis of BabySoC</summary>
+
+BabySoc consists of three blocks -
+1. RVMYTH
+2. DAC
+3. PLL
+Here only RVMYTH is synthesizable and not DAC nor PLL.
+
+We observe that the functionality remains consistent with the one compared to the pre-synthesis stage, where it calculates the sum of the first n natural numbers up to 1000 and then decrements in the same manner.
+The following are the sequence of steps:
+```ruby
+set target_library <path_of_the_target_library>
+set linl_library {* <path_of_the_target_library>}
+read_verilog mythcore_test.v
+link
+compile_ultra
+write -f verilog -out rvmyth_net.v
+```
+The netlist written here as 'out' represents the default output 'clk_gate' in the code. Hence, the 'current_design' is switched to 'core' and the resulting netlist is written out as follows: <br>
+```ruby
+current_design core
+write -f verilog -out rvmyth_net.v
+```
+The processor's output increments in the same manner as it did at the pre-synthesis stage, confirming the proper definition of logic. 
+The following commands are used to simulate the output waveform: <br>
+```ruby
+iverilog -DFUNCTIONAL -DUNIT_DELAY=#1 rvmyth_net.v tb_mythcore_test.v primitives.v sky130_fd_sc_hdd.v
+./a.out
+gtkwave tb_mythcore_test.vcd
+```
+
+**BabySoC post-synthesis:**
+As only RVMYTH is synthesizable, we proceed to synthesis 'rvmyth' and subsequently verify its functionality with 'DAC' and 'PLL'.
+The following are the sequence of steps:
+```
+set target_library <path_of_the_target_library>
+set link_library {* <path_of_the_target_library>}
+read_verilog mythcore_test.v
+link
+compile_ultra
+write -f verilog -out mythcore_test_net.v
+```
+```
+iverilog -DFUNCTIONAL -DUNIT_DELAY=#1 mythcore_test_net.v tb_mythcore_test.v primitives.v sky130_fd_sc_hdd.v
+./a.out
+gtkwave dump.vcd
+```
+```
+[aviral.s@ssirlab03 module]$ gvim mythcore_test_net.v 
+[aviral.s@ssirlab03 module]$ iverilog -DFUNCTIONAL -DUNIT_DELAY#1 mythcore_test_net.v tb_mythcore_test.v primitives.v sky130_fd_sc_hd.v
+sky130_fd_sc_hd.v:12660: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:15094: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:19219: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:20338: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:21433: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:22681: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:27547: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:28109: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:43415: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:43851: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:44336: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:44722: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:47083: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:58039: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:58705: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:59893: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:64750: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:66038: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:67597: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:68795: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:71161: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:75662: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:79254: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:82629: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:88346: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:94608: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:96192: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+sky130_fd_sc_hd.v:100184: warning: macro UNIT_DELAY undefined (and assumed null) at this point.
+[aviral.s@ssirlab03 module]$ gvim sky130_fd_sc_hd.v
+[aviral.s@ssirlab03 module]$ gvim sky130_fd_sc_hd.v
+[aviral.s@ssirlab03 module]$ iverilog -DFUNCTIONAL -DUNIT_DELAY=#1 mythcore_test_net.v tb_mythcore_test.v primitives.v sky130_fd_sc_hd.v
+[aviral.s@ssirlab03 module]$ ./a.out
+VCD info: dumpfile tb_mythcore_test.vcd opened for output.
+```
+<img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/7e1e88e6540185a13156cac1038bbc76cca755e5/Samsung_PD_%23Day13/1(mythcore%20sim%20wave).png">
+
+```
+[aviral.s@ssirlab03 module]$ iverilog -DFUNCTIONAL -DUNIT_DELAY=#1 mythcore_test_net.v vsdbabysoc.v testbench.v avsddac.v avsdpll.v primitives.v sky130_fd_sc_hd.v
+warning: Found both default and `timescale based delays. Use
+         -Wtimescale to find the module(s) with no `timescale.
+[aviral.s@ssirlab03 module]$ ./a.out
+VCD info: dumpfile dump.vcd opened for output.
+[aviral.s@ssirlab03 module]$ gtkwave dump.vcd
+
+```
+<img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/7e1e88e6540185a13156cac1038bbc76cca755e5/Samsung_PD_%23Day13/2(top%20module).png">
+</details>
