@@ -3665,7 +3665,54 @@ VCD info: dumpfile dump.vcd opened for output.
 	- If THS = 0, the design passed. 
 	- If positive, the design failed.
 
-   Analysing the Design with respectect to 13 libraries provided to us
+ </details>
+
+<details>
+
+<Summary>LABS</Summary>
+
+Steps
+ Get all the .lib files by cloning https://github.com/Geetima2021/vsdpcvrd.git
+ converting all the 13 .lib files to .db
+  ```
+  read_lib <library_name>
+  write_lib <library_name> -f db -o <name_of_the_db_file>
+  ```
+Generating a constaraint file as **As without constraint file when minimize the clock period to 0.1 ns we were not seeing any violations neither setup nor hold**
+  ```
+   set_units -time ns
+  create_clock -name MYCLK -per 2 [get_pins {pll/CLK}];
+
+  set_clock_latency -source 1 [get_clocks MYCLK]
+  set_clock_uncertainty -setup 0.5 [get_clocks MYCLK]; 
+  set_clock_uncertainty -hold 0.4 [get_clocks MYCLK]; 
+
+  set_input_delay -max 1 -clock \[get_clocks MYCLK] [all_inputs];
+  set_input_delay -min 0.5 -clock \[get_clocks MYCLK] [all_inputs];
+  set_output_delay -max 1 -clock \[get_clocks MYCLK] [all_outputs];
+  set_output_delay -min 0.5 -clock \[get_clocks MYCLK] [all_outputs];
+
+  set_input_transition -max 0.2 \[all_inputs];
+  set_input_transition -min 0.1 \[all_inputs];
+
+  set_max_area  800;
+
+  set_load -max 0.2 \[all_outputs];
+  set_load -min 0.1 \[all_outputs];
+  ```
+--> Now set the required db files (sky130.db,avsddac.db,avsdpll.db), read the design , link the library and do compile_ultra
+--> Commands for implementing this are as follows
+  ```
+  set target_library { <sky130_PVT_corner> , avsddac.db , avsdpll.db}
+  set link_library {* sky130_PVT_corner> , avsddac.db , avsdpll.db}
+  read_verilog vsdbabysoc.v
+  link
+  source <constraints_file_name>
+  compile_ultra
+  report_qor
+  ```
+
+ ##Analysing the Design with respect to 13 libraries provided to us
 
  **Operating Condition Process- SS Temperature- 40C , Voltage- 1.44**
 ```
@@ -4784,3 +4831,21 @@ Date   : Thu Sep 28 16:34:47 2023
 
 
   Design (Hold)  WNS: 0.09  TNS: 5.15  Number of Violating Paths: 69
+```
+**SETUP CHECK DATAPOINTS**
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/735ff178-f21e-4f9e-83ac-f8c1dcd133e0)
+
+**HOLD CHECK DATAPOINTS**
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5bf9b1b9-f7b4-437f-92eb-740361ac0353)
+
+**Findings**
+```
+From Plots we can observe for slow libraries setup is getting violated as data path is getting slow slack is coming out to be negative. If we can meet the timing with respect to sky130_ss_n40C_1v28 we can take care of timing for remaining corners
+
+From Plots we can observe for fast libraries hold is getting violated as data path is getting fast slack is coming out to be negative. If we can meet the timing with respect to sky130_ff_n40C_1v65 we can take care of timing for remaining corners
+```
+
+
+
