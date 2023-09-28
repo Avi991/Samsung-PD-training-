@@ -3627,3 +3627,1160 @@ VCD info: dumpfile dump.vcd opened for output.
 **TOP MODULE SCHEMATIC**
 <img  width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/9465b6d02719cebc2b7abd6b3e09ef4b28efa20c/Samsung_PD_%23Day13/5(top%20module%20schematic).png">
 </details>
+
+## Day 14 -   Synopsys DC and timing analysis
+
+<details>
+<summary>Theory</summary>
+
+**What is synthesis?**
+- Translation from RTL to gate level
+- The design is transformed into gates, and links are established between the gates.
+- This is distributed in the form of a file named netlist.
+
+**What specifically is .lib?**
+- A grouping of logical components
+- Basic logic gates such as AND, OR, NOT, and so on are included.
+- Contains diffrent variety of the same gate
+
+**What does PVT stand for?**
+- Temperature, Voltage, and Process
+- Process: is used to describe variety. The parameters of transistors during manufacture cannot be similar throughout the device since layers are produced. (tt=typical-typical, ff=fast-fast, ss=slow-slow, fs=fast-slow, sf=slow-fast)
+- Voltage: refers to the fluctuating voltages on the chip during operation, which can be caused by a variety of factors such as IO drop or supply noise caused by parasitic inductance.
+- Temperature: relates to the chip's variable temperature during operation as a result of power dissipation in the MOS-transistors, which affects the delay on the cells.
+
+**PVT corners**
+- Designers model the chip at various process, voltage, and temperature corners in order to make it operate after manufacturing in all feasible scenarios. 
+- These are referred to as corners. 
+- All three of these characteristics have a direct impact on the cell's latency.
+	
+ **PVT terminologies**
+- WNS (Worst Negative Slack): slack for the timing path with worst timing failure
+	- If WNS is positive, the path has passed. Otherwise,it's failed.
+- WHS (Worst Hole Slack):  slack for hold path with worst timing failure
+- TNS (Total Negative Slack): sum of the total negative path slacks, or the sum of all WNS
+	- If TNS = 0, the design meets timing. 
+	- If positive, there is negative slack in the design (hence the design fails).
+- THS (Total Hold Slack): sum of the total negative hold slack paths, or the sum of all WHS
+	- If THS = 0, the design passed. 
+	- If positive, the design failed.
+
+   Analysing the Design with respectect to 13 libraries provided to us
+
+ **Operating Condition Process- SS Temperature- 40C , Voltage- 1.44**
+```
+****************************************
+Report : timing
+        -path full
+        -delay max
+        -max_paths 1
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 12:15:53 2023
+****************************************
+
+ # A fanout number of 1000 was used for high fanout net computations.
+
+Operating Conditions: nom_pvt   Library: avsddac
+Wire Load Model Mode: top
+
+  Startpoint: c1/CPU_src1_value_a3_reg[3]
+              (rising edge-triggered flip-flop clocked by MYCLK)
+  Endpoint: c1/CPU_Xreg_value_a4_reg[2][24]
+            (rising edge-triggered flip-flop clocked by MYCLK)
+  Path Group: MYCLK
+  Path Type: max
+
+  Point                                                   Incr       Path
+  --------------------------------------------------------------------------
+  clock MYCLK (rise edge)                                 0.00       0.00
+  clock network delay (ideal)                             1.00       1.00
+  c1/CPU_src1_value_a3_reg[3]/CLK (sky130_fd_sc_hd__dfxtp_2)
+                                                          0.00 #     1.00 r
+  c1/CPU_src1_value_a3_reg[3]/Q (sky130_fd_sc_hd__dfxtp_2)
+                                                          0.90       1.90 f
+  c1/U1939/Y (sky130_fd_sc_hd__inv_1)                     0.22       2.12 r
+  c1/U2766/Y (sky130_fd_sc_hd__nand2_4)                   0.17       2.29 f
+  c1/U2025/Y (sky130_fd_sc_hd__nand2_1)                   0.16       2.45 r
+  c1/U1744/Y (sky130_fd_sc_hd__nand2_1)                   0.11       2.57 f
+  c1/U1743/Y (sky130_fd_sc_hd__inv_1)                     0.15       2.71 r
+  c1/U1742/Y (sky130_fd_sc_hd__nand3_2)                   0.20       2.91 f
+  c1/U1937/Y (sky130_fd_sc_hd__nand3_2)                   0.19       3.10 r
+  c1/U2863/Y (sky130_fd_sc_hd__nand3_2)                   0.17       3.27 f
+  c1/U2273/Y (sky130_fd_sc_hd__nand2_2)                   0.22       3.49 r
+  c1/U1957/Y (sky130_fd_sc_hd__nand2_4)                   0.17       3.67 f
+  c1/U1748/Y (sky130_fd_sc_hd__inv_2)                     0.21       3.87 r
+  c1/U1747/Y (sky130_fd_sc_hd__clkinv_4)                  0.16       4.04 f
+  c1/U2100/Y (sky130_fd_sc_hd__nand2_4)                   0.13       4.17 r
+  c1/U2101/Y (sky130_fd_sc_hd__nand2_2)                   0.11       4.28 f
+  c1/U500/Y (sky130_fd_sc_hd__xnor2_1)                    0.32       4.60 f
+  c1/U1316/Y (sky130_fd_sc_hd__nand2_1)                   0.18       4.78 r
+  c1/U1808/Y (sky130_fd_sc_hd__nand3_2)                   0.23       5.01 f
+  c1/U2673/Y (sky130_fd_sc_hd__nand2_2)                   0.24       5.25 r
+  c1/U2059/Y (sky130_fd_sc_hd__inv_4)                     0.16       5.40 f
+  c1/U1960/Y (sky130_fd_sc_hd__inv_4)                     0.23       5.63 r
+  c1/U4252/Y (sky130_fd_sc_hd__o22ai_1)                   0.17       5.80 f
+  c1/CPU_Xreg_value_a4_reg[2][24]/D (sky130_fd_sc_hd__dfxtp_1)
+                                                          0.00       5.80 f
+  data arrival time                                                  5.80
+
+  clock MYCLK (rise edge)                                 2.00       2.00
+  clock network delay (ideal)                             1.00       3.00
+  clock uncertainty                                      -0.50       2.50
+  c1/CPU_Xreg_value_a4_reg[2][24]/CLK (sky130_fd_sc_hd__dfxtp_1)
+                                                          0.00       2.50 r
+  library setup time                                     -0.71       1.79
+  data required time                                                 1.79
+  --------------------------------------------------------------------------
+  data required time                                                 1.79
+  data arrival time                                                 -5.80
+  --------------------------------------------------------------------------
+  slack (VIOLATED)                                                  -4.01
+
+
+ 
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 12:16:13 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              21.00
+  Critical Path Length:          4.80
+  Critical Path Slack:          -4.01
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -4215.69
+  No. of Violating Paths:     1145.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               7384
+  Buf/Inv Cell Count:            2278
+  Buf Cell Count:                  80
+  Inv Cell Count:                2198
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      6192
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    31896.841153
+  Noncombinational Area: 24138.149698
+  Buf/Inv Area:           8892.278140
+  Total Buffer Area:           472.95
+  Total Inverter Area:        8419.32
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             56034.990851
+  Design Area:           56034.990851
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          7391
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.19
+  Logic Optimization:                 10.33
+  Mapping Optimization:               55.69
+  -----------------------------------------
+  Overall Compile Time:               89.49
+  Overall Compile Wall Clock Time:    91.06
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 4.01  TNS: 4215.69  Number of Violating Paths: 1145
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+```
+
+ **Operating Condition Process- SS Temperature- 40C , Voltage- 1.40**
+
+ ``` 
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 15:16:14 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              18.00
+  Critical Path Length:          5.47
+  Critical Path Slack:          -4.82
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -5077.17
+  No. of Violating Paths:     1191.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               7568
+  Buf/Inv Cell Count:            2255
+  Buf Cell Count:                  55
+  Inv Cell Count:                2200
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      6376
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    31998.188302
+  Noncombinational Area: 24260.767340
+  Buf/Inv Area:           8824.713346
+  Total Buffer Area:           409.14
+  Total Inverter Area:        8415.57
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             56258.955642
+  Design Area:           56258.955642
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          7575
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.16
+  Logic Optimization:                 12.82
+  Mapping Optimization:               50.44
+  -----------------------------------------
+  Overall Compile Time:               86.36
+  Overall Compile Wall Clock Time:    87.96
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 4.82  TNS: 5077.17  Number of Violating Paths: 1191
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+
+ **Operating Condition Process- SS Temperature- 40C , Voltage- 1.76**
+
+ ****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 15:25:00 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              20.00
+  Critical Path Length:          2.48
+  Critical Path Slack:          -1.24
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -1255.17
+  No. of Violating Paths:     1107.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6596
+  Buf/Inv Cell Count:            1867
+  Buf Cell Count:                  66
+  Inv Cell Count:                1801
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      5404
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    29570.860431
+  Noncombinational Area: 24066.831270
+  Buf/Inv Area:           7629.817402
+  Total Buffer Area:           506.74
+  Total Inverter Area:        7123.08
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             53637.691701
+  Design Area:           53637.691701
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6603
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.18
+  Logic Optimization:                 14.56
+  Mapping Optimization:               51.59
+  -----------------------------------------
+  Overall Compile Time:               91.59
+  Overall Compile Wall Clock Time:    93.23
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 1.24  TNS: 1255.17  Number of Violating Paths: 1107
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+```
+
+**Operating Condition Process- SS Temperature- 40C , Voltage- 1.35**
+```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 15:28:52 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              19.00
+  Critical Path Length:          6.48
+  Critical Path Slack:          -6.07
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -6452.99
+  No. of Violating Paths:     1192.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               7532
+  Buf/Inv Cell Count:            2332
+  Buf Cell Count:                  41
+  Inv Cell Count:                2291
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      6340
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    30965.948336
+  Noncombinational Area: 24229.487320
+  Buf/Inv Area:           9114.991738
+  Total Buffer Area:           272.76
+  Total Inverter Area:        8842.23
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             55195.435656
+  Design Area:           55195.435656
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          7538
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.23
+  Logic Optimization:                 11.67
+  Mapping Optimization:               44.62
+  -----------------------------------------
+  Overall Compile Time:               79.63
+  Overall Compile Wall Clock Time:    81.16
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 6.07  TNS: 6452.99  Number of Violating Paths: 1192
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+```
+
+**Operating Condition Process- SS Temperature- 40C , Voltage- 1.28**
+```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 15:33:57 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              19.00
+  Critical Path Length:          8.75
+  Critical Path Slack:          -8.93
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -9617.33
+  No. of Violating Paths:     1192.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               7283
+  Buf/Inv Cell Count:            2137
+  Buf Cell Count:                  44
+  Inv Cell Count:                2093
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      6091
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    30415.420381
+  Noncombinational Area: 24164.424898
+  Buf/Inv Area:           8406.812561
+  Total Buffer Area:           223.96
+  Total Inverter Area:        8182.85
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             54579.845279
+  Design Area:           54579.845279
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          7289
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.29
+  Logic Optimization:                 10.39
+  Mapping Optimization:               56.51
+  -----------------------------------------
+  Overall Compile Time:              118.24
+  Overall Compile Wall Clock Time:   120.26
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 8.93  TNS: 9617.33  Number of Violating Paths: 1192
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+```
+
+**Operating Condition Process- SS Temperature- 100C , Voltage- 1.4**
+```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 15:58:58 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              19.00
+  Critical Path Length:          4.32
+  Critical Path Slack:          -3.32
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -3460.05
+  No. of Violating Paths:     1121.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               7183
+  Buf/Inv Cell Count:            2122
+  Buf Cell Count:                  59
+  Inv Cell Count:                2063
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      5991
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    30480.482793
+  Noncombinational Area: 24913.893919
+  Buf/Inv Area:           8396.802960
+  Total Buffer Area:           447.93
+  Total Inverter Area:        7948.87
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             55394.376712
+  Design Area:           55394.376712
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          7191
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.17
+  Logic Optimization:                 14.56
+  Mapping Optimization:               41.02
+  -----------------------------------------
+  Overall Compile Time:               75.57
+  Overall Compile Wall Clock Time:    77.18
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 3.32  TNS: 3460.05  Number of Violating Paths: 1121
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+```
+**Operating Condition Process- SS Temperature- 100C , Voltage- 1.6**
+```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:03:12 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              17.00
+  Critical Path Length:          3.03
+  Critical Path Slack:          -1.83
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:      -1887.53
+  No. of Violating Paths:     1118.00
+  Worst Hold Violation:          0.00
+  Total Hold Violation:          0.00
+  No. of Hold Violations:        0.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6533
+  Buf/Inv Cell Count:            1864
+  Buf Cell Count:                 119
+  Inv Cell Count:                1745
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      5341
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    28939.004327
+  Noncombinational Area: 24076.840876
+  Buf/Inv Area:           7493.436600
+  Total Buffer Area:           793.26
+  Total Inverter Area:        6700.18
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             53015.845203
+  Design Area:           53015.845203
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6552
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.22
+  Logic Optimization:                 14.45
+  Mapping Optimization:               45.85
+  -----------------------------------------
+  Overall Compile Time:               79.81
+  Overall Compile Wall Clock Time:    81.29
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 1.83  TNS: 1887.53  Number of Violating Paths: 1118
+
+
+  Design (Hold)  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+```
+
+**Operating Condition Process- FF Temperature- 40C , Voltage- 1.56**
+```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:09:43 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              15.00
+  Critical Path Length:          1.56
+  Critical Path Slack:          -0.20
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:       -161.86
+  No. of Violating Paths:      953.00
+  Worst Hold Violation:         -0.11
+  Total Hold Violation:         -7.30
+  No. of Hold Violations:      355.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6551
+  Buf/Inv Cell Count:            1850
+  Buf Cell Count:                  52
+  Inv Cell Count:                1798
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      5359
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    28218.313179
+  Noncombinational Area: 24050.565678
+  Buf/Inv Area:           7213.167787
+  Total Buffer Area:           366.60
+  Total Inverter Area:        6846.57
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             52268.878856
+  Design Area:           52268.878856
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6561
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.12
+  Logic Optimization:                 13.17
+  Mapping Optimization:               32.11
+  -----------------------------------------
+  Overall Compile Time:               67.80
+  Overall Compile Wall Clock Time:    69.40
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.20  TNS: 161.86  Number of Violating Paths: 953
+
+
+  Design (Hold)  WNS: 0.11  TNS: 7.30  Number of Violating Paths: 355
+
+```
+**Operating Condition Process- FF Temperature- 40C , Voltage- 1.65**
+```
+
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:14:42 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              13.00
+  Critical Path Length:          1.39
+  Critical Path Slack:          -0.01
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:         -0.72
+  No. of Violating Paths:      220.00
+  Worst Hold Violation:         -0.14
+  Total Hold Violation:        -42.10
+  No. of Hold Violations:     1059.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6445
+  Buf/Inv Cell Count:            1805
+  Buf Cell Count:                  80
+  Inv Cell Count:                1725
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      5253
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    27865.474865
+  Noncombinational Area: 24059.324074
+  Buf/Inv Area:           7010.473392
+  Total Buffer Area:           452.93
+  Total Inverter Area:        6557.54
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             51924.798939
+  Design Area:           51924.798939
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6452
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.24
+  Logic Optimization:                 15.18
+  Mapping Optimization:               43.18
+  -----------------------------------------
+  Overall Compile Time:               80.01
+  Overall Compile Wall Clock Time:    81.53
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.01  TNS: 0.72  Number of Violating Paths: 220
+
+
+  Design (Hold)  WNS: 0.14  TNS: 42.10  Number of Violating Paths: 1059
+```
+**Operating Condition Process- FF Temperature- 40C , Voltage- 1.76**
+```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:19:04 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              13.00
+  Critical Path Length:          1.45
+  Critical Path Slack:           0.00
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:          0.00
+  No. of Violating Paths:        0.00
+  Worst Hold Violation:         -0.18
+  Total Hold Violation:        -86.34
+  No. of Hold Violations:     1082.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6095
+  Buf/Inv Cell Count:            1587
+  Buf Cell Count:                  21
+  Inv Cell Count:                1566
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      4903
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    25525.730903
+  Noncombinational Area: 23901.672846
+  Buf/Inv Area:           5965.721413
+  Total Buffer Area:            87.58
+  Total Inverter Area:        5878.14
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             49427.403749
+  Design Area:           49427.403749
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6101
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.22
+  Logic Optimization:                  8.79
+  Mapping Optimization:               11.09
+  -----------------------------------------
+  Overall Compile Time:               38.44
+  Overall Compile Wall Clock Time:    39.62
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+
+  Design (Hold)  WNS: 0.18  TNS: 86.34  Number of Violating Paths: 1082
+```
+  **Operating Condition  Process- FF Temperature- 100C , Voltage- 1.65**
+``` 
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:28:32 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              13.00
+  Critical Path Length:          1.40
+  Critical Path Slack:           0.00
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:          0.00
+  No. of Violating Paths:        0.00
+  Worst Hold Violation:         -0.15
+  Total Hold Violation:        -49.07
+  No. of Hold Violations:     1072.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6116
+  Buf/Inv Cell Count:            1646
+  Buf Cell Count:                  58
+  Inv Cell Count:                1588
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      4924
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    25644.594887
+  Noncombinational Area: 23896.668047
+  Buf/Inv Area:           6347.337409
+  Total Buffer Area:           331.57
+  Total Inverter Area:        6015.77
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             49541.262934
+  Design Area:           49541.262934
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6122
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.18
+  Logic Optimization:                 13.75
+  Mapping Optimization:                7.31
+  -----------------------------------------
+  Overall Compile Time:               37.95
+  Overall Compile Wall Clock Time:    39.10
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+
+
+  Design (Hold)  WNS: 0.15  TNS: 49.07  Number of Violating Paths: 1072
+
+```
+  **Operating Condition  Process- FF Temperature- 100C , Voltage- 1.95**
+  ```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:31:28 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              13.00
+  Critical Path Length:          1.43
+  Critical Path Slack:           0.00
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:          0.00
+  No. of Violating Paths:        0.00
+  Worst Hold Violation:         -0.20
+  Total Hold Violation:       -125.64
+  No. of Hold Violations:     1134.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               5589
+  Buf/Inv Cell Count:            1319
+  Buf Cell Count:                   1
+  Inv Cell Count:                1318
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      4397
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    23178.479759
+  Noncombinational Area: 23867.890450
+  Buf/Inv Area:           4962.259045
+  Total Buffer Area:             5.00
+  Total Inverter Area:        4957.25
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             47046.370209
+  Design Area:           47046.370209
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          5595
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.23
+  Logic Optimization:                  5.47
+  Mapping Optimization:                3.72
+  -----------------------------------------
+  Overall Compile Time:               25.64
+  Overall Compile Wall Clock Time:    26.74
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.00  TNS: 0.00  Number of Violating Paths: 0
+
+  Design (Hold)  WNS: 0.20  TNS: 125.64  Number of Violating Paths: 1134
+```
+
+ **Operating Condition  Process- tt Temperature- 25C , Voltage- 1.80**
+ ```
+****************************************
+Report : qor
+Design : vsdbabysoc
+Version: T-2022.03-SP5-1
+Date   : Thu Sep 28 16:34:47 2023
+****************************************
+
+
+  Timing Path Group 'MYCLK'
+  -----------------------------------
+  Levels of Logic:              16.00
+  Critical Path Length:          1.60
+  Critical Path Slack:          -0.21
+  Critical Path Clk Period:      2.00
+  Total Negative Slack:       -171.00
+  No. of Violating Paths:      998.00
+  Worst Hold Violation:         -0.09
+  Total Hold Violation:         -5.15
+  No. of Hold Violations:       69.00
+  -----------------------------------
+
+
+  Cell Count
+  -----------------------------------
+  Hierarchical Cell Count:          1
+  Hierarchical Port Count:         12
+  Leaf Cell Count:               6936
+  Buf/Inv Cell Count:            1312
+  Buf Cell Count:                 159
+  Inv Cell Count:                1153
+  CT Buf/Inv Cell Count:            0
+  Combinational Cell Count:      5744
+  Sequential Cell Count:         1192
+  Macro Count:                      0
+  -----------------------------------
+
+
+  Area
+  -----------------------------------
+  Combinational Area:    29019.081009
+  Noncombinational Area: 23971.740049
+  Buf/Inv Area:           5544.067058
+  Total Buffer Area:          1020.98
+  Total Inverter Area:        4523.09
+  Macro/Black Box Area:      0.000000
+  Net Area:                  0.000000
+  -----------------------------------
+  Cell Area:             52990.821059
+  Design Area:           52990.821059
+
+
+  Design Rules
+  -----------------------------------
+  Total Number of Nets:          6943
+  Nets With Violations:             0
+  Max Trans Violations:             0
+  Max Cap Violations:               0
+  -----------------------------------
+
+
+  Hostname: ssirlab03
+
+  Compile CPU Statistics
+  -----------------------------------------
+  Resource Sharing:                    2.23
+  Logic Optimization:                 12.59
+  Mapping Optimization:               35.78
+  -----------------------------------------
+  Overall Compile Time:               67.27
+  Overall Compile Wall Clock Time:    68.71
+
+  --------------------------------------------------------------------
+
+  Design  WNS: 0.21  TNS: 171.00  Number of Violating Paths: 998
+
+
+  Design (Hold)  WNS: 0.09  TNS: 5.15  Number of Violating Paths: 69
