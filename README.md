@@ -3703,6 +3703,7 @@ Generating a constaraint file as **As without constraint file when minimize the 
 --> Now set the required db files (sky130.db,avsddac.db,avsdpll.db), read the design , link the library and do compile_ultra
 --> Commands for implementing this are as follows
   ```
+  reset_design
   set target_library { <sky130_PVT_corner> , avsddac.db , avsdpll.db}
   set link_library {* sky130_PVT_corner> , avsddac.db , avsdpll.db}
   read_verilog vsdbabysoc.v
