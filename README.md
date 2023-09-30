@@ -4833,13 +4833,16 @@ Date   : Thu Sep 28 16:34:47 2023
 
   Design (Hold)  WNS: 0.09  TNS: 5.15  Number of Violating Paths: 69
 ```
-**SETUP CHECK DATAPOINTS**
 
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/735ff178-f21e-4f9e-83ac-f8c1dcd133e0)
+The graph presented below tells the Worst Negative Slack (WNS) and Total Negative Slack (TNS) values in the context of Setup timing violations. The left-hand side (LHS) axis represents WNS, while the right-hand side (RHS) axis represents TNS:
+
+**SETUP CHECK DATAPOINTS**
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a6cdaee4-ec4f-4d68-b938-5849f234f934)
+
 
 **HOLD CHECK DATAPOINTS**
 
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5bf9b1b9-f7b4-437f-92eb-740361ac0353)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5c4f7ecd-419d-4a7e-b615-5ba2968e1d5f)
 
 **Findings**
 ```
