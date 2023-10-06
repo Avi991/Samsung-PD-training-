@@ -5278,7 +5278,8 @@ The placement in the magic is as follows
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2d9e21c4-c786-4d13-bafd-3d61ef9610e8)
 
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/ec1124a1-fdb8-47a0-9cee-54778b17cf22)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d8ab7c5c-c8ca-42bf-808e-550c00f4d471)
+
 
 </details>
 
