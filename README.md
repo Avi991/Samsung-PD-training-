@@ -4851,5 +4851,486 @@ From Plots we can observe for slow libraries setup is getting violated as data p
 From Plots we can observe for fast libraries hold is getting violated as data path is getting fast slack is coming out to be negative. If we can meet the timing with respect to sky130_ff_n40C_1v65 we can take care of timing for remaining corners
 ```
 
+</details>
+
+  # Day 15 - Inception of EDA and PDK
+
+  <details>
+
+  <Summary>Introduction</Summary>
+  An integrated circuit (also known as an IC) is a set of electronic circuits on one small flat piece (or "chip") of semiconductor material, usually silicon. An integrated circuit is typically mounted on a printed circuit board 
+  (PCB) to create a functional electronic system.
+
+  The main components of a chip are as shown below
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/bef19c2f-f46b-4c48-952a-502279e039ca)
+
+
+  **DIE**  refers to a specific part of a silicon wafer that contains an individual integrated circuit (IC) or chip.Each silicon wafer is divided into multiple smaller sections, each of which contains a copy of the same integrated 
+  circuit design. These smaller sections are called "dies." Each die is essentially an individual chip that can function on its own once it's separated from the wafer.
+
+  **Pads** refer to the external connections or pins on an integrated circuit (IC) that allow it to interface with the outside world. Pads serve as the physical connection points through which electrical signals are input to or output 
+   from the IC.Pads play a crucial role in the functionality of an IC. They are the points at which signals, such as data, power, clock, and control signals, are brought into or sent out of the chip.
+
+   Types of pads
+
+   - Input Pads: These are used to receive external signals into the IC. For example, input pads might be used for data inputs from other interfaces.
+   - Output Pads: These are used to send signals generated within the IC to external devices or other parts of a circuit. For instance, output pads might be used to transmit data 
+   - Power Pads: These pads are used to provide power to the IC. They are typically connected to the power supply voltage (VDD) and ground (VSS).
+   - Ground Pads: Ground pads are connected to the ground reference voltage (VSS) and are essential for proper functioning and noise reduction in the circuit.
+  
+  **Core** refers to a fundamental functional block or module within an integrated circuit (IC) design. Cores are designed to perform specific tasks or functions, and they can be combined with other cores and components to create complex ICs that serve various purposes.
+
+  This particular component is housed in a QFN-48 package, which stands for Quad Flat No Leads and has 48 pins. Each of these pins serves as a connection point that interfaces with other components or packages on the design board. The 
+  package itself measures 7mm by 7mm in size. At the heart of this package, there is typically a microchip positioned in the center. The pins on the periphery of the package, often referred to as "outbounds," play a crucial role in facilitating the exchange of data between the external world and the chip contained within the package.
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9b78a1fd-2dd5-4d59-9347-fda531366776)
+
+  </details>
+
+  <details>
+
+  <Summary>RTL to GDSII </Summary>
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/98a95714-09fa-4aff-8e34-1474a34b92c8)
+
+
+- **Synthesis**  refers to the process of transforming a high-level hardware description of a digital circuit, often written in a hardware description language (HDL) using Verilog, into a netlist 
+  representing the logical and physical components that will make up the actual integrated circuit.Standard cells are fundamental building blocks used in this process. They have a regular layout, and each 
+  cell is represented in various views or models, including electrical, HDL, and SPICE. Additionally, there are abstract and detailed layout views available for standard cells. These standard cells play a 
+  pivotal role in constructing the final layout of the integrated circuit.
+
+- **Floor Planning** is a crucial early-stage process that involves defining the physical layout and placement of various functional blocks, modules, and components within an integrated circuit (IC). Floor 
+ planning is essential for optimizing factors such as chip area, signal routing, power distribution, and thermal management.
+
+- *Chip Floorplan* : It refers to the specific floorplan designed for an integrated circuit (IC) or semiconductor chip. It is a layout or diagram that details the physical arrangement and placement of 
+  various components,functional blocks, and critical elements within the chip's silicon area.
+
+- *Macro Floorplan* : A "macro floorplan" is a specific type of floorplan used in semiconductor and integrated circuit (IC) design. In IC design, a macro typically refers to a predefined and pre- 
+  characterized functional block or module that performs a specific function. A macro can be anything from a processor core to a memory block or any other complex building block within an IC.
+  
+- *Power Planning* : Power planning in VLSI (Very Large Scale Integration) design is a critical aspect of semiconductor chip design that involves managing and distributing electrical power Effective power 
+   planning is essential for achieving reliable and efficient operation while minimizing power consumption.
+
+
+  - **Placement**  is a crucial step in the physical design process of creating integrated circuits (ICs). It involves determining the optimal location for each logical cell, or standard cell, within the chip's silicon area. Effective 
+    placement has a significant impact on factors like performance, power consumption, and chip area utilization. The primary objective of placement is to arrange standard cells in a way that minimizes the total wirelength (the total 
+    length of wires connecting the cells), optimizes chip area utilization, and meets various design constraints such as timing, power, and manufacturability.
+
+  - **CTS** stands for "Clock Tree Synthesis." CTS is a crucial step in the physical design process of creating integrated circuits (ICs), and it specifically deals with the generation and optimization of the clock distribution 
+    network within the chip. The primary goal of CTS is to ensure that clock signals are distributed efficiently and reliably to all flip-flops and sequential elements, minimizing clock skew and meeting the required timing 
+    constraints.Clock Tree Synthesis is a critical step in VLSI design, as clock distribution plays a significant role in the overall performance, power consumption, and reliability of integrated circuits. Advanced algorithms and 
+    tools are used to automate and optimize the CTS process for complex and high-performance ICs.
+
+  - **Routing** in VLSI (Very Large Scale Integration) design is a fundamental step in the physical design process of creating integrated circuits (ICs). It involves the generation of physical connections (metal traces or wires) 
+    between the various components and logic elements on the chip, ensuring that data signals, control signals, and power are routed efficiently and meet design constraints. Routing plays a critical role in determining the 
+    performance, power consumption, and overall functionality of the IC.
+
+  - **Sign Off** refers to the final stage of the design process before the design is sent for fabrication (manufacturing). Sign-off involves a comprehensive set of checks, analyses, and validations to ensure that the integrated 
+    circuit (IC) design meets all of the necessary criteria, constraints, and specifications before it is sent to the foundry for manufacturing. This stage is critical because any design errors or issues not caught at this point can       in costly and time-consuming problems later in the manufacturing process or after the ICs are in operation.
+
+  - **Physical Verification** It involves a series of checks and analyses to verify that the physical layout of the integrated circuit (IC) adheres to various design rules, constraints, and manufacturing requirements. The goal of 
+     physical verification is to ensure the manufacturability, functionality, and reliability of the IC design before it is sent for fabrication. It involves
+          -
+ 1. *Design Rule Checking (DRC)*:
+    - Geometry Checks: DRC verifies that the layout adheres to the design rules specified by the foundry. These rules include minimum feature sizes, spacing requirements, width and spacing of metal layers, 
+        
+ 2. *Electrical Rule Checking (ERC)*:
+    - Electrical Connectivity: ERC ensures that there are no electrical shorts or opens in the layout. It verifies that the actual connections in the layout match the intended connectivity in the schematic.
+
+    - Antenna Checking: ERC also checks for charge buildup issues, known as antenna effects, that can result from the deposition and etching processes during manufacturing.		
+
+  3. *Layout Versus Schematic (LVS) Verification*:
+
+	   - Netlist Consistency: LVS compares the layout netlist with the schematic netlist to ensure that they are equivalent. Any mismatches or discrepancies are flagged for resolution.
+
+	   - Parasitic Extraction: Parasitic elements, such as capacitance and resistance, are extracted from the layout and compared with the schematic to verify electrical equivalence.
+
+
+
+  </details>
+
+  <details>
+
+  <summary>OpenLane Flow</summary>
+
+  OpenLane is an open-source digital ASIC (Application-Specific Integrated Circuit) design flow and toolchain developed by Google and the Skywater Technology Foundry. It provides a 
+  complete, automated environment for designing and manufacturing digital chips, from RTL (Register-Transfer Level) design to GDSII (Graphic Data System II) tape-out. OpenLane is built 
+  upon various open-source tools and methodologies and is intended to simplify and democratize the ASIC design process.
+
+  1. Synthesis Exploration:
+
+	- Synthesis exploration is a utility used to generate reports that display the design's delay and area characteristics.
+ 
+ 	- It helps identify the most suitable design strategy to proceed with by analyzing these reports.
+		
+		
+  2. Design for Testability (DFT):
+
+	- After synthesis, DFT steps prepare the design for testing before fabrication (optional).These steps include:
+
+		- Scan Insertion
+
+   		- Automatic Test Pattern Generation (ATPG)
+
+		- Test Patterns Compaction
+  
+  		- Fault Coverage Analysis
+
+  3. Physical Implementation (Automated PnR):
+
+	- Physical implementation, often referred to as Automated Place and Route (PnR), is conducted using open-source tools like OpenRoad.It encompasses various steps:
+
+		- Floor and Power Planning
+
+		- End Decoupling Capacitors and Tap Cells Insertion
+
+		- Placement (Global and Detailed)
+
+		- Post Placement Optimization
+
+		- Clock Tree Synthesis (CTS)
+
+		- Routing (Global and Detailed)
+
+		- Logic Equivalent Check (LEC) to ensure functionality consistency after netlist modifications.
+
+
+  4. Dealing with Antenna Rules Violations: A specific phase during physical implementation addresses Antenna Rules Violations.
+     It involves inserting Antenna Diodes to mitigate issues caused by long metal wire segments acting as antennas, which can accumulate charge and potentially damage transistor gates 
+     during fabrication.
+     Solutions include bridging and adding antenna diode cells.
+
+	- Static Timing Analysis (STA):STA involves several steps, including RC extraction (from .def to .spef format) and the use of tools like OpenSTA (within OpenROAD).
+	  It generates timing reports to check for violations in timing paths and ensure that the design meets its timing constraints.
+          Physical Verification (DRC & LVS):
+
+	- Magic is utilized for Design Rule Checking (DRC) and SPICE Extraction from Layout.Netgen, along with Magic, is employed for Layout vs. Schematic (LVS) checks, comparing the 
+          extracted SPICE data from Magic with the Verilog netlist.
+  
+  </details>
+
+  <details>
+
+  <summary>Labs</summary>
+
+  **Skywater130 PDK Files**
+
+  The skywater130 PDK contains 3 directories:
+
+  1. skywater-pdk : It contains all pdk related files (.lib,.lef)
+  2. open-pdks : It contains scripts that bridge the compatibility gap between closed-source and open-source PDKs for Electronic Design Automation (EDA) tools.
+  3. sky130A : It contains open source compatible EDA files.
+ 
+  The commands for invoking Openlane
+  ```ruby
+  docker
+  flow.tcl -interactive
+  ```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6abed818-37c8-4a8a-b95e-ef6debd91dd3)
+
+
+  Preparing Design:
+
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3db3f03e-befb-4dba-be9f-2d70c2b4b4e4)
+
+ **Config file in the new directory shows the default parameters taken by the run**.
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e343c37a-c008-46cd-9880-95654a71d4ec)
+
+
+  After running the command *run_synthesis*
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/c2436373-e812-47f5-b88f-eca1e8e71125)
+
+Timing Report After Synthesis
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/fa4dbf6f-de2a-49d9-80aa-d33a72908591)
+
+
+  The number of d flip flops = 1613
+
+  Total Number of cells = 14876
+
+  D flip flop ratio = 1613/14876 = 0.108429
+
+  In percentage => 10.8429%
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8532254b-0568-4658-b8ee-70c5e860f608)
+
+
+  </details>
+
+
+
+# Day 16 Good Floorplan and Bad Floorplan
+
+<details>
+
+ <summary>Utillization Factor and aspect ratio</summary>
+
+This circuit consits of 2 Flipflops , 1 And gate and 1 OR gate
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5e4c8b1a-a513-49d0-ad1c-78c78fb83e47)
+
+ converting this design into physical implementation 
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f3630554-303d-4296-be0d-38bd236a3847)
+
+ To define the height and width of the core and die we need to know the dimensions of standard cells
+
+ Lets consider the area of standard cell as 1 sq unit and area of the flip flop cell also as 1 sq unit.
+
+ Now we remove the wires and do a rough calculation of min area occupied by netlist.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6c5217a5-ddf3-4632-b1b2-084a5f155028)
+
+
+ The area is **4 sq unit**
+
+ **Utilization Factor** : It is defined as the ratio of area occupied by netlist to the total area of core 
+
+ Utilization Factor = area occupied by netlist / total area of core
+
+ Consider the above circuit  the utilization factor is 1 (4/4)
+
+ **Aspect Ratio** : It is defined by the ratio of height and width of the core.
+
+ Aspect Ratio = Height/Width
+
+ In this the aspect ratio is 1 (2/2)
+
+</details>
+
+<details>
+
+<summary>Concept of preplaced cells</summary>
+
+Consider the below circuit 
+
+
+
+These circuits can be split into blocks as shown in the figure and further these blocks can be considered as blackboxes with extended pins , They are known as Ip's and they can be used multiple times in the design
+
+
+
+
+These are example of IP's 
+
+![image](https://github.com/AbhishekChinchani/Samsung_pd/assets/142480501/db44fc1d-a376-4fb3-b1e4-391138b1cd2f)
+
+</details>
+
+<details>
+
+ <summary> Decoupling Capacitors</summary>
+
+ Consider a complex circuit as shown in the figure
+
+ ![image](https://github.com/AbhishekChinchani/Samsung_pd/assets/142480501/84f3cbdf-2190-43f0-813a-a7e7b39404e2)
+
+ - During the switching case the circuit requires high peak current.
+ - But there will be some voltage drop beacuse of R and L , as a reult the voltage at node A will be Vdd'.
+ - Now if this drop is higher then the noise margin then the Voltage goes to undefined state i.e it can act as 1 or 0.
+ - Referring to the noise margin graph, there are three regions: logic 0, undefined, and logic 1. If Vdd falls between Vil and Vih, it is considered undefined, posing a risk.
+ - So to overcome this problem we use decoupling capacitor
+ - Decoupling Capacitor provide the require amount of the current to the nodes so that they dont do into undefined state
+ - They are placed parallel to circuit
+ - These capacitors are strategically placed between blocks to ensure that all blocks receive the necessary power supply when switching occurs.
+
+   After placing the decoupling capacitances
+
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b6e74213-d1f0-4633-9d7a-c647169b24a8)
+
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d3636185-189d-420a-85a5-8790c0b8c735)
+
+
+
+</details>
+
+<details>
+
+ <summary> Power planning </summary>
+
+ Consider the below case
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/080b0eed-69a0-4029-9c10-73d41be839ac)
+
+ - Now the output at the driver is high , this signal should be sent to another driver.
+ - This is a 16 bit bus which is again connected to an inverter
+ - So all the logic 1 bits should eventually discharge and all logic 0 should charge .
+   **Problem Of Voltage Droop And Ground Bounce**
+ - During Discharging all the logic 1 discharge at the same time reulting in bounce , if this bounce exceeds the noise margin then that bit enters the undefined state
+ - During charging phase all the logic 0 should be charged at same causing Voltage Droop
+ - So to overcome this we use multiple power supplies
+ - These multiple power supplies will be directed to the nearest blocks, ensuring that each block receives a reliable power supply without any possibility of missing out.
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6c0eed3d-5282-4acf-8e9e-e7ea7c8b5862)
+
+</details>
+
+<details>
+
+ <summary>Pin placement and logical cell placement blockage </summary>
+
+ This has 4 input and 4 output pins, 2 input clock pins and 1 output clock pins
+
+ pin placement 
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2eaeb2f2-664a-43e4-a97b-ec54f48ba580)
+
+ - These pins are placed in random order
+ - Clock pins are larger because they need to send the signals to all flip flops
+ - 
+</details>
+
+<details>
+
+ <summary> Floorplan using Openlane</summary>
+
+ Running the floorplan using the command *run_floorplan*
+ 
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/23b91369-acd6-4156-8092-d13fcbcf6074)
+
+
+ The values chosen are chosen based on set of priorities, the least priority is for floorplan.tcl then config.tcl in designs and the **highest priority is for sky130A_sky130_fd_sc_hd.tcl**
+
+ 1. floorplan.tcl
+  
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/30e49178-36fe-4397-9802-00c46389970a)
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/beba2f86-64b1-4f04-a336-c0f641ae57b4)
+ 
+ The values chosen in our case are *utilization ratio 35* , *vertical metal layer as 2* , *horizonatal metal layer as 3*
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/919e16c4-7df4-48b3-91c9-8a5d54a99e87)
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/148ac070-c64d-4639-85c0-02fa61af4b8a)
+
+
+ The reult is stored as .def file
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/fa7369a3-0f50-47df-8406-99767866e5ef)
+
+
+ command to invoke magic is
+ ```ruby
+ magic -T <path_of_tech_file> lef read <path_of_lef_file> def read <path_of_def_file>
+ ```
+
+ The floorplan in magic is as follows
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/974233ec-d66f-4e71-bbdd-5ed38e3b962a)
+
+
+ We can select and check its metal layer by just selecting it in magic and giving what command in tkkon2.3
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/75c65e5e-6a3a-43ba-bfa7-035a8fdef259)
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6698dcf1-1f94-49b4-af0e-bd3dc31f8771)
+
+
+</details>
+
+<details>
+
+ <summary>Netlist Binding and intial place design</summary>
+
+ - First the circuit is converted into the netlist as shown in the figure
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/13d4f79c-a0ac-4808-acf4-6a5b9c2f4643)
+
+- A Library consist of different flavours of the gates as shown in the figure
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/4729ead5-8e0b-457a-a63a-fd206732496c)
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0d27b79c-3a52-4c0b-a257-a174f73a48df)
+
+</details>
+
+<details>
+
+ <summary>Final placement optimization </summary>
+
+ Consider the initial placement as shown in the figure
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9e1c3807-70fb-4035-b6a5-c6a0969a5357)
+
+
+ - At this stage we estimate wire length and capacitance and based on that we insert repetators
+ - Repeater insertion involves placing buffers along the signal path to reinforce the signal and duplicate it. It's worth noting that adding more repeaters consumes additional chip area.
+ - Consider the above circuit , Lets estimate the wire length between Din1 and Dout1, we see that there are not that far enough so they can be directly connected without any repeater 
+   buffers
+ - Consider the case between Din2 and Dout2 , Din2 is placed far enought from FF1 so we nees to insert a repeater buffer.
+ - While the connection between FF1 (yellow) and Din 1 is acceptable, there's a challenge when crossing other flip-flops due to excessive distance. To address this, buffers are 
+   introduced, and to avoid congestion, they are placed on a separate layer.
+
+</details>
+
+<details>
+
+<summary>Placement Labs</summary>
+
+To run tbe placement we use the command *run_placement*
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/bebe4e5d-fb91-4d83-8d90-de28fe02d26f)
+
+The placement in the magic is as follows
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/be9ff1e6-8141-4474-a447-d21f77f790f7)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2d9e21c4-c786-4d13-bafd-3d61ef9610e8)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/ec1124a1-fdb8-47a0-9cee-54778b17cf22)
+
+</details>
+
+<details>
+
+ <summary>Standard Cell Design Flow</summary>
+
+ The standard cell design flow and characterization process are essential aspects of designing integrated circuits (ICs) using CMOS technology.
+
+ **Inputs**
+
+ - *Process Design Kits* : Process Design Kits (PDKs) are essential tools used in semiconductor manufacturing and integrated circuit (IC) design. They provide a comprehensive set of information, data, and files necessary for designing and simulating semiconductor devices and ICs using a specific semiconductor manufacturing process technology.
+ - *DRC and LVS* : *DRC* stands for "Design Rule Checking," and it is a critical step in the semiconductor and integrated circuit (IC) design and manufacturing process. DRC is a set of automated checks that ensure that the layout of an IC adheres to the design rules specified by the semiconductor foundry or manufacturing facility. These design rules are essential to ensure that the resulting IC can be manufactured reliably and accurately. **LVS** is a process that verifies the accuracy and consistency between the physical layout of an IC (the layout design) and its logical schematic or netlist.
+ - *SPICE* : *SPICE* models, often simply referred to as "SPICE," are essential tools used in electronic circuit design and simulation. SPICE stands for "Simulation Program with Integrated Circuit Emphasis." It is a computer program used to model and simulate the behavior of electronic circuits. SPICE models provide a way to mathematically describe and analyze the performance of electronic components and circuits.
+
+**Design Steps**
+- *Circuit Design* :n this phase, engineers create the logical schematic representation of the digital circuit. They specify the functionality, connectivity, and desired performance parameters.It refers to the process of creating and optimizing electronic circuits on a microchip or integrated circuit (IC) at a very high level of complexity. VLSI design is a critical aspect of semiconductor engineering and involves the creation of complex digital and analog circuits that can include millions or even billions of transistors on a single chip.
+  
+- *Layout Design* : After the logical design, engineers create a physical layout of the circuit, adhering to DRC and LVS rules. This involves placing transistors and interconnecting them while considering factors like area, power, and signal integrity.It refers to the process of creating the physical representation of an IC on a semiconductor wafer. This physical representation includes the placement and interconnection of various components, transistors, wires, and other elements that make up the IC.
+  
+- Characterization*: Characterization is the process of quantifying how the standard cells behave under various conditions. This step ensures that the cells meet timing, power, and noise requirements. GUNA is a software tool used for this purpose.
+
+
+**Outputs**
+- CDL **(Circuit Description Language)**: CDL files describe the logical behavior of standard cells, including their connectivity, functionality, and timing information.
+- GDSII **(Graphic Database System II)**: GDSII is a file format used to represent the final layout of the IC in a binary form. It is used for chip fabrication.
+- LEF (Library Exchange Format): LEF files provide information about the physical properties of the standard cells, which is necessary for placement and routing in the IC design process.
+- Timing, Noise, Power Libraries: These libraries store information on the timing characteristics, noise behavior, and power consumption of standard cells. They are essential for synthesis and optimization tools.
+- Extracted Spice Netlist (.cir): This is a SPICE-compatible netlist that includes parasitic elements extracted from the layout. It is used for accurate simulation of the designed circuit.
+
+
+</details>
+
+<details>
+
+ <summary>Standard Cell Characterization</summary>
+
+ - **Link Model File of CMOS** : This step involves linking the Liberty file, which defines the properties, timing, and other characteristics of the CMOS process technology.
+
+ - **Specify Process Corner(s)**: Process corners represent different manufacturing variations and operating conditions (e.g., fast, slow, typical). The characterization process evaluates 
+   the standard cell's behavior across these corners.
+
+ - **Specify Cell Delay and Slew Thresholds**: These thresholds determine how the cell's timing characteristics are characterized, helping capture both the rising and falling edges of 
+   signals.
+   
+ - **Read Parasitic Extracted Netlist** : The parasitic elements extracted from the layout of the standard cell are incorporated into the characterization process to account for their 
+    impact on signal delays and power consumption.
+
+ - **Apply Input or Stimulus**: Simulated inputs or stimuli are applied to the standard cell to evaluate its response under various conditions.
+
+ - **Provide Necessary Simulation Commands**: Simulation commands are used to run simulations on the standard cell to gather data on its performance.
+</details>
+
 
 
