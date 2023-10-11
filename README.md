@@ -5333,6 +5333,8 @@ The placement in the magic is as follows
  - **Provide Necessary Simulation Commands**: Simulation commands are used to run simulations on the standard cell to gather data on its performance.
 </details>
 
+</details>
+
 ## Day-17 Standard Cell Characterizations ##
 
 <details>
@@ -5384,7 +5386,6 @@ The spice netlist generated as shown below
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f7b021e9-b47d-4e40-9878-df5ea55c8333)
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3df0b64a-4ac0-4d30-bf6d-792018755e50)
-
 
 </details>
 
@@ -5440,7 +5441,6 @@ This comprehensive process forms the foundation of semiconductor device manufact
 
 - Below image is obtained after removing Drc Errors
   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3d11a2c3-c90f-48ae-886b-3c3c42637e83)
-
 
 </details>
 
