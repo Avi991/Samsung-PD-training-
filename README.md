@@ -5363,6 +5363,7 @@ Vin in 0 2.5
 .LIB "tsmc_025um_model.mod" CMOS_MODELS
 .end
 ```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3df0b64a-4ac0-4d30-bf6d-792018755e50)
 
 1. Component M1 represents a PMOS transistor with its drain connected to the OUT node, its gate linked to the IN node, and its substrate and source connected to VDD. M1 also features a specified width-to-length (W/L) ratio.
 2. Component M2 represents an NMOS transistor with its drain linked to the OUT node, its gate connected to the IN node, and its substrate and source tied to the ground (0V). M2 also includes a defined W/L ratio.
@@ -5384,8 +5385,6 @@ The spice netlist generated as shown below
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b7253f40-3721-4cb4-b7ac-584b31dd4a7f)
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f7b021e9-b47d-4e40-9878-df5ea55c8333)
-
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3df0b64a-4ac0-4d30-bf6d-792018755e50)
 
 </details>
 
