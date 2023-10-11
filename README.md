@@ -5333,5 +5333,142 @@ The placement in the magic is as follows
  - **Provide Necessary Simulation Commands**: Simulation commands are used to run simulations on the standard cell to gather data on its performance.
 </details>
 
+## Day-17 Standard Cell Characterizations ##
 
+<details>
+ <summary>Spice Simulation lab for CMOS Inverter</summary>
+	
+ 1. The initial step involves generating a SPICE Deck file that encompasses essential details, such as the netlist's connectivity information, specified input sources, and designated points for observing outputs. In the creation of this SPICE Deck, the process entails defining the interconnections among components, specifying component values, as well as recognizing and labeling nodes accordingly.
+	
+ 2. A CMOS inverter is a digital logic gate that takes an input signal and produces an output signal that is the logical complement (opposite) of the input. In other words, when the input is high (1), the output is low (0), and when the input is low (0), the output is high (1).
+  
+ 3. A CMOS inverter is constructed using complementary pairs of both NMOS (n-channel metal-oxide-semiconductor) and PMOS (p-channel metal-oxide-semiconductor) transistors. When one transistor is on (conducting), the other is off (non-conducting), allowing for low-power consumption and high noise immunity.
+ 
+ 4. A node is identified when a component is positioned between two nodes.
+
+- The SPICE deck for CMOS inverter is as follows.
+
+```ruby
+M1 out in vdd vdd pmos W=0.375u L=0.25u
+M2 out in 0 0 nmos W=0.375u W=0.25u
+cload out 0 10f
+Vdd vdd 0 2.5
+Vin in 0 2.5
+** Simulation Commands**
+.op
+.dc Vin 0 2.5 0.05
+** .include tsmc_025um_model.mod **
+.LIB "tsmc_025um_model.mod" CMOS_MODELS
+.end
+```
+
+1. Component M1 represents a PMOS transistor with its drain connected to the OUT node, its gate linked to the IN node, and its substrate and source connected to VDD. M1 also features a specified width-to-length (W/L) ratio.
+2. Component M2 represents an NMOS transistor with its drain linked to the OUT node, its gate connected to the IN node, and its substrate and source tied to the ground (0V). M2 also includes a defined W/L ratio.
+3. The load capacitance, with a value of 10fF, is connected between the OUT node and ground. Likewise, the supply voltages, set at 2.5V, are connected between the ground and their respective nodes.
+4. The Simulation command signifies the incremental variation of the gate voltage, ranging from 0V to 2.5V, in steps of 0.05V. This procedure is executed to observe and record the output characteristics concerning changes in the input voltage. The model file should be structured as follows, providing a comprehensive description of both NMOS and PMOS transistors, including their respective dimensions (length and width).
+
+The layout of the CMOS inverter is as follows:<br>
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0607a1d2-a778-409d-9f36-b77bff25c88b)
+
+Following commands are runned in tckon Main window.
+```ruby
+extract all
+ext2spice cthresh 0 rthresh 0
+ext2spice
+```
+The spice netlist generated as shown below
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2f2b607b-4ff4-4aed-bdb5-d5e3145e4d20)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b7253f40-3721-4cb4-b7ac-584b31dd4a7f)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f7b021e9-b47d-4e40-9878-df5ea55c8333)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3df0b64a-4ac0-4d30-bf6d-792018755e50)
+
+
+</details>
+
+<details>
+ <summary>16 Mask CMOS Fabricaion</summary>
+
+The manufacturing process involves several key steps:
+
+1.Substrate Preparation: Commences with a silicon wafer as the initial material, which undergoes rigorous cleaning and pre-processing to prepare it for further stages.
+
+2.Gate Oxide Formation (Mask 1): A thin layer of silicon dioxide (SiO2) is either grown or deposited onto the silicon wafer. This layer functions as the gate dielectric.
+
+3.Polysilicon Gate Formation (Mask 2): Polysilicon is deposited and precisely patterned to create gate electrodes for both NMOS and PMOS transistors.
+
+4.N-Well and P-Well Formation (Mask 3): The creation of regions for NMOS and PMOS transistors involves the use of n-type and p-type ion implantation processes.
+
+5.Source and Drain Formation (Masks 4 and 5): Ion implantation, followed by annealing processes, is employed to define the source and drain regions of the transistors.
+
+6.Gate Spacer and Silicidation (Masks 6 and 7): Insulating spacers are introduced around the gate structures, and metal silicide is formed on the source and drain regions to reduce contact resistance.
+
+7.Interlayer Dielectric (ILD) Deposition (Mask 8): A layer of insulating material, typically silicon dioxide, is deposited and planarized to create a level surface for metal interconnections.
+
+8.Contact and Via Formation (Masks 9 and 10): Etching processes create contact holes through the ILD, facilitating connections between metal interconnects and the underlying transistor nodes.
+
+9.Metal Layer 1 (Mask 11): The formation of metal lines and interconnects allows for connections between different parts of the circuit.
+
+10.Intermetal Dielectric (IMD) Deposition (Mask 12): Another insulating layer is deposited to provide separation between metal layers and isolation.
+
+11.Metal Layer 2 (Mask 13): Additional layers of metal interconnects may be added as required.
+
+13.Passivation Layer (Mask 14): A protective layer is deposited to shield the underlying layers and offer electrical insulation.
+
+14.Pad Opening (Mask 15): Openings are created in the passivation layer to enable wire bonding or solder bump connections.
+
+15.Testing and Packaging (Mask 16): Chips undergo rigorous testing for functionality and performance, followed by packaging to prepare them for their final use.
+
+This comprehensive process forms the foundation of semiconductor device manufacturing, allowing for the creation of integrated circuits with intricate electronic functionalities.
+
+***CMOS Inverter layout in Magic***
+
+- When we select nmos and pmos box in Magic and run *what* command in tckon window we obtain below image.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/05a82229-6977-4af0-a1de-7110109ee429)
+
+- The connection of Y to both the drain terminals of the PMOS and NMOS transistors
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/83b856b8-5250-448a-b574-b900065f59ee)
+
+- The connections of the PMOS source and NMOS source are established as follows
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/abd8a996-9762-4643-8620-497765ad3ece)
+
+- After removing some layers we get drc errors
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8804a933-8ed8-49db-9d9a-fbbbe6fa9220)
+
+- Below image is obtained after removing Drc Errors
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3d11a2c3-c90f-48ae-886b-3c3c42637e83)
+
+
+</details>
+
+<details>
+ <summary>Labs on DRC</summary>
+	
+- Initially,git clone the 'open_pdks.git' repository from RTimothyEdwards. Now all the magic files is with us. We will look for mtal3.mag. So metal3.mag file now with us.
+
+- *cif see VIA2* command is runned in tckon window to obtain metal 3 contacts.
+- When we see the layout of metal3.mag in Magic 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/893425ac-0962-4db5-9201-e7f350904f2b)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0c92baba-9c71-4227-9bf9-4998303b6264)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f27609ce-f0b8-49ae-bebf-11f1e7c5cff0)
+
+
+- Now width and height of the box is shown in below image which determine distance between the metal contact and metal layer boundary
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9522c9ab-611f-4481-b85b-ce5d532f10a0)
+
+
+- Below image of tckon window shows the box width in poly
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8f38d20a-cd2b-4759-a69b-292225b3a472)
+
+- Now sky130A.tech file is edited by adding ***allpolynonres*** in poly.9. After editting we load the tech file and check drc using *drc check* in tckon window. 
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d3a8b82b-2f54-4d92-a47d-42c265d8ca3c)
+
+- Here we can obsevre that no drc error is occuring. Hence we succesfully fixed poly.9 error. 
+</details>
 
