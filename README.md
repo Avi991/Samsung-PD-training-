@@ -6857,4 +6857,124 @@ set ::env(CTS_CLK_BUFFER_LIST) [linsert $::env(CTS_CLK_BUFFER_LIST) 0 sky130_fd_
 <img width="820" alt="435B0EB3-CDB0-4F50-B29E-805DD63628C8" src="https://github.com/Avi991/Samsung-PD-training-/assets/142480104/59786300-ef43-48c3-9664-780e30494e15">
 
 </details>
+
+# Day-19 Final Step RTL to GDSII
+
+<details>
+
+ <summary>Introduction to maze Routing use Lee's Algorithm</summary>
+
+ **Routing** 
+
+ Routing refers to the process of connecting various components, such as transistors, logic gates, and other electronic elements, on an integrated circuit (IC) using a network of interconnected wires or metal layers. Efficient and 
+ optimized routing is crucial for the performance and functionality of VLSI chips. There are two main types of routing in VLSI: global routing and detailed routing.
+
+ **Maze Routing Lee's Algorithm**
+
+ The Lee algorithm, also known as the Lee-Moore algorithm, is a pathfinding or maze routing algorithm used in computer science, particularly in VLSI design and printed circuit board (PCB) design. Its primary purpose is to find the 
+ shortest path between two points on a grid or maze, considering obstacles or blocked areas. It is a breadth-first search (BFS) algorithm and is often used in detailed routing stages of VLSI design.
+
+ The steps in Lee Algorithm
+
+ *Initialization* :
+
+ - Create a grid or maze where each cell can be either empty (open) or blocked.
+ - Mark the starting point as the source cell and the destination point as the target cell.
+ - Initialize a queue data structure to manage the cells to be explored.
+
+ *Breadth-First Search* :
+
+ - Begin with the source cell and enqueue it in the queue.
+ - Set its distance or step count as 0.
+ - Start a loop until the queue is empty.
+ - For each cell in the queue
+ - Explore the neighboring cells (up, down, left, right) that are not blocked and have not been visited. If a neighboring cell is not visited, mark it as visited, enqueue it, and set its distance or step count as the distance of the 
+   current cell plus one. Continue this process until the destination cell is reached or until there are no more cells to explore.
+
+*Backtracking* :
+
+ - Once the destination cell is reached, the algorithm can backtrack from the destination to the source by examining the neighboring cells and choosing the one with a lower distance value at each step. This retraces the shortest path 
+   from the destination to the source.
+
+*Path Construction*:
+
+- After backtracking, the path from the source to the destination is reconstructed, and the shortest route is found.
+- The Lee algorithm is especially useful in detailed routing for VLSI design because it helps find the shortest path while taking into account the grid structure and obstacles. It is an efficient way to navigate around obstacles, 
+  avoid congestion, and connect various components on an integrated circuit
+
+ 
+
+One of the key advantages of the Lee algorithm is its ability to guarantee that the shortest path is found. However, it may require a significant amount of memory and can be computationally intensive for large grids or mazes. There are variations and optimizations of the Lee algorithm to address these limitations, such as bidirectional Lee algorithm, A* algorithm, and hierarchical versions for PCB routing.
+
+</details>
+
+<details>
+
+ <summary>Design Rule Checks</summary>
+
+ - Design Rule Checks (DRC) are a crucial part of the integrated circuit (IC) design and manufacturing process, especially in VLSI (Very Large Scale Integration) design.
+ - DRC is a set of guidelines and checks used to ensure that the layout of an IC adheres to manufacturing and design rules. These rules are essential to guarantee that the IC can be manufactured successfully and will function as 
+   intended.
+
+ - Some of the Design Rule checks are as shown in the figure
+
+
+
+ - One type of DRC violation is a signal short, where two wires that are not intended to be connected becomes in contact on the same layer.
+
+ - This could lead to functional failure, so this needs to be taken care of.
+
+ - To fix this, we need to simply moving one of the wires onto a different metal layer.
+
+ - However, please keep in mind that there are new drc rules that need to be taken into account.
+
+  
+
+ - Performing parasitic extraction, where the resistances and capacitances of the wires are extracted and will be used for further processes.
+
+
+
+      
+</details>
+
+<details>
+
+ <summary>Labs</summary>
+ If exited from openlane 
+ 
+```ruby
+cd work/tools/openlane_working_dir/openlane
+make mount
+pwd
+ls -ltr
+./flow.tcl -interactive
+package require openlane 0.9
+prep -design picorv32a -tag 13-01_14-09
+```
+
+In openlane 
+```ruby
+echo $::env(CURRENT_DEF)    (Ensure current_def is on the CTS stage)
+gen_pdn                     (To generate power distribution network)
+```
+We get the error
+
+
+**Basics of global and detail routing and configure TritonRoute**
+
+```ruby
+echo $::env(CURRENT_DEF)            (Ensure the def file of pdn has been created)
+echo $::env(ROUTING_STRATEGY)
+set ::env(CURRENT_DEF) <path_of_cts.def>
+run_routing
+```
+when we run the command *run_routing* we get
+
+
+
+The results can be seen in the result folder
+
+
+
+</details>
 </details>
