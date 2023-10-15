@@ -6857,11 +6857,13 @@ set ::env(CTS_CLK_BUFFER_LIST) [linsert $::env(CTS_CLK_BUFFER_LIST) 0 sky130_fd_
 <img width="820" alt="435B0EB3-CDB0-4F50-B29E-805DD63628C8" src="https://github.com/Avi991/Samsung-PD-training-/assets/142480104/59786300-ef43-48c3-9664-780e30494e15">
 
 </details>
+
 </details>
 
-<details>
-# Day-19 Final Step RTL to GDSII
 
+
+# Day-19 Final Step RTL to GDSII
+<details>
  <summary>Introduction to maze Routing use Lee's Algorithm</summary>
 
  **Routing** 
@@ -6974,7 +6976,6 @@ when we run the command *run_routing* we get
 
 The results can be seen in the result folder
 
-
-
 </details>
+
 </details>
