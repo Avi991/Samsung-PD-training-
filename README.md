@@ -5471,3 +5471,1383 @@ This comprehensive process forms the foundation of semiconductor device manufact
 - Here we can obsevre that no drc error is occuring. Hence we succesfully fixed poly.9 error. 
 </details>
 
+## DAY-18 Pre-layout timing analysis and importance of good clock tree
+<details>
+<summary> Timing model using delay tables</summary>
+
+<details>
+ <summary>Lab 1: Lab steps to convert grid info to track info </summary>
+Library Exchange Format (LEF)
+
+A specification in which representing the physical layout of an integrated circuit in an ASCII format
+
+It includes design rules and abstract information about the standard cells
+
+LEF only has abstract view of cell required at that level to serve the purpose of the concerned CAD tool
+
+Containing information on input, output, power and group port, does not consists logic path information
+
+Objective: extract LEF file from .mag file and then plug the file into the picorv32a flow (previous is standard cell library)
+
+Main guidelines:
+
+The input and output ports must lie on the intersection of the vertical and horizontal tracks
+The width of standard cell should be on the track pitch, and the height should be on the track vertical pitch.
+```
+~/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/openlane/sky130_fd_sc_hd
+
+vim tracks.info
+
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/vsdstdcelldesign
+
+magic -T sky130A.tech sky130_inv.mag
+```
+- Track information (using during routing stage) routes can go over the track/layer (metal traces)
+
+- Set the grid based on the tracks.info (grid) converted the track into grid
+- Ports are on the intersection of the horizontal and vertical tracks. It ensures that the routes can reach the ports from x and y direction.
+- Verified that both input and output ports have fulfilled the guideline where input and output ports lies at the intersection of horizontal and vertical tracks
+Note: press "g" to enable grid (zoom in to see the grid)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f4663d44-a672-4156-98de-7facd15d1b14)
+
+</details>
+
+<details>
+ <summary>Lab 2: Lab steps to convert magic layout to std cell LEF </summary>
+
+ We need to only define layers, not ports in layout
+- Ports definitions are required when we want to extract LEF file
+- Ports will be defined as pins of a macro
+How to define ports?
+
+Select port --> edit --> Text --> fill those required information
+Note: For A; and Y in locali while for VPWR and VGND in metal1
+
+*Extract the LEF file*
+```
+In tkcon
+
+save sky130A_prakhar_inv.mag
+```
+Checking saved file:
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/vsdstdcelldesign
+ls
+magic -T sky130A.tech sky130_prakhar_inv.mag
+lef write
+vim sky130_prakhar_inv.lef
+```
+aviral_inv:
+![inverter in design](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5a261130-b410-438f-868d-42e747cf7d1a)
+
+</details>
+
+<details>
+ <summary>Lab 3: Introduction to timing libs and steps to include new cell in synthesis</summary>
+
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/vsdstdcelldesign
+cp sky130A_vsdinv.lef ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/vsdstdcelldesign/libs
+cp sky130_fd_sc_hd__* ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/
+vim config.tcl
+```
+
+Modifying config.tcl file
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/abad90aa-289a-4e1a-adb9-9f2060365b11)
+
+
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane
+make mount
+./flow.tcl -interactive
+package require openlane 0.9
+prep -design picorv32a -tag <run_name> -overwrite      (Check run date at ls ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs)
+set lefs [glob $::env(DESIGN_DIR)/src/*.lef]
+add_lefs -src $lefs
+run_synthesis
+```
+
+</details>
+
+ <details>
+ <summary>Theory : Introduction to delay tables and its usage </summary>
+
+**Introduction to delay tables**
+
+- We need to look into the timing characteristics of the buffer, in the case where we want to swap out the buffer for a gate.
+- For each level of buffering, we should have an identical buffer being used, and each node should be driving the same node.
+- Keep in mind that the load at the output will be varying, and since the load of one buffer is varying, the input transition of the following buffer will also vary.
+- This means that we will have a variety of delays.
+- The delay table is characterized based on varying the input transition and output load of a cell, against the delay of that cell.
+- Each cell will have its own delay table for different sizes and threshold tables.
+
+
+*Delay table usage*
+
+- Each type of cell will be having its own individual delay table, as the internal pmos and nmos width/length ratio gets varied, the resistance changes, then RC constant gets varied 
+  as well, meaning the delay of each cell gets varied.
+- The values of delay which are not available in the table are extrapolated based on the given data.
+- Similarly, the ways on how we have a delay table, we will also have a characterization table for input transition.
+- The latency at the endpoints will be the sum of the delays of each individual cell in that path.
+- The total skew value between two endpoints will be non-zero if the output load driven for a cell is varied, meaning different delay numbers are seen between endpoints, this is why 
+  it is preferred to have the nodes at each level driving the same load.
+- Another case in which we can retain the skew to be zero in the presence of varied load, is by using a different buffer size at the same level that can achieve the same level of 
+  delay as the other buffer in same level based on its delay table.
+- These are factors which should be looked into in the early stages of the clock tree design stage.
+- Now we must look into power aware CTS, where we have to consider endpoints which are only active under certain conditions.
+- In this case, we do not need to propagate the clock into those cells during the period of inactivity.
+
+</details>
+
+<details>
+<summary>Lab 4: Lab steps to configure synthesis settings to fix slack and include aviral_inv</summary>
+	 
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/configuration
+vim README.md
+```
+- SYNTH_STRATEGY: control the area and timing
+- SYNTH_BUFFERING: control if we want to buffer high fanout net
+- SYNTH_SIZING: control in cell sizing instead of buffering
+- SYNTH_DRIVING_CELL: ensure more drive strength cell to drive input
+
+In openlane terminal:
+```
+echo $::env(SYNTH_STRATEGY)
+set ::env(SYNTH_STRATEGY) "DELAY 0"
+echo $::env(SYNTH_STRATEGY)
+echo $::env(SYNTH_BUFFERING)
+echo $::env(SYNTH_SIZING)
+set ::env(SYNTH_SIZING) 1
+echo $::env(SYNTH_SIZING)
+echo $::env(SYNTH_DRIVING_CELL)
+```
+
+
+With SYNTH_STRATEGY of Delay 0, the tool will focus more on optimizing/minimizing the delay, index can be 0 to 3 where 3 is the most optimized for timing (sacrificing more area).
+SYNTH_BUFFERING of 1 ensures cell buffer will be used on high fanout cells to reduce delay due to high capacitance load.
+SYNTH_SIZING of 1 will enable cell sizing where cell will be upsize or downsized as needed to meet timing.
+SYNTH_DRIVING_CELL is the cell used to drive the input ports and is vital for cells with a lot of fan-outs since it needs higher drive strength (larger driving cell needed).
+
+
+Removing old result:
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/results/synthesis
+rm -rf picorv32a.synthesis.v
+```
+
+In openlane terminal:
+```
+run_synthesis
+```
+
+
+
+
+- After successfully running placement, runs/[date]/results/placement/picorv32.def will be created.
+
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/scripts/openroad
+vim or_basic_mp.tcl
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/scripts/tcl_commands
+vim floorplan.tcl
+```
+Modification in gvim
+
+
+In openlane:
+```
+run_floorplan
+run_placement
+```
+Floorplan
+
+
+Placement
+
+
+In terminal:
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/results/placement
+magic -T ~/Desktop/work/tools/openlane_working_dir/pdks/sky130A/libs.tech/magic/sky130A.tech lef read ../../tmp/merged.lef def read picorv32a.placement.def
+```
+My cell in layout:
+
+
+</details>
+
+</details>
+
+<details>
+<summary>Timing analysis with ideal clocks using openSTA </summary>
+
+<details>
+<summary>Theory : Setup timing analysis, introduction to flip-flop setup time and clock jitter </summary>
+
+*Setup timing analysis and introduction to flip-flop setup time*
+- At the zero time stamp, there is one clock edge that reaches the launch flop.
+- At T time stamp, the second rising edge reaches the capture flop. Any analysis that needs to be done is between 0 and T. For the combinational circuit to work, the combinational delay needs to be less than the period, T.
+- Looking at more practical scenarios and how the flop works, there will be a delay within the internal flop circuitry, between mux 1 and mux 2.
+- These internal delays will restrict the combinational delay requirements.
+- This internal delay is known as the setup time, and this setup time needs to be subtracted away from the complete clock period T.
+- Now the capture flop has enough time for it to compute the data within the flop and ensure the data is ready at Q by the time the second rise edge of clock reach.
+
+*Introduction to clock jitter and uncertainty*
+Jitter :Deviation of a clock edge from its ideal location
+
+- Typically caused by clock generator circuitry, noise, power supply variations, interference from nearby circuitry etc. Jitter is a contributing factor to the design margin specified for timing closure
+
+- The next practical scenario to take into consideration is jitter.
+
+- The clock is expected to reach the clock pin at exactly 0s or at Ts, but in real scenarios, the clock signal may not be able to reach at the exact moment, as the clock source generation may have its own built-in variation.
+
+-  This is known as jitter, the temporary variation of the clock period.
+
+- The combinational delay will become more stringent as a result. Thus we change our combinational delay to factor in the uncertainty factor from the jitter.
+</details>
+
+
+<details>
+<summary>Lab 1: steps to configure OpenSTA for post-synth timing analysis</summary>
+
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane
+gvim pre_sta.conf                                          (For pre-layout timing analysis)
+```
+pre_sta.conf file:
+
+```ruby
+set_cmd_units -time ns -capacitance pF -current mA -voltage V -resistance kOhm -distance um
+read_liberty -min /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src/sky130_fd_sc_hd__slow.lib
+
+read_liberty -max /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src/sky130_fd_sc_hd__fast.lib
+
+read_verilog /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/06-10_11-41/results/synthesis/picorv32a.synthesis.v
+
+link_design picorv32a
+
+read_sdc /home/vsduser/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/src/my_base1.sdc
+report_checks -path_delay min_max -fields {slew trans net cap input_pin}
+report_tns
+report_wns
+```
+my_base1.sdc file:
+```
+
+set ::env(CLOCK_PORT) clk 
+set ::env(CLOCK_PERIOD) 12
+set ::env(SYNTH_DRIVING_CELL) sky130_vsdinv 
+set ::env(SYNTH_DRIVING_CELL_PIN) Y 
+set ::env(SYNTH_CAP_LOAD) 17.65 
+create_clock [get_ports $::env(CLOCK_PORT)] -name $::env(CLOCK_PORT) -period $::env(CLOCK_PERIOD)
+set ::env(IO_PCT) 0.2
+set input_delay_value [expr $::env(CLOCK_PERIOD) * $::env(IO_PCT)]
+set output_delay_value [expr $::env(CLOCK_PERIOD) * $::env(IO_PCT)]
+puts "\[INFO\]: Setting output delay to: $output_delay_value" 
+puts "\[INFO\]: Setting input delay to: $input_delay_value"
+ 
+## set max fanout S::env(SYNTH MAX FANOUT) (current design)
+set clk_indx [lsearch [all_inputs] [get_port $::env(CLOCK_PORT)]]
+
+#set rst indx [isearch (all inputs) Iget port resetn]]
+set all_inputs_wo_clk [lreplace [all_inputs] $clk_indx $clk_indx]
+
+#set all inputs wo clk rst (treplace sall inputs wo clk srst indx Srst indx] 
+set all_inputs_wo_clk_rst $all_inputs_wo_clk
+
+# correct resetn
+set_input_delay $input_delay_value -clock [get_clocks $::env(CLOCK_PORT)] $all_inputs_wo_clk_rst
+
+# set_input_delay 0.0 -clock [get clocks S::env(CLOCK PORT)] (resetn)
+set_output_delay $output_delay_value -clock [get_clocks $::env(CLOCK_PORT)] [all_outputs]
+
+# TODO set this as parameter
+set_driving_cell -lib_cell $::env(SYNTH_DRIVING_CELL) -pin $::env(SYNTH_DRIVING_CELL_PIN) [all_inputs]
+set cap_load [expr $::env(SYNTH_CAP_LOAD) / 1000.0] 
+puts "\[INFO\]: Setting load to: $cap_load" 
+set_load $cap_load [all_outputs]
+```
+Running STA:
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane
+sta pre_sta.conf
+```
+
+
+
+</details>
+
+
+<details>
+<summary>Lab 2: Lab steps to optimize synthesis to reduce setup violations</summary>
+In openlane :
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane
+echo $::env(SYNTH_MAX_FANOUT)
+set ::env(SYNTH_MAX_FANOUT) 4
+```
+Remove old result:
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/13-01_14-09/results/synthesis
+rm -rf picorv32a.synthesis.v
+```
+In openlane:
+```
+run_synthesis
+```
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane
+sta pre_sta.conf
+report_net -connections _18242_                           
+replace_cell _41952_ sky130_fd_sc_hd__dfxtp_4             (Pick the highest fanout, cap, slew and replace the worst violations of the cell by increasing drive strength --> upsize cell from 2 to 4)
+report_checks -fields {net cap dlew input pins} -digits 4
+report_tns
+report_wns
+```
+
+report_net:
+
+
+```
+replace_cell _38618_ sky130_fd_sc_hd__dfxtp_4
+1
+```
+
+_38618_ same as dff in design.
+
+Timing report :
+```
+ report_checks -fields {net cap dlew input pins} -digits 4
+Startpoint: _38615_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _38545_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+Fanout       Cap     Delay      Time   Description
+----------------------------------------------------------------------------
+                    0.0000    0.0000   clock clk (rise edge)
+                    0.0000    0.0000   clock network delay (ideal)
+                    0.0000    0.0000 ^ _38615_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                    0.5970    0.5970 v _38615_/Q (sky130_fd_sc_hd__dfxtp_2)
+     4    0.0101                       irq_state[0] (net)
+                    0.0000    0.5970 v _18612_/A (sky130_fd_sc_hd__buf_1)
+                    0.2379    0.8349 v _18612_/X (sky130_fd_sc_hd__buf_1)
+     6    0.0120                       _15907_ (net)
+                    0.0000    0.8349 v _18623_/A (sky130_fd_sc_hd__buf_1)
+                    0.2740    1.1089 v _18623_/X (sky130_fd_sc_hd__buf_1)
+     6    0.0119                       _15917_ (net)
+                    0.0000    1.1089 v _21670_/B (sky130_fd_sc_hd__nor2_2)
+                    1.4228    2.5317 ^ _21670_/Y (sky130_fd_sc_hd__nor2_2)
+    32    0.1065                       _00292_ (net)
+                    0.0000    2.5317 ^ _35809_/S (sky130_fd_sc_hd__mux2_1)
+                    1.1908    3.7225 v _35809_/X (sky130_fd_sc_hd__mux2_1)
+     4    0.0137                       _02560_ (net)
+                    0.0000    3.7225 v _23131_/A (sky130_fd_sc_hd__xnor2_2)
+                    0.3358    4.0583 v _23131_/Y (sky130_fd_sc_hd__xnor2_2)
+     2    0.0096                       _18154_ (net)
+                    0.0000    4.0583 v _23136_/A_N (sky130_fd_sc_hd__nand3b_2)
+                    0.5066    4.5649 v _23136_/Y (sky130_fd_sc_hd__nand3b_2)
+     2    0.0087                       _18156_ (net)
+                    0.0000    4.5649 v _23143_/A2_N (sky130_fd_sc_hd__o2bb2ai_2)
+                    0.2998    4.8647 v _23143_/Y (sky130_fd_sc_hd__o2bb2ai_2)
+     2    0.0087                       _18161_ (net)
+                    0.0000    4.8647 v _23151_/A2_N (sky130_fd_sc_hd__o2bb2ai_2)
+                    0.2386    5.1033 v _23151_/Y (sky130_fd_sc_hd__o2bb2ai_2)
+     1    0.0043                       _18167_ (net)
+                    0.0000    5.1033 v _23152_/B1 (sky130_fd_sc_hd__o21ai_2)
+                    0.1456    5.2489 ^ _23152_/Y (sky130_fd_sc_hd__o21ai_2)
+     2    0.0131                       _18168_ (net)
+                    0.0000    5.2489 ^ _23159_/B1 (sky130_fd_sc_hd__o21ai_2)
+                    0.1911    5.4400 v _23159_/Y (sky130_fd_sc_hd__o21ai_2)
+     1    0.0043                       _18173_ (net)
+                    0.0000    5.4400 v _23160_/B1 (sky130_fd_sc_hd__o21ai_2)
+                    0.1469    5.5869 ^ _23160_/Y (sky130_fd_sc_hd__o21ai_2)
+     2    0.0110                       _18174_ (net)
+                    0.0000    5.5869 ^ _23167_/A1 (sky130_fd_sc_hd__a21o_2)
+                    0.3724    5.9593 ^ _23167_/X (sky130_fd_sc_hd__a21o_2)
+     2    0.0131                       _18179_ (net)
+                    0.0000    5.9593 ^ _23174_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.1696    6.1288 v _23174_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18184_ (net)
+                    0.0000    6.1288 v _23182_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3186    6.4475 ^ _23182_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.0131                       _18190_ (net)
+                    0.0000    6.4475 ^ _23189_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.2411    6.6886 v _23189_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18195_ (net)
+                    0.0000    6.6886 v _23196_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3259    7.0145 ^ _23196_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.0131                       _18200_ (net)
+                    0.0000    7.0145 ^ _23202_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.2411    7.2556 v _23202_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18204_ (net)
+                    0.0000    7.2556 v _23208_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3259    7.5815 ^ _23208_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.0131                       _18208_ (net)
+                    0.0000    7.5815 ^ _23214_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.2411    7.8226 v _23214_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18212_ (net)
+                    0.0000    7.8226 v _23220_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3259    8.1485 ^ _23220_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.0131                       _18216_ (net)
+                    0.0000    8.1485 ^ _23226_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.2411    8.3896 v _23226_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18220_ (net)
+                    0.0000    8.3896 v _23232_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3259    8.7155 ^ _23232_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.0131                       _18224_ (net)
+                    0.0000    8.7155 ^ _23238_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.2411    8.9566 v _23238_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18228_ (net)
+                    0.0000    8.9566 v _23245_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3259    9.2825 ^ _23245_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.0131                       _18233_ (net)
+                    0.0000    9.2825 ^ _23251_/A1 (sky130_fd_sc_hd__a21oi_2)
+                    0.2411    9.5236 v _23251_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.0122                       _18237_ (net)
+                    0.0000    9.5236 v _23258_/A2 (sky130_fd_sc_hd__o21bai_2)
+                    0.3811    9.9047 ^ _23258_/Y (sky130_fd_sc_hd__o21bai_2)
+     3    0.0176                       _18242_ (net)
+                    0.0000    9.9047 ^ _23268_/A (sky130_fd_sc_hd__nand3_2)
+                    0.2823   10.1870 v _23268_/Y (sky130_fd_sc_hd__nand3_2)
+     3    0.0099                       _18248_ (net)
+                    0.0000   10.1870 v _23284_/A2 (sky130_fd_sc_hd__o211ai_2)
+                    0.4462   10.6332 ^ _23284_/Y (sky130_fd_sc_hd__o211ai_2)
+     3    0.0176                       _18260_ (net)
+                    0.0000   10.6332 ^ _23294_/A (sky130_fd_sc_hd__nand3_2)
+                    0.2957   10.9289 v _23294_/Y (sky130_fd_sc_hd__nand3_2)
+     3    0.0099                       _18266_ (net)
+                    0.0000   10.9289 v _23310_/A2 (sky130_fd_sc_hd__o211ai_2)
+                    0.4481   11.3771 ^ _23310_/Y (sky130_fd_sc_hd__o211ai_2)
+     3    0.0175                       _18278_ (net)
+                    0.0000   11.3771 ^ _23315_/A (sky130_fd_sc_hd__nand2_2)
+                    0.1895   11.5666 v _23315_/Y (sky130_fd_sc_hd__nand2_2)
+     1    0.0043                       _18281_ (net)
+                    0.0000   11.5666 v _23318_/A (sky130_fd_sc_hd__nand2_2)
+                    0.1319   11.6984 ^ _23318_/Y (sky130_fd_sc_hd__nand2_2)
+     1    0.0085                       _18284_ (net)
+                    0.0000   11.6984 ^ _23319_/B (sky130_fd_sc_hd__xor2_2)
+                    0.1086   11.8071 v _23319_/X (sky130_fd_sc_hd__xor2_2)
+     1    0.0018                       _01676_ (net)
+                    0.0000   11.8071 v _36534_/A1 (sky130_fd_sc_hd__mux2_1)
+                    0.6252   12.4323 v _36534_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.0013                       _01677_ (net)
+                    0.0000   12.4323 v _36988_/A1 (sky130_fd_sc_hd__mux4_1)
+                    1.0986   13.5309 v _36988_/X (sky130_fd_sc_hd__mux4_1)
+     1    0.0015                       _01678_ (net)
+                    0.0000   13.5309 v _36535_/A0 (sky130_fd_sc_hd__mux2_1)
+                    0.6333   14.1642 v _36535_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.0016                       _02529_ (net)
+                    0.0000   14.1642 v _18990_/A (sky130_fd_sc_hd__or2b_2)
+                    0.6472   14.8114 v _18990_/X (sky130_fd_sc_hd__or2b_2)
+     1    0.0024                       _16178_ (net)
+                    0.0000   14.8114 v _18991_/C1 (sky130_fd_sc_hd__o211a_2)
+                    0.2140   15.0254 v _18991_/X (sky130_fd_sc_hd__o211a_2)
+     1    0.0016                       _03989_ (net)
+                    0.0000   15.0254 v _38545_/D (sky130_fd_sc_hd__dfxtp_2)
+                             15.0254   data arrival time
+
+                   12.0000   12.0000   clock clk (rise edge)
+                    0.0000   12.0000   clock network delay (ideal)
+                    0.0000   12.0000   clock reconvergence pessimism
+                             12.0000 ^ _38545_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                   -0.2909   11.7091   library setup time
+                             11.7091   data required time
+----------------------------------------------------------------------------
+                             11.7091   data required time
+                            -15.0254   data arrival time
+----------------------------------------------------------------------------
+                             -3.3164   slack (VIOLATED)
+
+report_tns             
+tns -311.63
+report_wns  
+wns -3.32
+
+```
+Tns and wns has improved for setup by increasing drive strength.
+
+</details>
+</details>
+
+<details>
+<summary>Clock tree synthesis TritonCTS and signal integrity</summary>
+
+<details>	
+<summary>Theory : Clock tree routing and buffering using H-Tree algorithm, Crosstalk and clock net shielding </summary>
+
+*Clock tree routing and buffering using H-Tree algorithm*
+
+    - Clock tree synthesis is done to propagate the clock signals to all the clock pins in the design.
+    - However, a good clock tree needs to be designed to take into account the skew between the clock pins due to long routing.
+    - Through the use of H-tree, which is a smarter implementation for a clock tree design, that is designed based on the distances between the clock pins in the design between the clock port.
+    - This is to give a skew value as close to 0 as possible by having the clock signals reach all the cells at the same time.
+    
+    - The next step is to perform clock tree buffering.
+    - The wires for the clock routes each will have resistances and huge number of capacitances, and with the long routing, there will be signal integrity issues.
+    - Thus, to maintain the signal integrity, we need buffering on these nets.
+
+*Crosstalk and clock net shielding*
+
+    - Another topic to understand before moving to using real clocks is clock net shielding.
+    - Clock nets are the critical nets in the design, we build the clock tree to ensure there is a minimum skew.
+    - However, if there is any cross talk that happens and affect the clock signals, that will affect the design very badly.
+    - By shielding, we are protecting the clock nets from the outside world, avoiding glitches and delta delays from occurring.
+    - If a glitch occurs on the clock net, incorrect data in the memory will cause inaccurate functionality for the design.
+    - The shield can be connected to ground or to Vdd, as long as there is no switching activity occurring.
+    - Critical data nets are also necessary to be shielded.
+</details>
+
+<details>
+<summary>Lab 1: Lab steps to run CTS using TritonCTS</summary>
+
+In sta terminal:
+```
+write_verilog ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/results/synthesis/picorv32a.synthesis.v
+```
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/designs/picorv32a/runs/13-01_14-09/results/synthesis
+ls -lrt picorv32a.synthesis.v
+date
+```
+In openlane:
+```
+run_floorplan
+run_placement
+run_cts
+```
+
+picorv32a.synthesis_cts.v is generated.
+</details>
+
+<details>
+<summary>Lab 2: Lab steps to verify CTS runs</summary>
+
+```
+cd ~/Desktop/work/tools/openlane_working_dir/openlane/scripts/tcl_commands
+vim cts.tcl
+```
+
+In openlane:
+```
+echo $::env(LIB_TYPICAL)
+echo $::env(CURRENT_DEF)
+echo $::env(CTS_MAX_CAP)
+echo $::env(CTS_CLK_BUFFER_LIST)
+echo $::env(CTS_ROOT_BUFFER)
+```
+
+
+</details>
+</details>
+
+<details>
+<summary>Timing analysis with real clocks using openSTA</summary>
+
+<details>
+<summary>Theory: Setup timing and Hold timing analysis using real clocks </summary>
+	
+**Setup timing analysis using real clocks**
+
+    - After buffer has been added in, more clock network delay has been introduced and it will combining all the delays.
+    - With real clocks, we will need to have buffers inserted into the clock path to ensure the clock signal integrity.
+    - Because of the buffer introduction, the clock edge will reach the clock pin with consideration to the delays of the buffers inserted.
+    - The clock network delay will also need to take into consideration the delays from the buffers inserted.
+    - The window will become shifted as a result of the delays from the buffers inserted.
+    - The skew for this design will now be the difference between the deltas.
+    - If the data arrival time is higher than the data required time, then we will have negative slack on the path, meaning we have violations.
+
+    - For hold timing analysis, where the capture edge is on the o clock rise edge, the combinational delay should be greater than the hold time of the flop.
+    - Hold time refers to the second mux delay, which is the time required for the data to be sent after the clock edge within the flop.
+    - So the data needs to be arrived after the hold time, so the new data can be captured into the flop, after existing data is launched out.
+
+**Hold timing analysis using real clocks**
+
+    - Introducing more real factors into our design for hold analysis will yield the below equation for hold timing.
+    - Jitter for the launch clock and capture flop will not need to be taken into consideration as the design is on the 0 clock edge, and the arrival difference for the capture and launch flop will be the same.
+    - So, the uncertainty should be kept low for the hold analysis.
+    - The slack formula will be --> data arrival time – data required time
+    - If data required time is higher, we will have negative slack, meaning the timing path for hold will be violated.
+    - For the timing path setup for real clocks, we need to take into considerations the deltas that were mentioned earlier.
+    - For delta1, will be launch clock network delay, while delta2, will be capture clock network delay.
+</details>
+
+
+<details>
+<summary>Lab 1: Lab steps to analyze timing with real clocks using OpenSTA</summary>
+
+In openlane:
+```
+openroad                                                                                                       (Invoking openroad)
+read_lef /openLANE_flow/designs/picorv32a/runs/13-01_14-09/tmp/merged.lef
+read_def /openLANE_flow/designs/picorv32a/runs/13-01_14-09/results/cts/picorv32a.cts.def
+write_db pico_cts.db
+read_db pico_cts.db
+read_verilog /openLANE_flow/designs/picorv32a/runs/13-01_14-09/results/synthesis/picorv32a.synthesis_cts.v
+read_liberty -max $::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__slow.lib
+read_liberty -min $::env(OPENLANE_ROOT)/designs/picorv32a/src/sky130_fd_sc_hd__fast.lib
+set_propagated_clock [all_clocks]
+read_sdc designs/picorv32a/src/my_base.sdc
+report_checks -path_delay min_max -format full_clock_expanded -digits 4
+```
+This step is not practical, therefore it violated.
+
+```
+
+% report_checks -path_delay min_max -format full_clock_expanded -digits 4
+Startpoint: _40725_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _40725_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+    Delay      Time   Description
+-------------------------------------------------------------
+   0.0000    0.0000   clock clk (rise edge)
+   0.0000    0.0000   clock network delay (ideal)
+   0.0000    0.0000 ^ _40725_/CLK (sky130_fd_sc_hd__dfxtp_1)
+   0.1823    0.1823 ^ _40725_/Q (sky130_fd_sc_hd__dfxtp_1)
+   0.0472    0.2295 ^ _23930_/X (sky130_fd_sc_hd__clkbuf_1)
+   0.0000    0.2295 ^ _40725_/D (sky130_fd_sc_hd__dfxtp_1)
+             0.2295   data arrival time
+
+   0.0000    0.0000   clock clk (rise edge)
+   0.0000    0.0000   clock network delay (ideal)
+   0.0000    0.0000   clock reconvergence pessimism
+             0.0000 ^ _40725_/CLK (sky130_fd_sc_hd__dfxtp_1)
+  -0.0176   -0.0176   library hold time
+            -0.0176   data required time
+-------------------------------------------------------------
+           -0.0176   data required time
+            -0.2295   data arrival time
+-------------------------------------------------------------
+             0.2471   slack (MET)
+
+
+Startpoint: _41952_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _41879_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+    Delay      Time   Description
+-------------------------------------------------------------
+   0.0000    0.0000   clock clk (rise edge)
+   0.0000    0.0000   clock network delay (ideal)
+   0.0000    0.0000 ^ _41952_/CLK (sky130_fd_sc_hd__dfxtp_4)
+   0.9923    0.9923 ^ _41952_/Q (sky130_fd_sc_hd__dfxtp_4)
+   0.8498    1.8421 v _39853_/X (sky130_fd_sc_hd__mux2_1)
+   0.6464    2.4885 v _39852_/X (sky130_fd_sc_hd__mux2_1)
+   0.3149    2.8034 v _25161_/X (sky130_fd_sc_hd__and2_1)
+   0.6072    3.4106 v _39143_/X (sky130_fd_sc_hd__mux2_2)
+   0.2837    3.6942 v _25583_/Y (sky130_fd_sc_hd__xnor2_1)
+   0.4643    4.1586 v _25588_/Y (sky130_fd_sc_hd__nand3b_2)
+   0.2835    4.4421 v _25595_/Y (sky130_fd_sc_hd__o2bb2ai_1)
+   0.2387    4.6809 v _25603_/Y (sky130_fd_sc_hd__o2bb2ai_1)
+   0.1845    4.8653 ^ _25604_/Y (sky130_fd_sc_hd__o21ai_1)
+   0.2208    5.0861 v _25611_/Y (sky130_fd_sc_hd__o21ai_1)
+   0.1325    5.2187 ^ _25612_/Y (sky130_fd_sc_hd__o21ai_2)
+   0.3209    5.5395 ^ _25619_/X (sky130_fd_sc_hd__a21o_1)
+   0.1551    5.6946 v _25626_/Y (sky130_fd_sc_hd__a21oi_2)
+   0.3124    6.0071 ^ _25634_/Y (sky130_fd_sc_hd__o21bai_2)
+   0.1891    6.1962 v _25641_/Y (sky130_fd_sc_hd__a21oi_4)
+   0.2576    6.4538 ^ _25648_/Y (sky130_fd_sc_hd__o21bai_2)
+   0.1952    6.6490 v _25654_/Y (sky130_fd_sc_hd__a21oi_2)
+   0.3159    6.9649 ^ _25660_/Y (sky130_fd_sc_hd__o21bai_2)
+   0.1891    7.1539 v _25666_/Y (sky130_fd_sc_hd__a21oi_4)
+   0.2576    7.4115 ^ _25672_/Y (sky130_fd_sc_hd__o21bai_2)
+   0.1952    7.6067 v _25678_/Y (sky130_fd_sc_hd__a21oi_2)
+   0.3158    7.9225 ^ _25684_/Y (sky130_fd_sc_hd__o21bai_2)
+   0.2038    8.1264 v _25690_/Y (sky130_fd_sc_hd__a21oi_4)
+   0.2544    8.3808 ^ _25697_/Y (sky130_fd_sc_hd__o21bai_4)
+   0.1776    8.5583 v _25704_/Y (sky130_fd_sc_hd__a21oi_4)
+   0.2661    8.8244 ^ _25711_/Y (sky130_fd_sc_hd__o21bai_4)
+   0.2044    9.0288 v _25721_/Y (sky130_fd_sc_hd__nand3_4)
+   0.3568    9.3856 ^ _25737_/Y (sky130_fd_sc_hd__o211ai_4)
+   0.2251    9.6107 v _25747_/Y (sky130_fd_sc_hd__nand3_4)
+   0.3081    9.9188 ^ _25763_/Y (sky130_fd_sc_hd__o211ai_4)
+   0.1550   10.0737 v _25768_/Y (sky130_fd_sc_hd__nand2_1)
+   0.1149   10.1887 ^ _25771_/Y (sky130_fd_sc_hd__nand2_1)
+   0.1165   10.3051 v _25772_/X (sky130_fd_sc_hd__xor2_1)
+   0.6296   10.9347 v _39868_/X (sky130_fd_sc_hd__mux2_1)
+   1.0986   12.0333 v _40322_/X (sky130_fd_sc_hd__mux4_1)
+   0.6333   12.6665 v _39869_/X (sky130_fd_sc_hd__mux2_1)
+   0.4839   13.1505 v _20796_/X (sky130_fd_sc_hd__or2b_1)
+   0.1920   13.3424 v _20797_/X (sky130_fd_sc_hd__o211a_1)
+   0.0000   13.3424 v _41879_/D (sky130_fd_sc_hd__dfxtp_1)
+            13.3424   data arrival time
+
+  12.0000   12.0000   clock clk (rise edge)
+   0.0000   12.0000   clock network delay (ideal)
+   0.0000   12.0000   clock reconvergence pessimism
+            12.0000 ^ _41879_/CLK (sky130_fd_sc_hd__dfxtp_1)
+  -0.2845   11.7155   library setup time
+            11.7155   data required time
+-------------------------------------------------------------
+            11.7155   data required time
+           -13.3424   data arrival time
+-------------------------------------------------------------
+            -1.6270   slack (VIOLATED)
+```
+
+</details>
+
+
+<details>
+<summary>Lab 2: Lab steps to execute OpenSTA with right timing libraries and CTS assignment</summary>
+
+Continuing from previous lab:
+```
+exit        (Exit openroad)
+openroad
+read_db pico_cts.db
+read_verilog /openLANE_flow/designs/picorv32a/runs/13-01_14-09/results/synthesis/picorv32a.synthesis_cts.v
+read_liberty $::env(LIB_SYNTH_COMPLETE)
+link_design picorv32a
+read_sdc designs/picorv32a/src/my_base.sdc
+set_propagated_clock [all_clocks]
+report_checks -path_delay min_max -fields {slew trans net cap input pin} -format full_clock_expanded
+echo $::env(CTS_CLK_BUFFER_LIST)                              (To see the list of buffers)
+```
+
+- Both timing are already met after post CTS
+- The tool picked small cell first to meet the skew and area
+  - skew values are within 10% of the max clock period
+```
+% report_checks -path_delay min_max -fields {slew trans net cap input pin} -format full_clock_expanded
+Startpoint: _37166_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _37548_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk (rise edge)
+                          0.00    0.00   clock source latency
+                  0.00    0.00    0.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00    0.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09    0.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00    0.09 ^ clkbuf_1_1_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.07    0.16 ^ clkbuf_1_1_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_1_1_0_clk (net)
+                  0.04    0.00    0.16 ^ clkbuf_1_1_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09    0.25 ^ clkbuf_1_1_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_1_1_1_clk (net)
+                  0.06    0.00    0.25 ^ clkbuf_2_2_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.08    0.34 ^ clkbuf_2_2_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_2_2_0_clk (net)
+                  0.04    0.00    0.34 ^ clkbuf_2_2_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09    0.43 ^ clkbuf_2_2_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_2_2_1_clk (net)
+                  0.06    0.00    0.43 ^ clkbuf_3_4_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10    0.53 ^ clkbuf_3_4_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_3_4_0_clk (net)
+                  0.06    0.00    0.53 ^ clkbuf_4_8_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10    0.62 ^ clkbuf_4_8_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_4_8_0_clk (net)
+                  0.06    0.00    0.62 ^ clkbuf_5_17_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.47    0.38    1.00 ^ clkbuf_5_17_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     5    0.04                           clknet_5_17_0_clk (net)
+                  0.47    0.00    1.00 ^ clkbuf_leaf_182_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.04    0.22    1.22 ^ clkbuf_leaf_182_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     5    0.01                           clknet_leaf_182_clk (net)
+                  0.04    0.00    1.22 ^ _37166_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                  0.04    0.29    1.52 ^ _37166_/Q (sky130_fd_sc_hd__dfxtp_1)
+     1    0.00                           alu_out_q[29] (net)
+                  0.04    0.00    1.52 ^ _36370_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.06    0.13    1.64 ^ _36370_/X (sky130_fd_sc_hd__mux2_1)
+     2    0.00                           _01548_ (net)
+                  0.06    0.00    1.64 ^ _24072_/B2 (sky130_fd_sc_hd__a221o_1)
+                  0.04    0.13    1.77 ^ _24072_/X (sky130_fd_sc_hd__a221o_1)
+     1    0.00                           _02128_ (net)
+                  0.04    0.00    1.77 ^ _35742_/A0 (sky130_fd_sc_hd__mux2_4)
+                  0.05    0.14    1.92 ^ _35742_/X (sky130_fd_sc_hd__mux2_4)
+     4    0.01                           cpuregs_wrdata[29] (net)
+                  0.05    0.00    1.92 ^ _21409_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.03    0.11    2.03 ^ _21409_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _02992_ (net)
+                  0.03    0.00    2.03 ^ _37548_/D (sky130_fd_sc_hd__dfxtp_1)
+                                  2.03   data arrival time
+
+                          0.00    0.00   clock clk (rise edge)
+                          0.00    0.00   clock source latency
+                  0.00    0.00    0.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00    0.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09    0.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00    0.09 ^ clkbuf_1_0_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.07    0.16 ^ clkbuf_1_0_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_1_0_0_clk (net)
+                  0.04    0.00    0.16 ^ clkbuf_1_0_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09    0.25 ^ clkbuf_1_0_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_1_0_1_clk (net)
+                  0.06    0.00    0.25 ^ clkbuf_2_0_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.08    0.34 ^ clkbuf_2_0_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_2_0_0_clk (net)
+                  0.04    0.00    0.34 ^ clkbuf_2_0_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09    0.43 ^ clkbuf_2_0_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_2_0_1_clk (net)
+                  0.06    0.00    0.43 ^ clkbuf_3_0_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10    0.53 ^ clkbuf_3_0_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_3_0_0_clk (net)
+                  0.06    0.00    0.53 ^ clkbuf_4_0_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10    0.62 ^ clkbuf_4_0_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_4_0_0_clk (net)
+                  0.06    0.00    0.62 ^ clkbuf_5_0_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  1.46    1.06    1.69 ^ clkbuf_5_0_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+    16    0.13                           clknet_5_0_0_clk (net)
+                  1.46    0.00    1.69 ^ clkbuf_leaf_259_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.07    0.32    2.00 ^ clkbuf_leaf_259_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     5    0.01                           clknet_leaf_259_clk (net)
+                  0.07    0.00    2.00 ^ _37548_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                          0.00    2.00   clock reconvergence pessimism
+                         -0.03    1.98   library hold time
+                                  1.98   data required time
+-----------------------------------------------------------------------------
+                                  1.98   data required time
+                                 -2.03   data arrival time
+-----------------------------------------------------------------------------
+                                  0.05   slack (MET)
+
+
+Startpoint: _38618_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _38545_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk (rise edge)
+                          0.00    0.00   clock source latency
+                  0.00    0.00    0.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00    0.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09    0.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00    0.09 ^ clkbuf_1_0_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.07    0.16 ^ clkbuf_1_0_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_1_0_0_clk (net)
+                  0.04    0.00    0.16 ^ clkbuf_1_0_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09    0.25 ^ clkbuf_1_0_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_1_0_1_clk (net)
+                  0.06    0.00    0.25 ^ clkbuf_2_1_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.08    0.34 ^ clkbuf_2_1_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_2_1_0_clk (net)
+                  0.04    0.00    0.34 ^ clkbuf_2_1_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09    0.43 ^ clkbuf_2_1_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_2_1_1_clk (net)
+                  0.06    0.00    0.43 ^ clkbuf_3_3_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10    0.53 ^ clkbuf_3_3_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_3_3_0_clk (net)
+                  0.06    0.00    0.53 ^ clkbuf_4_6_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10    0.62 ^ clkbuf_4_6_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_4_6_0_clk (net)
+                  0.06    0.00    0.62 ^ clkbuf_5_12_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.65    0.50    1.13 ^ clkbuf_5_12_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     7    0.06                           clknet_5_12_0_clk (net)
+                  0.65    0.00    1.13 ^ clkbuf_leaf_212_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.04    0.25    1.37 ^ clkbuf_leaf_212_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_leaf_212_clk (net)
+                  0.04    0.00    1.37 ^ _38618_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                  0.33    0.55    1.92 ^ _38618_/Q (sky130_fd_sc_hd__dfxtp_4)
+    33    0.12                           latched_stalu (net)
+                  0.33    0.00    1.92 ^ _36519_/S (sky130_fd_sc_hd__mux2_1)
+                  0.06    0.37    2.29 v _36519_/X (sky130_fd_sc_hd__mux2_1)
+     2    0.00                           _00293_ (net)
+                  0.06    0.00    2.29 v _36518_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.05    0.28    2.57 v _36518_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _00294_ (net)
+                  0.05    0.00    2.57 v _22741_/B (sky130_fd_sc_hd__and2_1)
+                  0.03    0.15    2.71 v _22741_/X (sky130_fd_sc_hd__and2_1)
+     1    0.00                           _00295_ (net)
+                  0.03    0.00    2.71 v _35809_/A0 (sky130_fd_sc_hd__mux2_2)
+                  0.07    0.28    2.99 v _35809_/X (sky130_fd_sc_hd__mux2_2)
+     4    0.01                           _02560_ (net)
+                  0.07    0.00    2.99 v _23131_/A (sky130_fd_sc_hd__xnor2_1)
+                  0.07    0.15    3.14 v _23131_/Y (sky130_fd_sc_hd__xnor2_1)
+     2    0.01                           _18154_ (net)
+                  0.07    0.00    3.14 v _23136_/A_N (sky130_fd_sc_hd__nand3b_2)
+                  0.07    0.21    3.35 v _23136_/Y (sky130_fd_sc_hd__nand3b_2)
+     2    0.00                           _18156_ (net)
+                  0.07    0.00    3.35 v _23143_/A2_N (sky130_fd_sc_hd__o2bb2ai_1)
+                  0.06    0.14    3.49 v _23143_/Y (sky130_fd_sc_hd__o2bb2ai_1)
+     2    0.00                           _18161_ (net)
+                  0.06    0.00    3.49 v _23151_/A2_N (sky130_fd_sc_hd__o2bb2ai_1)
+                  0.05    0.13    3.62 v _23151_/Y (sky130_fd_sc_hd__o2bb2ai_1)
+     1    0.00                           _18167_ (net)
+                  0.05    0.00    3.62 v _23152_/B1 (sky130_fd_sc_hd__o21ai_2)
+                  0.12    0.07    3.68 ^ _23152_/Y (sky130_fd_sc_hd__o21ai_2)
+     2    0.01                           _18168_ (net)
+                  0.12    0.00    3.68 ^ _23159_/B1 (sky130_fd_sc_hd__o21ai_1)
+                  0.06    0.09    3.77 v _23159_/Y (sky130_fd_sc_hd__o21ai_1)
+     1    0.00                           _18173_ (net)
+                  0.06    0.00    3.77 v _23160_/B1 (sky130_fd_sc_hd__o21ai_2)
+                  0.13    0.07    3.84 ^ _23160_/Y (sky130_fd_sc_hd__o21ai_2)
+     2    0.01                           _18174_ (net)
+                  0.13    0.00    3.84 ^ _23167_/A1 (sky130_fd_sc_hd__a21o_1)
+                  0.13    0.19    4.03 ^ _23167_/X (sky130_fd_sc_hd__a21o_1)
+     2    0.01                           _18179_ (net)
+                  0.13    0.00    4.03 ^ _23174_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.05    0.07    4.10 v _23174_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18184_ (net)
+                  0.05    0.00    4.10 v _23182_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.18    4.28 ^ _23182_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18190_ (net)
+                  0.20    0.00    4.28 ^ _23189_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.06    0.08    4.37 v _23189_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18195_ (net)
+                  0.06    0.00    4.37 v _23196_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.15    0.15    4.52 ^ _23196_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18200_ (net)
+                  0.15    0.00    4.52 ^ _23202_/A1 (sky130_fd_sc_hd__a21oi_2)
+                  0.06    0.09    4.61 v _23202_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.01                           _18204_ (net)
+                  0.06    0.00    4.61 v _23208_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.19    4.79 ^ _23208_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18208_ (net)
+                  0.20    0.00    4.79 ^ _23214_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.06    0.08    4.87 v _23214_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18212_ (net)
+                  0.06    0.00    4.87 v _23220_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.18    5.06 ^ _23220_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18216_ (net)
+                  0.20    0.00    5.06 ^ _23226_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.06    0.08    5.14 v _23226_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18220_ (net)
+                  0.06    0.00    5.14 v _23232_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.15    0.15    5.29 ^ _23232_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18224_ (net)
+                  0.15    0.00    5.29 ^ _23238_/A1 (sky130_fd_sc_hd__a21oi_2)
+                  0.06    0.09    5.38 v _23238_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.01                           _18228_ (net)
+                  0.06    0.00    5.38 v _23245_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.19    5.56 ^ _23245_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18233_ (net)
+                  0.20    0.00    5.56 ^ _23251_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.07    0.09    5.65 v _23251_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18237_ (net)
+                  0.07    0.00    5.65 v _23258_/A2 (sky130_fd_sc_hd__o21bai_4)
+                  0.16    0.16    5.81 ^ _23258_/Y (sky130_fd_sc_hd__o21bai_4)
+     3    0.02                           _18242_ (net)
+                  0.16    0.00    5.81 ^ _23268_/A (sky130_fd_sc_hd__nand3_4)
+                  0.08    0.10    5.91 v _23268_/Y (sky130_fd_sc_hd__nand3_4)
+     3    0.01                           _18248_ (net)
+                  0.08    0.00    5.91 v _23284_/A2 (sky130_fd_sc_hd__o211ai_4)
+                  0.20    0.21    6.12 ^ _23284_/Y (sky130_fd_sc_hd__o211ai_4)
+     3    0.02                           _18260_ (net)
+                  0.20    0.00    6.12 ^ _23294_/A (sky130_fd_sc_hd__nand3_4)
+                  0.09    0.10    6.23 v _23294_/Y (sky130_fd_sc_hd__nand3_4)
+     3    0.01                           _18266_ (net)
+                  0.09    0.00    6.23 v _23310_/A2 (sky130_fd_sc_hd__o211ai_4)
+                  0.16    0.18    6.41 ^ _23310_/Y (sky130_fd_sc_hd__o211ai_4)
+     3    0.01                           _18278_ (net)
+                  0.16    0.00    6.41 ^ _23315_/A (sky130_fd_sc_hd__nand2_1)
+                  0.05    0.06    6.47 v _23315_/Y (sky130_fd_sc_hd__nand2_1)
+     1    0.00                           _18281_ (net)
+                  0.05    0.00    6.47 v _23318_/A (sky130_fd_sc_hd__nand2_1)
+                  0.06    0.07    6.54 ^ _23318_/Y (sky130_fd_sc_hd__nand2_1)
+     1    0.00                           _18284_ (net)
+                  0.06    0.00    6.54 ^ _23319_/B (sky130_fd_sc_hd__xor2_1)
+                  0.05    0.05    6.59 v _23319_/X (sky130_fd_sc_hd__xor2_1)
+     1    0.00                           _01676_ (net)
+                  0.05    0.00    6.59 v _36534_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.05    0.27    6.87 v _36534_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _01677_ (net)
+                  0.05    0.00    6.87 v _36988_/A1 (sky130_fd_sc_hd__mux4_1)
+                  0.08    0.48    7.34 v _36988_/X (sky130_fd_sc_hd__mux4_1)
+     1    0.00                           _01678_ (net)
+                  0.08    0.00    7.34 v _36535_/A0 (sky130_fd_sc_hd__mux2_1)
+                  0.05    0.28    7.62 v _36535_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _02529_ (net)
+                  0.05    0.00    7.62 v _18990_/A (sky130_fd_sc_hd__or2b_1)
+                  0.04    0.21    7.83 v _18990_/X (sky130_fd_sc_hd__or2b_1)
+     1    0.00                           _16178_ (net)
+                  0.04    0.00    7.83 v _18991_/C1 (sky130_fd_sc_hd__o211a_1)
+                  0.03    0.10    7.93 v _18991_/X (sky130_fd_sc_hd__o211a_1)
+     1    0.00                           _03989_ (net)
+                  0.03    0.00    7.93 v _38545_/D (sky130_fd_sc_hd__dfxtp_1)
+                                  7.93   data arrival time
+
+                         12.00   12.00   clock clk (rise edge)
+                          0.00   12.00   clock source latency
+                  0.00    0.00   12.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00   12.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09   12.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00   12.09 ^ clkbuf_1_1_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.07   12.16 ^ clkbuf_1_1_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_1_1_0_clk (net)
+                  0.04    0.00   12.16 ^ clkbuf_1_1_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09   12.25 ^ clkbuf_1_1_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_1_1_1_clk (net)
+                  0.06    0.00   12.25 ^ clkbuf_2_2_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.04    0.08   12.34 ^ clkbuf_2_2_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     1    0.00                           clknet_2_2_0_clk (net)
+                  0.04    0.00   12.34 ^ clkbuf_2_2_1_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.09   12.43 ^ clkbuf_2_2_1_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_2_2_1_clk (net)
+                  0.06    0.00   12.43 ^ clkbuf_3_4_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10   12.53 ^ clkbuf_3_4_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_3_4_0_clk (net)
+                  0.06    0.00   12.53 ^ clkbuf_4_8_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.06    0.10   12.62 ^ clkbuf_4_8_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     2    0.00                           clknet_4_8_0_clk (net)
+                  0.06    0.00   12.62 ^ clkbuf_5_17_0_clk/A (sky130_fd_sc_hd__clkbuf_1)
+                  0.47    0.38   13.00 ^ clkbuf_5_17_0_clk/X (sky130_fd_sc_hd__clkbuf_1)
+     5    0.04                           clknet_5_17_0_clk (net)
+                  0.47    0.00   13.00 ^ clkbuf_leaf_182_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.04    0.22   13.22 ^ clkbuf_leaf_182_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     5    0.01                           clknet_leaf_182_clk (net)
+                  0.04    0.00   13.22 ^ _38545_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                          0.00   13.22   clock reconvergence pessimism
+                         -0.11   13.12   library setup time
+                                 13.12   data required time
+-----------------------------------------------------------------------------
+                                 13.12   data required time
+                                 -7.93   data arrival time
+-----------------------------------------------------------------------------
+                                  5.19   slack (MET)
+
+```
+
+
+
+
+</details>
+
+<details>
+<summary>Lab 3: Lab steps to observe impact of bigger CTS buffers on setup and hold timing</summary>
+
+In openlane:
+```
+exit 
+echo $::env(CTS_CLK_BUFFER_LIST)
+set ::env(CTS_CLK_BUFFER_LIST) [lreplace $::env(CTS_CLK_BUFFER_LIST) 0 0]
+echo $::env(CURRENT_DEF)
+set ::env(CURRENT_DEF) /openLANE_flow/designs/picorv32a/runs/13-01_14-09/results/placement/picorv32a.placement.def
+run_cts
+openroad
+read_lef /openLANE_flow/designs/picorv32a/runs/13-01_14-09/tmp/merged.lef
+read_def /openLANE_flow/designs/picorv32a/runs/13-01_14-09/results/cts/picorv32a.cts.def
+write_db pico_cts1.db
+read_db pico_cts1.db
+read_verilog /openLANE_flow/designs/picorv32a/runs/13-01_14-09/results/synthesis/picorv32a.synthesis_cts.v
+read_liberty $::env(LIB_SYNTH_COMPLETE)
+link_design picorv32a
+read_sdc designs/picorv32a/src/my_base.sdc
+set_propagated_clock [all_clocks]
+report_checks -path_delay min_max -fields {slew trans net cap input pin} -format full_clock_expanded
+```
+
+Report check : Both MIN and MAX slack
+```
+
+report_checks -path_delay min_max -fields {slew trans net cap input pin} -format full_clock_expanded
+Startpoint: _37098_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _37103_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: min
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk (rise edge)
+                          0.00    0.00   clock source latency
+                  0.00    0.00    0.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00    0.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09    0.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00    0.09 ^ clkbuf_1_0_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.10    0.20 ^ clkbuf_1_0_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_1_0_0_clk (net)
+                  0.03    0.00    0.20 ^ clkbuf_1_0_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.31 ^ clkbuf_1_0_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_1_0_1_clk (net)
+                  0.03    0.00    0.31 ^ clkbuf_2_1_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.42 ^ clkbuf_2_1_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_2_1_0_clk (net)
+                  0.03    0.00    0.42 ^ clkbuf_2_1_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.53 ^ clkbuf_2_1_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_2_1_1_clk (net)
+                  0.03    0.00    0.53 ^ clkbuf_3_2_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.64 ^ clkbuf_3_2_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_3_2_0_clk (net)
+                  0.03    0.00    0.64 ^ clkbuf_4_4_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.75 ^ clkbuf_4_4_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_4_4_0_clk (net)
+                  0.03    0.00    0.75 ^ clkbuf_5_9_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.15    0.21    0.96 ^ clkbuf_5_9_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     6    0.05                           clknet_5_9_0_clk (net)
+                  0.15    0.00    0.96 ^ clkbuf_leaf_219_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.15    1.11 ^ clkbuf_leaf_219_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     4    0.01                           clknet_leaf_219_clk (net)
+                  0.03    0.00    1.11 ^ _37098_/CLK (sky130_fd_sc_hd__dfxtp_2)
+                  0.07    0.33    1.44 ^ _37098_/Q (sky130_fd_sc_hd__dfxtp_2)
+     6    0.01                           irq_pending[0] (net)
+                  0.07    0.00    1.44 ^ _35948_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.03    0.12    1.56 ^ _35948_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _18309_ (net)
+                  0.03    0.00    1.56 ^ _37103_/D (sky130_fd_sc_hd__dfxtp_1)
+                                  1.56   data arrival time
+
+                          0.00    0.00   clock clk (rise edge)
+                          0.00    0.00   clock source latency
+                  0.00    0.00    0.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00    0.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09    0.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00    0.09 ^ clkbuf_1_1_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.10    0.20 ^ clkbuf_1_1_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_1_1_0_clk (net)
+                  0.03    0.00    0.20 ^ clkbuf_1_1_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.31 ^ clkbuf_1_1_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_1_1_1_clk (net)
+                  0.03    0.00    0.31 ^ clkbuf_2_2_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.42 ^ clkbuf_2_2_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_2_2_0_clk (net)
+                  0.03    0.00    0.42 ^ clkbuf_2_2_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.53 ^ clkbuf_2_2_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_2_2_1_clk (net)
+                  0.03    0.00    0.53 ^ clkbuf_3_5_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.64 ^ clkbuf_3_5_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_3_5_0_clk (net)
+                  0.03    0.00    0.64 ^ clkbuf_4_10_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.75 ^ clkbuf_4_10_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_4_10_0_clk (net)
+                  0.03    0.00    0.75 ^ clkbuf_5_20_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.17    0.22    0.98 ^ clkbuf_5_20_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     7    0.06                           clknet_5_20_0_clk (net)
+                  0.17    0.00    0.98 ^ clkbuf_opt_5_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.16    1.14 ^ clkbuf_opt_5_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     1    0.01                           clknet_opt_5_clk (net)
+                  0.03    0.00    1.14 ^ clkbuf_leaf_187_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.04    0.12    1.25 ^ clkbuf_leaf_187_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     8    0.02                           clknet_leaf_187_clk (net)
+                  0.04    0.00    1.25 ^ _37103_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                          0.00    1.25   clock reconvergence pessimism
+                         -0.03    1.22   library hold time
+                                  1.22   data required time
+-----------------------------------------------------------------------------
+                                  1.22   data required time
+                                 -1.56   data arrival time
+-----------------------------------------------------------------------------
+                                  0.34   slack (MET)
+
+
+Startpoint: _38618_ (rising edge-triggered flip-flop clocked by clk)
+Endpoint: _38545_ (rising edge-triggered flip-flop clocked by clk)
+Path Group: clk
+Path Type: max
+
+Fanout     Cap    Slew   Delay    Time   Description
+-----------------------------------------------------------------------------
+                          0.00    0.00   clock clk (rise edge)
+                          0.00    0.00   clock source latency
+                  0.00    0.00    0.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00    0.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09    0.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00    0.09 ^ clkbuf_1_0_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.10    0.20 ^ clkbuf_1_0_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_1_0_0_clk (net)
+                  0.03    0.00    0.20 ^ clkbuf_1_0_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.31 ^ clkbuf_1_0_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_1_0_1_clk (net)
+                  0.03    0.00    0.31 ^ clkbuf_2_1_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.42 ^ clkbuf_2_1_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_2_1_0_clk (net)
+                  0.03    0.00    0.42 ^ clkbuf_2_1_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.53 ^ clkbuf_2_1_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_2_1_1_clk (net)
+                  0.03    0.00    0.53 ^ clkbuf_3_3_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.64 ^ clkbuf_3_3_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_3_3_0_clk (net)
+                  0.03    0.00    0.64 ^ clkbuf_4_6_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11    0.75 ^ clkbuf_4_6_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_4_6_0_clk (net)
+                  0.03    0.00    0.75 ^ clkbuf_5_12_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.17    0.22    0.98 ^ clkbuf_5_12_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     7    0.06                           clknet_5_12_0_clk (net)
+                  0.17    0.00    0.98 ^ clkbuf_leaf_212_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.15    1.13 ^ clkbuf_leaf_212_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_leaf_212_clk (net)
+                  0.03    0.00    1.13 ^ _38618_/CLK (sky130_fd_sc_hd__dfxtp_4)
+                  0.33    0.54    1.67 ^ _38618_/Q (sky130_fd_sc_hd__dfxtp_4)
+    33    0.12                           latched_stalu (net)
+                  0.33    0.00    1.67 ^ _36519_/S (sky130_fd_sc_hd__mux2_1)
+                  0.06    0.37    2.04 v _36519_/X (sky130_fd_sc_hd__mux2_1)
+     2    0.00                           _00293_ (net)
+                  0.06    0.00    2.04 v _36518_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.05    0.28    2.32 v _36518_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _00294_ (net)
+                  0.05    0.00    2.32 v _22741_/B (sky130_fd_sc_hd__and2_1)
+                  0.03    0.15    2.47 v _22741_/X (sky130_fd_sc_hd__and2_1)
+     1    0.00                           _00295_ (net)
+                  0.03    0.00    2.47 v _35809_/A0 (sky130_fd_sc_hd__mux2_2)
+                  0.07    0.28    2.75 v _35809_/X (sky130_fd_sc_hd__mux2_2)
+     4    0.01                           _02560_ (net)
+                  0.07    0.00    2.75 v _23131_/A (sky130_fd_sc_hd__xnor2_1)
+                  0.07    0.15    2.89 v _23131_/Y (sky130_fd_sc_hd__xnor2_1)
+     2    0.01                           _18154_ (net)
+                  0.07    0.00    2.89 v _23136_/A_N (sky130_fd_sc_hd__nand3b_2)
+                  0.07    0.21    3.10 v _23136_/Y (sky130_fd_sc_hd__nand3b_2)
+     2    0.00                           _18156_ (net)
+                  0.07    0.00    3.10 v _23143_/A2_N (sky130_fd_sc_hd__o2bb2ai_1)
+                  0.06    0.14    3.24 v _23143_/Y (sky130_fd_sc_hd__o2bb2ai_1)
+     2    0.00                           _18161_ (net)
+                  0.06    0.00    3.24 v _23151_/A2_N (sky130_fd_sc_hd__o2bb2ai_1)
+                  0.05    0.13    3.37 v _23151_/Y (sky130_fd_sc_hd__o2bb2ai_1)
+     1    0.00                           _18167_ (net)
+                  0.05    0.00    3.37 v _23152_/B1 (sky130_fd_sc_hd__o21ai_2)
+                  0.12    0.07    3.44 ^ _23152_/Y (sky130_fd_sc_hd__o21ai_2)
+     2    0.01                           _18168_ (net)
+                  0.12    0.00    3.44 ^ _23159_/B1 (sky130_fd_sc_hd__o21ai_1)
+                  0.06    0.09    3.53 v _23159_/Y (sky130_fd_sc_hd__o21ai_1)
+     1    0.00                           _18173_ (net)
+                  0.06    0.00    3.53 v _23160_/B1 (sky130_fd_sc_hd__o21ai_2)
+                  0.13    0.07    3.60 ^ _23160_/Y (sky130_fd_sc_hd__o21ai_2)
+     2    0.01                           _18174_ (net)
+                  0.13    0.00    3.60 ^ _23167_/A1 (sky130_fd_sc_hd__a21o_1)
+                  0.13    0.19    3.79 ^ _23167_/X (sky130_fd_sc_hd__a21o_1)
+     2    0.01                           _18179_ (net)
+                  0.13    0.00    3.79 ^ _23174_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.05    0.07    3.86 v _23174_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18184_ (net)
+                  0.05    0.00    3.86 v _23182_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.18    4.04 ^ _23182_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18190_ (net)
+                  0.20    0.00    4.04 ^ _23189_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.06    0.08    4.12 v _23189_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18195_ (net)
+                  0.06    0.00    4.12 v _23196_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.15    0.15    4.27 ^ _23196_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18200_ (net)
+                  0.15    0.00    4.27 ^ _23202_/A1 (sky130_fd_sc_hd__a21oi_2)
+                  0.06    0.09    4.36 v _23202_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.01                           _18204_ (net)
+                  0.06    0.00    4.36 v _23208_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.19    4.54 ^ _23208_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18208_ (net)
+                  0.20    0.00    4.54 ^ _23214_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.06    0.08    4.63 v _23214_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18212_ (net)
+                  0.06    0.00    4.63 v _23220_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.18    4.81 ^ _23220_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18216_ (net)
+                  0.20    0.00    4.81 ^ _23226_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.06    0.08    4.89 v _23226_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18220_ (net)
+                  0.06    0.00    4.89 v _23232_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.15    0.15    5.04 ^ _23232_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18224_ (net)
+                  0.15    0.00    5.04 ^ _23238_/A1 (sky130_fd_sc_hd__a21oi_2)
+                  0.06    0.09    5.13 v _23238_/Y (sky130_fd_sc_hd__a21oi_2)
+     2    0.01                           _18228_ (net)
+                  0.06    0.00    5.13 v _23245_/A2 (sky130_fd_sc_hd__o21bai_2)
+                  0.20    0.19    5.32 ^ _23245_/Y (sky130_fd_sc_hd__o21bai_2)
+     2    0.01                           _18233_ (net)
+                  0.20    0.00    5.32 ^ _23251_/A1 (sky130_fd_sc_hd__a21oi_4)
+                  0.07    0.09    5.41 v _23251_/Y (sky130_fd_sc_hd__a21oi_4)
+     2    0.01                           _18237_ (net)
+                  0.07    0.00    5.41 v _23258_/A2 (sky130_fd_sc_hd__o21bai_4)
+                  0.16    0.16    5.57 ^ _23258_/Y (sky130_fd_sc_hd__o21bai_4)
+     3    0.02                           _18242_ (net)
+                  0.16    0.00    5.57 ^ _23268_/A (sky130_fd_sc_hd__nand3_4)
+                  0.08    0.10    5.66 v _23268_/Y (sky130_fd_sc_hd__nand3_4)
+     3    0.01                           _18248_ (net)
+                  0.08    0.00    5.66 v _23284_/A2 (sky130_fd_sc_hd__o211ai_4)
+                  0.20    0.21    5.87 ^ _23284_/Y (sky130_fd_sc_hd__o211ai_4)
+     3    0.02                           _18260_ (net)
+                  0.20    0.00    5.87 ^ _23294_/A (sky130_fd_sc_hd__nand3_4)
+                  0.09    0.10    5.98 v _23294_/Y (sky130_fd_sc_hd__nand3_4)
+     3    0.01                           _18266_ (net)
+                  0.09    0.00    5.98 v _23310_/A2 (sky130_fd_sc_hd__o211ai_4)
+                  0.16    0.18    6.16 ^ _23310_/Y (sky130_fd_sc_hd__o211ai_4)
+     3    0.01                           _18278_ (net)
+                  0.16    0.00    6.16 ^ _23315_/A (sky130_fd_sc_hd__nand2_1)
+                  0.05    0.06    6.23 v _23315_/Y (sky130_fd_sc_hd__nand2_1)
+     1    0.00                           _18281_ (net)
+                  0.05    0.00    6.23 v _23318_/A (sky130_fd_sc_hd__nand2_1)
+                  0.06    0.07    6.29 ^ _23318_/Y (sky130_fd_sc_hd__nand2_1)
+     1    0.00                           _18284_ (net)
+                  0.06    0.00    6.29 ^ _23319_/B (sky130_fd_sc_hd__xor2_1)
+                  0.05    0.05    6.35 v _23319_/X (sky130_fd_sc_hd__xor2_1)
+     1    0.00                           _01676_ (net)
+                  0.05    0.00    6.35 v _36534_/A1 (sky130_fd_sc_hd__mux2_1)
+                  0.05    0.27    6.62 v _36534_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _01677_ (net)
+                  0.05    0.00    6.62 v _36988_/A1 (sky130_fd_sc_hd__mux4_1)
+                  0.08    0.48    7.10 v _36988_/X (sky130_fd_sc_hd__mux4_1)
+     1    0.00                           _01678_ (net)
+                  0.08    0.00    7.10 v _36535_/A0 (sky130_fd_sc_hd__mux2_1)
+                  0.05    0.28    7.37 v _36535_/X (sky130_fd_sc_hd__mux2_1)
+     1    0.00                           _02529_ (net)
+                  0.05    0.00    7.37 v _18990_/A (sky130_fd_sc_hd__or2b_1)
+                  0.04    0.21    7.59 v _18990_/X (sky130_fd_sc_hd__or2b_1)
+     1    0.00                           _16178_ (net)
+                  0.04    0.00    7.59 v _18991_/C1 (sky130_fd_sc_hd__o211a_1)
+                  0.03    0.10    7.68 v _18991_/X (sky130_fd_sc_hd__o211a_1)
+     1    0.00                           _03989_ (net)
+                  0.03    0.00    7.68 v _38545_/D (sky130_fd_sc_hd__dfxtp_1)
+                                  7.68   data arrival time
+
+                         12.00   12.00   clock clk (rise edge)
+                          0.00   12.00   clock source latency
+                  0.00    0.00   12.00 ^ clk (in)
+     1    0.01                           clk (net)
+                  0.00    0.00   12.00 ^ clkbuf_0_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.09   12.09 ^ clkbuf_0_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     2    0.00                           clknet_0_clk (net)
+                  0.03    0.00   12.09 ^ clkbuf_1_1_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.10   12.20 ^ clkbuf_1_1_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_1_1_0_clk (net)
+                  0.03    0.00   12.20 ^ clkbuf_1_1_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11   12.31 ^ clkbuf_1_1_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_1_1_1_clk (net)
+                  0.03    0.00   12.31 ^ clkbuf_2_2_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11   12.42 ^ clkbuf_2_2_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     1    0.00                           clknet_2_2_0_clk (net)
+                  0.03    0.00   12.42 ^ clkbuf_2_2_1_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11   12.53 ^ clkbuf_2_2_1_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_2_2_1_clk (net)
+                  0.03    0.00   12.53 ^ clkbuf_3_4_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11   12.64 ^ clkbuf_3_4_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_3_4_0_clk (net)
+                  0.03    0.00   12.64 ^ clkbuf_4_8_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.03    0.11   12.75 ^ clkbuf_4_8_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     2    0.00                           clknet_4_8_0_clk (net)
+                  0.03    0.00   12.75 ^ clkbuf_5_17_0_clk/A (sky130_fd_sc_hd__clkbuf_4)
+                  0.13    0.19   12.95 ^ clkbuf_5_17_0_clk/X (sky130_fd_sc_hd__clkbuf_4)
+     5    0.04                           clknet_5_17_0_clk (net)
+                  0.13    0.00   12.95 ^ clkbuf_leaf_182_clk/A (sky130_fd_sc_hd__clkbuf_16)
+                  0.03    0.15   13.09 ^ clkbuf_leaf_182_clk/X (sky130_fd_sc_hd__clkbuf_16)
+     5    0.01                           clknet_leaf_182_clk (net)
+                  0.03    0.00   13.09 ^ _38545_/CLK (sky130_fd_sc_hd__dfxtp_1)
+                          0.00   13.09   clock reconvergence pessimism
+                         -0.11   12.98   library setup time
+                                 12.98   data required time
+-----------------------------------------------------------------------------
+                                 12.98   data required time
+                                 -7.68   data arrival time
+-----------------------------------------------------------------------------
+                                  5.30   slack (MET)
+
+```
+
+
+```
+report_clock_skew -hold
+report_clock_skew -setup
+set ::env(CTS_CLK_BUFFER_LIST) [linsert $::env(CTS_CLK_BUFFER_LIST) 0 sky130_fd_sc_hd__clkbuf_1]      (Adding back clkbuf1)
+```
+<img width="820" alt="435B0EB3-CDB0-4F50-B29E-805DD63628C8" src="https://github.com/Avi991/Samsung-PD-training-/assets/142480104/59786300-ef43-48c3-9664-780e30494e15">
+
+</details>
+</details>
