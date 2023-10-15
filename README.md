@@ -6858,9 +6858,8 @@ set ::env(CTS_CLK_BUFFER_LIST) [linsert $::env(CTS_CLK_BUFFER_LIST) 0 sky130_fd_
 
 </details>
 
-# Day-19 Final Step RTL to GDSII
-
 <details>
+# Day-19 Final Step RTL to GDSII
 
  <summary>Introduction to maze Routing use Lee's Algorithm</summary>
 
