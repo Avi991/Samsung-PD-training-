@@ -5663,11 +5663,6 @@ In openlane:
 run_floorplan
 run_placement
 ```
-Floorplan
-
-
-Placement
-
 
 In terminal:
 ```
@@ -5734,7 +5729,7 @@ report_checks -path_delay min_max -fields {slew trans net cap input_pin}
 report_tns
 report_wns
 ```
-my_base1.sdc file:
+my_base.sdc file:
 ```
 
 set ::env(CLOCK_PORT) clk 
@@ -5775,7 +5770,11 @@ Running STA:
 cd ~/Desktop/work/tools/openlane_working_dir/openlane
 sta pre_sta.conf
 ```
+![3 hold](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/34c825e3-847b-463f-a91c-6e7c0bee888c)
 
+![4 setup](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e586d949-18a2-4b32-9997-2ae76c07ca6f)
+
+![5 optimized time](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/62dd85e7-95bd-4535-841d-608c7c13edc0)
 
 
 </details>
@@ -5807,9 +5806,6 @@ report_checks -fields {net cap dlew input pins} -digits 4
 report_tns
 report_wns
 ```
-
-report_net:
-
 
 ```
 replace_cell _38618_ sky130_fd_sc_hd__dfxtp_4
@@ -5970,6 +5966,9 @@ wns -3.32
 ```
 Tns and wns has improved for setup by increasing drive strength.
 
+![6 optimized time](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/326a2e70-c516-47e1-a607-a18301ad32dc)
+
+
 </details>
 </details>
 
@@ -6021,6 +6020,11 @@ run_cts
 ```
 
 picorv32a.synthesis_cts.v is generated.
+
+![6 optimized time](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/23f1ba2b-a1df-4416-a0b1-ae340d7bd9d1)
+
+![7 optimized time](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/03ac0571-035e-4a85-8722-3385ed3ee1c0)
+
 </details>
 
 <details>
@@ -6039,7 +6043,9 @@ echo $::env(CTS_MAX_CAP)
 echo $::env(CTS_CLK_BUFFER_LIST)
 echo $::env(CTS_ROOT_BUFFER)
 ```
+![8_fp](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/bf37aa3b-9ad9-4aef-a3e1-93b4865b8616)
 
+![9_place](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/321ba384-0e1a-4f9e-8343-d057a61d0059)
 
 </details>
 </details>
@@ -6847,6 +6853,7 @@ report_clock_skew -hold
 report_clock_skew -setup
 set ::env(CTS_CLK_BUFFER_LIST) [linsert $::env(CTS_CLK_BUFFER_LIST) 0 sky130_fd_sc_hd__clkbuf_1]      (Adding back clkbuf1)
 ```
+
 <img width="820" alt="435B0EB3-CDB0-4F50-B29E-805DD63628C8" src="https://github.com/Avi991/Samsung-PD-training-/assets/142480104/59786300-ef43-48c3-9664-780e30494e15">
 
 </details>
