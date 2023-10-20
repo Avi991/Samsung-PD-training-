@@ -6920,9 +6920,7 @@ One of the key advantages of the Lee algorithm is its ability to guarantee that 
 
  - Some of the Design Rule checks are as shown in the figure
 
-
-
- - One type of DRC violation is a signal short, where two wires that are not intended to be connected becomes in contact on the same layer.
+ - One of the violation is a signal short, where two wires that are not intended to be connected becomes in contact on the same layer.
 
  - This could lead to functional failure, so this needs to be taken care of.
 
@@ -6930,24 +6928,14 @@ One of the key advantages of the Lee algorithm is its ability to guarantee that 
 
  - However, please keep in mind that there are new drc rules that need to be taken into account.
 
-  
-
  - Performing parasitic extraction, where the resistances and capacitances of the wires are extracted and will be used for further processes.
 
-
-
-      
 </details>
 
 <details>
 
  <summary>Labs</summary>
- If exited from openlane 
- 
-```ruby
-cd work/tools/openlane_working_dir/openlane
-make mount
-pwd
+ Starting Openlane again
 ls -ltr
 ./flow.tcl -interactive
 package require openlane 0.9
@@ -6960,7 +6948,8 @@ echo $::env(CURRENT_DEF)    (Ensure current_def is on the CTS stage)
 gen_pdn                     (To generate power distribution network)
 ```
 We get the error
-
+file:///home/aviral.s/day%2019/1_gen_pdn.png
+file:///home/aviral.s/day%2019/gen_pdn_error_2.png
 
 **Basics of global and detail routing and configure TritonRoute**
 
@@ -6972,9 +6961,7 @@ run_routing
 ```
 when we run the command *run_routing* we get
 
-
-
-The results can be seen in the result folder
+file:///home/aviral.s/day%2019/run_routing.png
 
 </details>
 
