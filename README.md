@@ -7102,12 +7102,9 @@ file:///home/aviral.s/Desktop/Day20/pns%20modify.png
 source top.tcl
 ```
 
-<img width="800" alt="pic7_floorplan_plac" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic7_floorplan_plac.png"><br>
-
-<img width="800" alt="pic8_chip" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic8_chip.png"><br>
 
 Below screenshot displays the timing report showing slack = -5.31. <br>
-<img width="800" alt="pic9_40%25_before_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic9_40%25_before_propagated.png"><br>
+
 
 In icc2_shell
 
@@ -7116,7 +7113,6 @@ set_propagated_clock [all_clocks]             (Converting clock object from idea
 report_timing
 ```
 
-<img width="800" alt="pic10_40%25_after_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic10_40%25_after_propagated.png"><br>
 
 *violators.rpt*
 
@@ -7124,7 +7120,6 @@ report_timing
 gvim violators.rpt	     (Reviewing violations report within the design)
 ```
 
-<img width="800" alt="pic13_40-50%25violators" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic13_40-50%25violators.png"><br>
 
 **Observing for 50% of utilization**
 
