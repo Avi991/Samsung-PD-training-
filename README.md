@@ -6953,6 +6953,23 @@ file:///home/aviral.s/day%2019/gen_pdn_error_2.png
 
 **Basics of global and detail routing and configure TritonRoute**
 
+Routing, in the context of electronic design and integrated circuits, refers to the process of determining the physical paths or connections for electrical signals on a chip or a printed circuit board (PCB). It involves deciding how wires, traces, or interconnects should be laid out to ensure that signals can travel from their source to their destination while meeting various design constraints, such as timing, area constraints, and avoiding interference.
+
+**Global and detailed routing are two phases within the routing process:**
+
+**Global Routing:**
+
+- Global routing is the initial phase in the routing process, where the overall path for connections is established at a high level.<br>
+- It focuses on determining the general path and direction of wires or signal paths while taking into account high-level design constraints.<br>
+- At this stage, specific paths for each wire or signal are not yet defined in detail. Instead, it involves creating a rough plan for how wires should traverse the chip or PCB to connect various components.<br>
+- Global routing helps define the general topology of the interconnections and ensures that there are no major conflicts or congestion issues in the design.<br><br>
+
+**Detailed Routing:**
+
+- Detailed routing, also known as track assignment or channel routing, is the subsequent phase that follows global routing.<br>
+- In this phase, the exact paths for each wire or signal are defined in detail. This includes determining the specific locations of vias, routing layers, and obstacles that may be encountered
+- Detailed routing takes into consideration the intricacies of the design, adheres to design rules, and aims to optimize the routing for various objectives such as minimizing wirelength, reducing crosstalk, and avoiding congestion
+
 ```ruby
 echo $::env(CURRENT_DEF)            (Ensure the def file of pdn has been created)
 echo $::env(ROUTING_STRATEGY)
@@ -6965,4 +6982,170 @@ file:///home/aviral.s/day%2019/run_routing.png
 
 </details>
 
+## Day-20 Floorplanning and power planning labs ##
+<details>
+ <summary>Theory</summary>
+	The physical design flow in VLSI (Very Large Scale Integration) is a series of steps that transform a high-level hardware description of a digital circuit into a physical layout that can be fabricated as an integrated circuit (IC) on a semiconductor wafer. This flow involves several stages and a range of tools and methodologies. Here is an overview of the typical steps in the physical design flow:
+
+1. Design Specification: This is the initial step where you gather requirements and specifications for the digital circuit. It includes understanding the functionality, power consumption, performance, area constraints, and other design goals.
+
+2. RTL Design: Register Transfer Level (RTL) design involves creating a high-level representation of the digital circuit in a hardware description language (HDL) like VHDL or Verilog. The RTL description typically consists of flip-flops, registers, and the interconnections between them.
+
+3. Logic Synthesis: This step involves converting the RTL description into a gate-level representation. Logic synthesis tools map the RTL to a library of standard cells, optimizing for area, power, and speed while meeting the design constraints.
+
+4. Floor Planning: In this phase, you decide on the placement of different functional blocks and macros on the chip. It involves defining the size and location of each block to optimize for area, power, and signal routing.
+
+5. Power Planning: Power distribution networks are designed to ensure that all parts of the chip receive a stable and adequate power supply. This includes the design of power grids and voltage regulation circuits.
+
+6. Placement: The placement stage determines the physical locations of each standard cell on the chip. Tools aim to minimize wirelength, optimize for timing, and meet other design constraints.
+
+7. Clock Tree Synthesis (CTS): CTS is the process of designing a clock distribution network to ensure that clock signals reach all the flip-flops and latches with minimal skew and low power consumption.
+
+8. Routing: The routing step involves creating the physical wires (metal layers) that connect the gates, ensuring that all connections meet design requirements and constraints. Global and detailed routing are usually performed.
+
+9. Design for Manufacturing (DFM): DFM considerations address manufacturability issues like lithography, etching, and other process-related aspects to ensure the chip can be manufactured with high yield.
+
+10. Design Verification: Extensive verification is carried out at each stage of the physical design flow to ensure that the final layout adheres to the original design specifications and that it is free from logical and physical errors.
+
+11. Physical Verification: This involves checking the design against manufacturing rules, including design rule checking (DRC) and layout vs. schematic (LVS) checks.
+
+12. Extraction: Parasitic capacitances and resistances are extracted from the layout and included in the simulation models to accurately predict circuit behavior.
+
+13. Sign-off: This is the final review and approval stage before tape-out, where the design is deemed ready for fabrication.
+
+14. Tape-out: Once the design is thoroughly reviewed, validated, and optimized, it is sent for semiconductor fabrication. A set of files representing the design layout is created and submitted to the foundry.
+
+15. Post-Tapeout Tasks: After fabrication, there may be additional tasks such as package design, testing, and assembly before the final IC is ready for use.
+
+The physical design flow in VLSI is a complex and iterative process that requires careful planning and the use of various EDA (Electronic Design Automation) tools. Success in physical design depends on meeting the design goals and constraints while optimizing for power, area, and performance.
+</details>
+
+<details>
+ <summary>Labs</summary>
+	
+```ruby
+git clone https://github.com/manili/VSDBabySoC.git
+git clone https://github.com/Devipriya1921/VSDBabySoC_ICC2.git
+git clone https://github.com/bharath19-gs/synopsys_ICC2flow_130nm.git
+git clone https://github.com/kunalg123/icc2_workshop_collaterals.git
+git clone https://github.com/google/skywater-pdk-libs-sky130_fd_sc_hd.git
+git clone https://github.com/kunalg123/sky130RTLDesignAndSynthesisWorkshop.git
+```
+
+ ```ruby
+gvim vsdbabysoc.tcl &
+gvim avsdpll.lib &
+```
+
+*vsdbabysoc.tcl*
+- Modifying the contents to my path, remove -lib in read_lib commands, and replace MYCLK to clk since the clock used in the design is {clk}
+- All of the commands have been inserted in gvim and the tool will run it once at a time.<br>
+<img width="800" alt="1.vsdbabysoc.tcl" src=" https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/1.vsdbabysoc.tcl.png"><br>
+
+ *avsdpll.lib*
+ 
+- Remove the unwanted pins<br>
+  
+<img width="800" alt="3.avsdpll.lib" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/3.avsdpll.lib.png"><br>
+
+```ruby
+dc_shell
+source vsdbabysoc.tcl
+```
+***Reports***
+
+Report timing image is shown below.<br>
+<img width="800" alt="pic3_timing" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic3_timing.png"><br>
+
+Report area image is shown below.<br>
+<img width="800" alt="pic4_area" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic4_area.png"><br>
+
+Report power image is shown below.<br>
+<img width="800" alt="pic5_power" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic5_power.png"><br>
+
+***Output schematic***<br>
+<img width="800" alt="sche_pic1" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/sche_pic1.png"><br>
+
+*RVMYTH core*<br>
+<img width="800" alt="sche_pic2" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/sche_pic2.png"><br>
+
+***Performing physical design***
+
+```ruby
+gvim top.tcl
+gvim icc2_common_setup.tcl
+gvim icc2_dp_setup.tcl
+gvim init_design.read_parasitic_tech_example.tcl
+gvim init_design.mcmm_example.auto_expanded.tcl
+gvim pns_example.tcl
+```
+*Modifying files*
+
+1. top.tcl<br>
+<img width="800" alt="3.top.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/3.top.tcl.png"><br>
+
+2. icc2_common_setup.tcl<br>
+<img width="800" alt="4.icc2_common.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/4.icc2_common.tcl.png"><br>
+
+3. icc2_dp_setup.tcl<br>
+<img width="800" alt="5.icc2_dp.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/5.icc2_dp.tcl.png"><br>
+
+4. init_design.read_parasitic_tech_example.tcl<br>
+<img width="800" alt="6.init_example.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/6.init_example.tcl.png"><br>
+ 
+5. init_design.mcmm_example.auto_expanded.tcl<br>
+<img width="800" alt="7.init_expanded.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/7.init_expanded.tcl.png"><br>
+
+6. pns_example.tcl<br>
+<img width="800" alt="8.pns_ex.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/8.pns_ex.tcl.png"><br>
+
+**Observing for 40% of utilization**
+
+***Output Layout***
+
+```ruby
+source top.tcl
+```
+
+<img width="800" alt="pic7_floorplan_plac" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic7_floorplan_plac.png"><br>
+
+<img width="800" alt="pic8_chip" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic8_chip.png"><br>
+
+Below screenshot displays the timing report showing slack = -5.31. <br>
+<img width="800" alt="pic9_40%25_before_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic9_40%25_before_propagated.png"><br>
+
+In icc2_shell
+
+```ruby
+set_propagated_clock [all_clocks]             (Converting clock object from ideal clock to propagated clock)
+report_timing
+```
+
+<img width="800" alt="pic10_40%25_after_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic10_40%25_after_propagated.png"><br>
+
+*violators.rpt*
+
+```ruby
+gvim violators.rpt	     (Reviewing violations report within the design)
+```
+
+<img width="800" alt="pic13_40-50%25violators" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic13_40-50%25violators.png"><br>
+
+**Observing for 50% of utilization**
+
+*Slacks*
+
+<img width="800" alt="pic11_50%25_before_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic11_50%25_before_propagated.png"><br>
+
+In icc2_shell
+
+```ruby
+set_propagated_clock [all_clocks]             (Converting clock object from ideal clock to propagated clock)
+report_timing
+```
+
+Here observe that slack is getting increased.<br>
+<img width="800" alt="pic12_50%25_after_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic12_50%25_after_propagated.png"><br>
+
+Here we can observe that slack is getting increased when core utilization is increased from 40% to 50%.
 </details>
