@@ -7040,34 +7040,30 @@ gvim avsdpll.lib &
 *vsdbabysoc.tcl*
 - Modifying the contents to my path, remove -lib in read_lib commands, and replace MYCLK to clk since the clock used in the design is {clk}
 - All of the commands have been inserted in gvim and the tool will run it once at a time.<br>
-<img width="800" alt="1.vsdbabysoc.tcl" src=" https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/1.vsdbabysoc.tcl.png"><br>
 
- *avsdpll.lib*
+file:///home/aviral.s/Day20/vsdbabysoc.png
  
-- Remove the unwanted pins<br>
-  
-<img width="800" alt="3.avsdpll.lib" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/3.avsdpll.lib.png"><br>
-
 ```ruby
 dc_shell
 source vsdbabysoc.tcl
 ```
-***Reports***
+**Reports**
 
 Report timing image is shown below.<br>
-<img width="800" alt="pic3_timing" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic3_timing.png"><br>
+
 
 Report area image is shown below.<br>
-<img width="800" alt="pic4_area" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic4_area.png"><br>
 
-Report power image is shown below.<br>
-<img width="800" alt="pic5_power" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic5_power.png"><br>
 
-***Output schematic***<br>
-<img width="800" alt="sche_pic1" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/sche_pic1.png"><br>
+Report power image is shown below.
 
-*RVMYTH core*<br>
-<img width="800" alt="sche_pic2" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/sche_pic2.png"><br>
+
+**Output schematic**
+file:///home/aviral.s/Desktop/Day20/schematic.png![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/298572ef-2cd5-4a39-8148-c71c440a9437)
+
+
+**RVMYTH core**
+/home/aviral.s/Desktop/Day20/schematic core .png
 
 ***Performing physical design***
 
@@ -7079,26 +7075,25 @@ gvim init_design.read_parasitic_tech_example.tcl
 gvim init_design.mcmm_example.auto_expanded.tcl
 gvim pns_example.tcl
 ```
-*Modifying files*
+**Modified files**
 
 1. top.tcl<br>
-<img width="800" alt="3.top.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/3.top.tcl.png"><br>
+
 
 2. icc2_common_setup.tcl<br>
-<img width="800" alt="4.icc2_common.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/4.icc2_common.tcl.png"><br>
 
 3. icc2_dp_setup.tcl<br>
-<img width="800" alt="5.icc2_dp.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/5.icc2_dp.tcl.png"><br>
+
 
 4. init_design.read_parasitic_tech_example.tcl<br>
-<img width="800" alt="6.init_example.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/6.init_example.tcl.png"><br>
+
  
 5. init_design.mcmm_example.auto_expanded.tcl<br>
-<img width="800" alt="7.init_expanded.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/7.init_expanded.tcl.png"><br>
+file:///home/aviral.s/Desktop/Day20/mcmm%20modify.png
 
-6. pns_example.tcl<br>
-<img width="800" alt="8.pns_ex.tcl" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/8.pns_ex.tcl.png"><br>
-
+6. pns_example.tcl
+   
+file:///home/aviral.s/Desktop/Day20/pns%20modify.png
 **Observing for 40% of utilization**
 
 ***Output Layout***
@@ -7135,7 +7130,7 @@ gvim violators.rpt	     (Reviewing violations report within the design)
 
 *Slacks*
 
-<img width="800" alt="pic11_50%25_before_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic11_50%25_before_propagated.png"><br>
+
 
 In icc2_shell
 
@@ -7145,7 +7140,7 @@ report_timing
 ```
 
 Here observe that slack is getting increased.<br>
-<img width="800" alt="pic12_50%25_after_propagated" src="https://github.com/Sidv005/Samsung-PD-Training/blob/5867dee56a51d6d04d937d6db09f9af1480ebff6/day20/pic12_50%25_after_propagated.png"><br>
+
 
 Here we can observe that slack is getting increased when core utilization is increased from 40% to 50%.
 </details>
