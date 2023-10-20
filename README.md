@@ -7254,7 +7254,11 @@ Here we can observe that slack is getting increased when core utilization is inc
   - After synthesizing the clock tree, perform thorough verification, including simulations and static timing analysis, to ensure that the design requirements 
     are met and that clock signals are properly distributed from all sources. t's common to go through several iterations of clock tree synthesis to achieve the 
     desired performance, power efficiency, and timing closure. Fine-tune the clock tree as necessary based on the results of analysis and simulation.
+</details>
 
+<details>
+
+ <summary>Labs</summary>
 **Various CTS checks Performed**
 
  - Skew check
@@ -7273,4 +7277,5 @@ Here we can observe that slack is getting increased when core utilization is inc
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/270c05fe-3294-49d7-97b2-c88a5161576c)
 
+</details>
 </details>
