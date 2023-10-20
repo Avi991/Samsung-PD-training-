@@ -7137,3 +7137,140 @@ Here observe that slack is getting increased.
 
 Here we can observe that slack is getting increased when core utilization is increased from 40% to 50%.
 </details>
+
+## Day-21 Placement CTS Routing
+<details>
+<summary>Theory</summary>
+
+ - **Placement** : It refers to the process of determining the physical locations of various electronic components on an integrated circuit (IC) design. This 
+ step is crucial in the overall IC design process, as it affects the final performance, power consumption, and manufacturability of the chip.The primary 
+ objective of placement is to assign a physical position to each logic gate, flip-flop, or other components on the chip. The goal is to minimize wirelength, 
+ reduce congestion, and optimize for factors like signal delay and power consumption.
+ - **Routing** : Routing in VLSI (Very Large Scale Integration) design is the process of connecting the various components (logic gates, flip-flops, etc.) 
+ placed on an integrated circuit (IC) with wires, also known as interconnects.The primary objective of routing is to create an efficient and reliable network of 
+ interconnections between the components placed on the chip. This network must meet timing constraints, minimize wirelength, and avoid congestion.
+ - **Clock Tree Synthesis** : Clock Tree Synthesis (CTS) is a crucial step in the design of digital integrated circuits, especially those with synchronous 
+ logic, such as microprocessors and application-specific integrated circuits (ASICs). The primary purpose of CTS is to create a well-organized and optimized 
+ distribution network for clock signals, ensuring that all sequential elements (like flip-flops) receive clock signals with minimum skew, low latency, and low 
+ power consumption.
+   
+</details>
+<Details>
+
+ <summary>Labs</summary>
+
+ - Analysing the ICC2_run at core utilization of 40%
+
+ - In top.tcl we can see that
+   
+ 	- create_placement is used to create placement for the design. floorplan option is selected to make the design planning styled as placement.
+           ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/90c5857c-88b6-4788-88cb-f2ec11f3ccc4)    
+
+ - **Reports generated from the run**
+
+ 	- check_design.pre_pin_placement
+
+	![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b09c3de3-081e-440c-a192-2f45c859c861)
+
+
+ 	- report_port_placement.rpt
+
+        ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/15c634b7-1646-4085-8d52-2fc15d8d40df)
+
+
+
+    **icc2_output.txt**
+
+   - vsdbabysoc.post_estimated_timing.rpt
+
+         ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7b379a2e-e03f-4f11-a5b4-a0dec1b3c30c)
+
+
+    - vsdbabysoc.post_estimated_timing.qor
+
+         ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b9cc1c58-53f5-4064-b12e-ffb7b3ee7e48)
+
+  		
+   - vsdbabysoc.post_estimated_timing.qor.sum
+   - 
+        ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/18f3a312-ddd1-4e8f-81d6-8fb0faf59c46)
+
+
+    - Clock Tree Analysis
+
+      GUI opens we need to go to window sections and in that we need to select clock tree synthesis analyser
+ 
+    - PLL schematic with FANOUT
+
+	![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/34ca2708-8a4d-445e-a5cf-7d64df5c24aa)
+
+      </Details>
+
+
+## Day 22 CTS Analysis
+
+<details>
+
+ <summary>Clock tree synthesis</summary>
+
+ - Clock Tree Synthesis involves the generation of a clock distribution network that ensures a stable and synchronized clock signal throughout the entire chip or circuit.
+ - CTS is performed for several importnant reasons :
+   
+   1.Synchronization: In digital circuits, synchronous operations are critical. A clock signal is used to coordinate the activities of various elements within the circuit, ensuring they work together harmoniously. CTS is done to 	 
+     distribute this clock signal uniformly to all parts of the chip so that all operations occur in sync.
+
+   2.Minimizing Clock Skew: Clock skew refers to the variation in arrival times of the clock signal at different parts of the chip. Excessive clock skew can lead to timing violations and impact the overall performance and reliability 
+     of the circuit. CTS is employed to minimize clock skew, ensuring that the clock signal arrives at all elements at nearly the same time.
+
+   3.Timing Closure: Achieving timing closure is a crucial objective in chip design. CTS helps in meeting timing constraints by distributing the clock signal efficiently. When the clock signal reaches all elements simultaneously, it 
+     becomes easier to manage and control the timing of the circuit.
+
+   4.Power Efficiency: CTS can be used to design a power-efficient clock distribution network. By strategically placing buffers and repeaters and optimizing clock tree topology, designers can minimize power consumption in the clock 
+    distribution network, which is especially important in portable and battery-powered devices.
+
+- Various Algorithms used for CTS
+
+    H-Tree
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/81fa23ca-67ab-461c-82dc-f550366d7523)
+
+  2. **Clockwise multi-source clock tree synthesis (CTS) algorithm** : It is a specific approach to designing and optimizing the clock distribution network in digital integrated circuits. In this algorithm, multiple clock sources are considered, and the clock tree is designed to distribute clock signals from these sources in a clockwise direction.
+ 
+ 
+
+  Steps:
+
+  - Identify and specify the multiple clock sources in the design. These sources may be associated with different clock domains or regions of the chip.
+  - Create a clock tree topology that outlines the placement of buffers and repeaters, the routing of clock lines, and the interconnection of clock network 
+     elements. In a multi-source CTS, the tree should be designed to distribute clock signals from all selected sources.
+  - Determine the type and sizes of buffers to be used in the clock tree. Sizing is crucial for optimizing power consumption, signal integrity, and clock skew. 
+     Consider the characteristics of each clock source when sizing buffers.
+  - Physically lay out the clock distribution network, including the placement of buffers and the routing of clock lines. Ensure that the routing accommodates 
+     the distribution of clock signals from multiple sources in a clockwise manner
+  - Implement clock gating cells as needed to selectively enable or disable clock signals to specific circuit portions when they are not in use. Ensure that 
+    clock signals are synchronized as they traverse the clock tree.
+  - Ensure that the clock tree meets timing constraints, such as setup and hold times, for all flip-flops and other clocked elements in the design. Adjust 
+    buffer sizes and placement as necessary to achieve timing closure.
+  - After synthesizing the clock tree, perform thorough verification, including simulations and static timing analysis, to ensure that the design requirements 
+    are met and that clock signals are properly distributed from all sources. t's common to go through several iterations of clock tree synthesis to achieve the 
+    desired performance, power efficiency, and timing closure. Fine-tune the clock tree as necessary based on the results of analysis and simulation.
+
+**Various CTS checks Performed**
+
+ - Skew check
+ - Pulse width check
+ - Legality check
+ - Delta Delay Quality check
+ - Glitch Quality check Latency check
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3ab92892-2862-4afe-89ad-c7173eaa13d4)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/ba387322-3571-441d-8211-370de9d293e7)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8657bb6b-df30-462f-90d9-b9c774ef9700)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/1fe64294-0e02-414a-8561-aeb7b3be15be)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/270c05fe-3294-49d7-97b2-c88a5161576c)
+
+</details>
