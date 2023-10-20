@@ -7037,11 +7037,12 @@ gvim vsdbabysoc.tcl &
 gvim avsdpll.lib &
 ```
 
-*vsdbabysoc.tcl*
+**vsdbabysoc.tcl**
 - Modifying the contents to my path, remove -lib in read_lib commands, and replace MYCLK to clk since the clock used in the design is {clk}
-- All of the commands have been inserted in gvim and the tool will run it once at a time.<br>
-
-file:///home/aviral.s/Day20/vsdbabysoc.png
+- All of the commands have been inserted in gvim and the tool will run it once at a time.
+   
+  
+  
  
 ```ruby
 dc_shell
@@ -7049,21 +7050,21 @@ source vsdbabysoc.tcl
 ```
 **Reports**
 
-Report timing image is shown below.<br>
+Report timing image is shown below.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/67f12349-83d7-4173-89c1-9d716cc62e7f)
 
-
-Report area image is shown below.<br>
-
+Report area image is shown below.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/de033caa-df7c-4d86-b9ed-f795a5541921)
 
 Report power image is shown below.
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a20bb18f-3067-4f63-a471-5e582dca6cba)
 
 **Output schematic**
 file:///home/aviral.s/Desktop/Day20/schematic.png![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/298572ef-2cd5-4a39-8148-c71c440a9437)
 
-
 **RVMYTH core**
-/home/aviral.s/Desktop/Day20/schematic core .png
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7f32956f-c1a5-4b3c-a141-78cfa23b3061)
+
 
 ***Performing physical design***
 
@@ -7077,34 +7078,33 @@ gvim pns_example.tcl
 ```
 **Modified files**
 
-1. top.tcl<br>
+1. top.tcl
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/72ef5347-759a-4caa-a039-639fc203c08a)
 
+2. icc2_common_setup.tcl
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b020db7c-3da6-434a-8646-4712ff8f45ea)
 
-2. icc2_common_setup.tcl<br>
+3. init_design.read_parasitic_tech_example.tcl
+    ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a8b49d87-818b-4b8d-8403-f27a87301727)
 
-3. icc2_dp_setup.tcl<br>
-
-
-4. init_design.read_parasitic_tech_example.tcl<br>
-
- 
-5. init_design.mcmm_example.auto_expanded.tcl<br>
-file:///home/aviral.s/Desktop/Day20/mcmm%20modify.png
-
-6. pns_example.tcl
+4. init_design.mcmm_example.auto_expanded.tcl
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/19867c74-7f0c-4a18-b908-105ec7f49e22)
    
-file:///home/aviral.s/Desktop/Day20/pns%20modify.png
+5. pns_example.tcl
+   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/840567bf-f6de-4118-9233-9946fd57fd38)
+
 **Observing for 40% of utilization**
 
 ***Output Layout***
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7a4fbfb2-6c94-40ab-97d4-044362d8ae20)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/03a877e7-647c-47c6-a11a-0383cabeac4e)
 
 ```ruby
 source top.tcl
 ```
-
-
-Below screenshot displays the timing report showing slack = -5.31. <br>
-
+Below screenshot displays the timing report showing slack = -2.72
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/50408935-ce66-4062-b4c1-8469236e8b27)
 
 In icc2_shell
 
@@ -7113,20 +7113,16 @@ set_propagated_clock [all_clocks]             (Converting clock object from idea
 report_timing
 ```
 
-
-*violators.rpt*
-
+**violators.rpt**
 ```ruby
 gvim violators.rpt	     (Reviewing violations report within the design)
 ```
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/70d4408b-b50f-4421-8edb-afec779c7541)
 
 **Observing for 50% of utilization**
 
 *Slacks*
 
-
-
 In icc2_shell
 
 ```ruby
@@ -7134,8 +7130,10 @@ set_propagated_clock [all_clocks]             (Converting clock object from idea
 report_timing
 ```
 
-Here observe that slack is getting increased.<br>
+Here observe that slack is getting increased.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5d72ce84-5942-4543-92d7-48c11254157e)
 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b1468d4e-f906-45ac-a06d-2d5ac39c707a)
 
 Here we can observe that slack is getting increased when core utilization is increased from 40% to 50%.
 </details>
