@@ -7232,12 +7232,22 @@ Here we can observe that slack is getting increased when core utilization is inc
 
     H-Tree
 
+   ```
+   check_clock_tree
+   ```
   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/81fa23ca-67ab-461c-82dc-f550366d7523)
+
+ Command used to see the clock buffers such that that efficient CTS could take palce 
+  ```
+set_lib_cell_purpose -include cts {sky130_fd_sc_hd_tt_025C_1V80/sky130_fd_sc_hd__clkbuf*}
+synthesize_clock_tree
+clock_opt
+set_propagated_clock [all_clocks]
+```
 
   2. **Clockwise multi-source clock tree synthesis (CTS) algorithm** : It is a specific approach to designing and optimizing the clock distribution network in digital integrated circuits. In this algorithm, multiple clock sources are considered, and the clock tree is designed to distribute clock signals from these sources in a clockwise direction.
  
  
-
   Steps:
 
   - Identify and specify the multiple clock sources in the design. These sources may be associated with different clock domains or regions of the chip.
@@ -7267,14 +7277,31 @@ Here we can observe that slack is getting increased when core utilization is inc
  - Delta Delay Quality check
  - Glitch Quality check Latency check
 
+```
+check_legality
+```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3ab92892-2862-4afe-89ad-c7173eaa13d4)
 
+```
+report_clock_timing -type latency
+```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/ba387322-3571-441d-8211-370de9d293e7)
 
+```
+report_clock_timing -type skew
+```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8657bb6b-df30-462f-90d9-b9c774ef9700)
 
+
+```
+report_clock_timing -type transition
+```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/1fe64294-0e02-414a-8561-aeb7b3be15be)
 
+
+```
+report_clock_timing -type summary
+```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/270c05fe-3294-49d7-97b2-c88a5161576c)
 
 </details>
