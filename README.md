@@ -7279,3 +7279,107 @@ Here we can observe that slack is getting increased when core utilization is inc
 
 </details>
 </details>
+
+## Day-23 Clock gating technique
+
+<details>
+  <summary>Theory</summary>
+  
+**Advanced H-Tree for million flop clock end-points randomly placed**
+  
+ When CTS is performed, power consumption also needs to be taken care of, especially when designing a large number of clocks where the design might induce a larger power, as well as a larger power usage .A digital circuit with a lot of clocks would   be so huge with many buffers etc when designing its clock tree
+
+In order to fix that, the whole chip is sectioned into smaller versions where each section will have its own clock tree, and managed to get a complete routed tree .Therefore, **Clock Gating (CG)** technique is introduced
+
+**Basic Principle:**
+Integrated Clock Gating is based on the fundamental concept that many digital circuits only need the clock signal when they are actively performing computations or when data needs to be transferred. When a circuit is idle, clocking its components consumes power unnecessarily. By selectively disabling the clock to idle components, you can significantly reduce power consumption.
+
+### Introduction to Clock Gating technique
+  
+**What is Clock Gating (CG)?**
+  
+It is used to reduce the clock power consumption by cutting off the idle clock cycles
+
+  
+**Where/when clock gating is applied?**
+  
+It is being inserted in synthesis stage and being optimized in the implementation stage (Physical Design stage)
+  
+**Types of clock gating**
+
+ There are two primary types of clock gating techniques:
+
+   a. **Static Clock Gating:** In this approach, the clock gating conditions are determined during design time, and the gating logic remains fixed. This method is suitable for circuits with predictable and static gating conditions.
+
+   b. **Dynamic Clock Gating:** Here, the gating conditions can change dynamically during the operation of the circuit. This approach is more versatile and is often used in complex designs with variable clock 
+
+**Techniques**
+* AND gate
+* OR gate
+* Universal AND gate
+  
+### Routing
+    
+The process of making physical connections between signal pins using metal layers
+  
+**Types of routing**
+  
+* P/G routing
+* Clock routing
+* Signal routing: Global & Detailed routing
+  
+**Basic flow of routing**
+  
+ Basically, **route_opt** command is used during routing stage
+  
+ **clock_opt** is used to synthesize and route the clocks, and then further optimize the design based on the propagated clock latencies
+
+ **route_auto** is used to run global routing, trace assignment, and detailed routing at once/automatically
+
+</details>
+
+<details>
+  <summary>Lab</summary>
+ 
+### Routing 
+  
+**Script in routing stage**
+  
+*  P/G routing  
+  
+```
+pns_example.tcl
+```
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/pns_ex.png">
+https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/pns_ex.png
+```
+modyfying top.tcl
+```
+we need to Update the top.tcl as shown below
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/caeb6e740b34772676d9e659f4be3df798637f47/day23/top.tcl%20.png">
+
+```
+place_opt
+set_lib_cell_purpose -include cts{sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_*}
+synthesize_clock_tree
+set_propagated_clock[all_clocks]
+clock_opt
+route_opt
+
+```
+We need to update the mcmm file to the 1.8 volts as the skywater 130 is meant to work for 1.8 volts
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/mcmm.png">
+
+Below shows the image of the Clock tree getting built witht appropriate buffers used 
+ 
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/caeb6e740b34772676d9e659f4be3df798637f47/day23/db%20AFTER%20OPTIMIZATION1.png">
+
+**TIMING REPPORT BEFORE AND AFTER OPTIMIZATION**
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/global%20time.png">
+
+<img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/TIMING%20AFTER%20OPTIMIZATION.png">
+
+Slack issue can be fixed in the ECO stage in the next lab
+</details>
