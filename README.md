@@ -7237,6 +7237,8 @@ Here we can observe that slack is getting increased when core utilization is inc
    ```
   ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/81fa23ca-67ab-461c-82dc-f550366d7523)
 
+  <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/caeb6e740b34772676d9e659f4be3df798637f47/day23/db%20AFTER%20OPTIMIZATION1.png">
+
  Command used to see the clock buffers such that that efficient CTS could take palce 
   ```
 set_lib_cell_purpose -include cts {sky130_fd_sc_hd_tt_025C_1V80/sky130_fd_sc_hd__clkbuf*}
@@ -7399,7 +7401,7 @@ We need to update the mcmm file to the 1.8 volts as the skywater 130 is meant to
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/mcmm.png">
 
-Below shows the image of the Clock tree getting built witht appropriate buffers used 
+Below shows the image of the Clock tree getting built with appropriate buffers used 
  
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/caeb6e740b34772676d9e659f4be3df798637f47/day23/db%20AFTER%20OPTIMIZATION1.png">
 
