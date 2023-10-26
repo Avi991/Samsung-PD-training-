@@ -7317,6 +7317,21 @@ report_clock_timing -type summary
 ```
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/270c05fe-3294-49d7-97b2-c88a5161576c)
 
+Here from the summary report of timing we explored some useful acronyms to analyze the the report properly
+```
+It gave two skew hold and setup , hold and setup latency, transistion values
+rp-+ -> rising transition of propagated clock in the clock pin from launch to capture.
+
+r --> Rising transition
+
+f-->  Falling transition
+
+p-->  Propagated clock to this pin
+
+[ - ]    Launching transition
+
+[ + ]    Capturing transition   
+```
 </details>
 </details>
 
