@@ -7239,7 +7239,18 @@ Here we can observe that slack is getting increased when core utilization is inc
 
   <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/caeb6e740b34772676d9e659f4be3df798637f47/day23/db%20AFTER%20OPTIMIZATION1.png">
 
- Command used to see the clock buffers such that that efficient CTS could take palce 
+ When we man CTS-904 
+ 
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/dfca9aea-8012-4712-b8fd-d281340076cb)
+LEQ cells are absent for resizing. LEQ cells  are level Equivalence cells which are used to create logic gates or elements that have equivalent feature of different complexity. As a result the sizes of the cells can be easily resized by using a cell of differnt complexity.
+ 
+ When we man CTS-019
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2d5c522e-d329-47e8-a35b-63c6a899f80c)
+It gives the info about mone than one clock can be propagated to output ports ,As default CTS behaviour is dependent on the constraint on the the output port as well
+
+CTS-015 : It is a warning which comes up when we set_max_delay  or  set_min_delay  constraints are defined in the clock network.
+
+Command used to see the clock buffers such that that efficient CTS could take palce 
   ```
 set_lib_cell_purpose -include cts {sky130_fd_sc_hd_tt_025C_1V80/sky130_fd_sc_hd__clkbuf*}
 synthesize_clock_tree
@@ -7390,25 +7401,96 @@ we need to Update the top.tcl as shown below
 
 ```
 place_opt
-set_lib_cell_purpose -include cts{sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_*}
-synthesize_clock_tree
-set_propagated_clock[all_clocks]
-clock_opt
-route_opt
+```
+**set_lib_cell_purpose -include cts{sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_*}**
+With this we specify the library cells in the  tech_lib library(sky130_fd_sc_hd__tt_025C_1v80)  whose names start with "buf" should be used for clock tree synthesis.
 
+**synthesize_clock_tree**
+It synthesizes clock trees and updates  the  design  database with  the  compiled  clock  trees also the compilation of the clock tree is skew driven.
+
+**set_propagated_clock[all_clocks]**
+
+It Specifies that delays be propagated through the clock network to determine latency at register clock pins.
+
+clock_opt
+
+route_opt
 ```
 We need to update the mcmm file to the 1.8 volts as the skywater 130 is meant to work for 1.8 volts
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/mcmm.png">
 
 Below shows the image of the Clock tree getting built with appropriate buffers used 
+The clock buffers and ICG inserted in the circuit are as follows
+
+```ruby
+
+Buffer/Inverter reference list for clock tree synthesis:
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_12
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_16
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_6
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__buf_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__bufbuf_16
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__bufbuf_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkbuf_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkbuf_16
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkbuf_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkbuf_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkbuf_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s15_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s15_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s18_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s18_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s50_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkdlybuf4s50_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlygate4sd1_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlygate4sd2_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__probe_p_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__probec_p_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkbufkapwr_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkbufkapwr_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkbufkapwr_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkbufkapwr_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__bufinv_16
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__bufinv_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinv_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinv_16
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinv_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinv_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinv_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinvlp_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__clkinvlp_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_12
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_16
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_6
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__inv_8
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkinvkapwr_2
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkinvkapwr_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__lpflow_clkinvkapwr_8
+
+ICG reference list:
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlclkp_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__dlclkp_4
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdlclkp_1
+   sky130_fd_sc_hd__tt_025C_1v80/sky130_fd_sc_hd__sdlclkp_4
+```
+		
  
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/caeb6e740b34772676d9e659f4be3df798637f47/day23/db%20AFTER%20OPTIMIZATION1.png">
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/072b6ea3-b538-42ca-a389-df876cfe340a)
+
 
 **TIMING REPPORT BEFORE AND AFTER OPTIMIZATION**
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/global%20time.png">
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/TIMING%20AFTER%20OPTIMIZATION.png">
 
-Slack issue can be fixed in the ECO stage in the next lab
+
 </details>
