@@ -7507,5 +7507,136 @@ ICG reference list:
 
 <img width="1085" alt="lib1" src="https://github.com/Avi991/Samsung-PD-training-/blob/62e2d171d3183a8fe3995f5b0af1142de7043e95/day23/TIMING%20AFTER%20OPTIMIZATION.png">
 
+</details>
+
+## Day24 : Timing violations and ECO
+<details>
+<summary>Theory</summary>
+
+Engineering Change Order or ECO is how you incorporate last minute changes in your design.Typically we do ECO on the gate level netlist. Designer need to edit the gate-level netlist, make the same changes in RTL. 
+Make sure the ECO pass formal and functional verification before you start editing your layout.In this stage all the violations are fixed and seal all the sign-off checks that weren’t done during the PD flow
+
+It is all dependent on the PPA - Power(dynamic, short-circuit, leakage), Performance, Area.
+- We need to see different options for tradeoff between the PPA.
+- Implementation tool doesn’t fix all the violations 
+- More sign-off corners than what is enabled in PnR.
+- Verification catches bugs but can’t do a re-spin, hence we just directly change the netlist
+
+ECO has has the following steps :
+1. Investigate the problem using the recent database
+2. ECO generation to address the problem
+3. ECO implementation with the recent database
+4. After implementing and fixing the problem, save it in the database for future
 
 </details>
+<details>
+<summary>Lab</summary>
+<br>
+
+The following image shows the run completed by placing the filler cells in the design.
+
+Setup Slack 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d4bb8b2e-32ac-4d57-8d33-f2c4de83da00)
+
+Area 
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d7554743-7517-4b2a-98a2-84abeafbf8c1)
+
+Power
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/238dc38a-ca6b-4555-9458-6d8b652959d0)
+
+
+The critical path in the design i.e., the report that has highest worst slack is viewed in GUI as follows:
+
+
+All the cells, ports,pins are highlighted so the view is not clear, the only cells and label highlighted view is as follows:
+
+
+The inserted fiiler cell in the cell-view is as follows:
+
+
+After inserting the decap cells in top.tcl,
+
+The decap cells are inserted as follows:
+
+
+The setup slack was violated after inserting decap cells as shown.
+
+
+The following report of global timing shows that there are 20 setup violations(NVE) with worst negative slack(WNS) of 0.08 ns and 0.76 of total negative slack(TNS).
+
+
+The setup violation can be fixed by upsizing the cells in the arrival path of the data path. So, using ```size_cell``` command, the following violations are made to zero.
+```
+size_cell core/U339 sky130_fd_sc_hd_fa_2
+size_cell core/U3 sky130_fd_sc_hd_fa_2
+size_cell core/U340 sky130_fd_sc_hd_fa_2
+```
+
+
+
+
+The improvement in the slack can be seen after upsizing the each cell. FInally the setup is MET with a positive margin of 30ps.
+
+Let us fix the tran violations. 
+The tran violations can be checked using the following command 
+```
+report_constraints -all_violators -max_transition
+```
+There are 5 violations. The driving cell needs to be upsized to fix the transition violation.
+
+The various methods to fix transition violation are:
+- upsize the driving cell
+- add_buffer_on_route (if netlength is high)
+- split_load/split_fanout by adding buffer
+
+The method to fix capacitance is to upsize the cell. So, Upsizing the driving cell at transition violating pins might fix the capacitance violations.
+
+The following image shows the net reported as violating with high fanout.
+
+
+The following commands are used:
+```
+change_selection [get_net <violating_net>]
+// switch to schematic view and highlight the driving cell of net
+get_selection
+get_attribute [get_selection] ref_name
+size_cell <instance_name> <new_ref_name>
+```
+Similarly,
+
+All the transition violations are MET as shown.
+
+
+Fixing the transition violations, also fixed the capacitance violations but setup was violated again 
+
+
+Again resizing the cells, the setup got fixed and all the violations are fixed.
+
+
+**report_power**
+
+The ```report_power``` shows the final leakage power, switching power when the timing is completely MET.
+![lab6_power_after](https://github.com/Usha-Mounika/Samsung_PD/assets/142480150/ad350b80-764d-424b-badc-56bddbe1b249)
+
+The following report shows the power before ECO.
+![lab6_power_before](https://github.com/Usha-Mounika/Samsung_PD/assets/142480150/b49b289d-627a-4578-b231-ff1d347b2ef2)
+
+- Internal power is any power dissipated within the boundary of a cell. A circuit dissipates internal power by charging or discharging any existing capacitances internal to the cell during switching.
+The internal power is 2.86 mW before and after ECO.
+- Switching power results from calculations based on the voltage, netlist capacitance, and switching of the nets. The switching power is 1.34mW before and after ECO.
+- Leakage power is the power dissipated by a cell when it is not switching—that is, when it is inactive or static.  The Leakage power increased from 190nW to 194nW.
+- The total power is at 4.2mW due to the negligible change of leakage power.  The cell internal power and the net switching power and cell leakage power are almost same. So, There is not much variation in power i.e., 4nW of increased power dissipiation.
+  
+  **report_qor**
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/45ac4f7c-26cc-4d1f-98c2-ed8e4567f052)
+
+The above image shows the all violations fixed in design, including the capacitance and transition violations.
+The cell area has increased from 700465 to 700487 microns.
+There is no change in buffer area or non-combinational area, as the combinational cells only are upsized.
+**So, This is an improved qor with no timing violations with expected trade-off in area**.
+
+</details>
+
