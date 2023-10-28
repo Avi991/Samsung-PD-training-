@@ -7542,41 +7542,22 @@ Area
 
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d7554743-7517-4b2a-98a2-84abeafbf8c1)
 
-Power
-
-![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/238dc38a-ca6b-4555-9458-6d8b652959d0)
-
-
 The critical path in the design i.e., the report that has highest worst slack is viewed in GUI as follows:
-
-
-All the cells, ports,pins are highlighted so the view is not clear, the only cells and label highlighted view is as follows:
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a56458a1-1129-4508-8099-12c409abc055)
 
 The inserted fiiler cell in the cell-view is as follows:
 
+After inserting the decap cells in top.tcl, we can view in GUI
 
-After inserting the decap cells in top.tcl,
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b4dbb7a2-b574-4156-9a71-bcc2ea505a94)
 
-The decap cells are inserted as follows:
-
-
-The setup slack was violated after inserting decap cells as shown.
-
-
-The following report of global timing shows that there are 20 setup violations(NVE) with worst negative slack(WNS) of 0.08 ns and 0.76 of total negative slack(TNS).
-
+The following timing report with worst negative slack(WNS) of 0.06 ns and 0.43 of total negative slack(TNS).
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/317cf740-f887-4c9b-a883-aec77f21a22b)
 
 The setup violation can be fixed by upsizing the cells in the arrival path of the data path. So, using ```size_cell``` command, the following violations are made to zero.
 ```
-size_cell core/U339 sky130_fd_sc_hd_fa_2
-size_cell core/U3 sky130_fd_sc_hd_fa_2
-size_cell core/U340 sky130_fd_sc_hd_fa_2
+size_cell core/U89 sky130_fd_sc_hd_fa_2
 ```
-
-
-
-
 The improvement in the slack can be seen after upsizing the each cell. FInally the setup is MET with a positive margin of 30ps.
 
 Let us fix the tran violations. 
@@ -7584,7 +7565,12 @@ The tran violations can be checked using the following command
 ```
 report_constraints -all_violators -max_transition
 ```
-There are 5 violations. The driving cell needs to be upsized to fix the transition violation.
+There are 2 violations. The driving cell needs to be upsized to fix the transition violation.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/cef212a0-ae10-44d5-b7b5-af97f86593a1)
+
+Timing through net , we can figure out the cell which is driving this net so that we can try vary size to improve timing
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a4b1cfe1-17db-4b89-82f0-a8bae1231db2)
+
 
 The various methods to fix transition violation are:
 - upsize the driving cell
@@ -7592,9 +7578,7 @@ The various methods to fix transition violation are:
 - split_load/split_fanout by adding buffer
 
 The method to fix capacitance is to upsize the cell. So, Upsizing the driving cell at transition violating pins might fix the capacitance violations.
-
-The following image shows the net reported as violating with high fanout.
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/77e2f60a-aa02-44fb-9a34-5261ba92fc06)
 
 The following commands are used:
 ```
@@ -7607,27 +7591,21 @@ size_cell <instance_name> <new_ref_name>
 Similarly,
 
 All the transition violations are MET as shown.
-
-
-Fixing the transition violations, also fixed the capacitance violations but setup was violated again 
-
-
-Again resizing the cells, the setup got fixed and all the violations are fixed.
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b91d8ce0-5eb4-4209-a9d3-32f45ce44979)
 
 **report_power**
 
 The ```report_power``` shows the final leakage power, switching power when the timing is completely MET.
-![lab6_power_after](https://github.com/Usha-Mounika/Samsung_PD/assets/142480150/ad350b80-764d-424b-badc-56bddbe1b249)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f503c67f-a7d2-4cc4-b9cf-16765b2d1237)
 
 The following report shows the power before ECO.
-![lab6_power_before](https://github.com/Usha-Mounika/Samsung_PD/assets/142480150/b49b289d-627a-4578-b231-ff1d347b2ef2)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/238dc38a-ca6b-4555-9458-6d8b652959d0)
 
-- Internal power is any power dissipated within the boundary of a cell. A circuit dissipates internal power by charging or discharging any existing capacitances internal to the cell during switching.
+Internal power is the power dissipated within the boundary of a cell. A circuit dissipates internal power by charging or discharging any existing capacitances internal to the cell during switching.
+
 The internal power is 2.86 mW before and after ECO.
-- Switching power results from calculations based on the voltage, netlist capacitance, and switching of the nets. The switching power is 1.34mW before and after ECO.
-- Leakage power is the power dissipated by a cell when it is not switching—that is, when it is inactive or static.  The Leakage power increased from 190nW to 194nW.
-- The total power is at 4.2mW due to the negligible change of leakage power.  The cell internal power and the net switching power and cell leakage power are almost same. So, There is not much variation in power i.e., 4nW of increased power dissipiation.
+Switching power results from calculations based on the voltage, netlist capacitance, and switching of the nets. The switching power is 1.61mW before and after ECO is performed
+
   
   **report_qor**
 
