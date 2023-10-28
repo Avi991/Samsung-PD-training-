@@ -7612,7 +7612,7 @@ Switching power results from calculations based on the voltage, netlist capacita
 ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/45ac4f7c-26cc-4d1f-98c2-ed8e4567f052)
 
 The above image shows the all violations fixed in design, including the capacitance and transition violations.
-The cell area has increased from 700465 to 700487 microns.
+The cell area has increased from 700344 to 700347 microns.
 There is no change in buffer area or non-combinational area, as the combinational cells only are upsized.
 **So, This is an improved qor with no timing violations with expected trade-off in area**.
 
