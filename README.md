@@ -7618,7 +7618,7 @@ There is no change in buffer area or non-combinational area, as the combinationa
 
 </details>
 
-# Day 26 Introduction to Mixed signal flow
+## Day 26 : Introduction to Mixed signal flow
 
 <details>
 
