@@ -7836,9 +7836,9 @@ The various types of glitches are rise, fall, overshoot and undershoot.
 * Noise could be easily eliminated or can be ignored at this margin.
 
   </details>
+  </details>
 <details>
 <summary>Lab</summary>
-
 
 Before generating the reports for the crosstalk and SI analysis using primetime, the inputs required to read the design by the primetime tool are generated using icc2_shell.
 
@@ -7849,7 +7849,12 @@ source top1.tcl
 update_timing
 write_parasitics -format spef -output vsdbabysoc_spef
 ```
+ while doing man **update_timing**
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/1c8b934a-adca-46c4-8d93-f0f04b6135b6)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/1a398426-b5ea-4826-b17b-b48e495c6adf)
+
 The following image shows the generation of SPEF:
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/b222f44d-8943-4b12-9596-65cd3e84b1f1)
 
 The generated zip file is unzipped using the command:
 ```
@@ -7860,13 +7865,14 @@ cp vsdbabysoc.pt.v /home/aviral.s/Day20/VsdbabySoC_ICC2/standaloneFlow
 cp func1.sdc /home/aviral.s/Day20/VsdBabySoc_ICC2/standaloneFlow
 ```
 These files are copied to main directory standalone flow.
-
 The design is read into the pt_shell are as follows:
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/40eabcab-efb8-440b-947e-79ecd84dad84)
+
 ```
 set target_library {list set target_library "avsddac.db avsdpll.db sky130_fd_sc_hd__tt_025C_1v80.db"
 set link_library [list avsddac.db avsdpll.db sky130_fd_sc_hd__tt_025C_1v80.db]
 read_verilog vsdbabysoc.pt.v
-link_design vsdbabysoc_1
+link_design vsdbabysoc
 current_design
 ```
 
@@ -7877,16 +7883,19 @@ set_app_var si_enable_analysis true
 read_parasitics -keep_capacitive_coupling vsdbabysoc_spef.temp1_25.spef
 ```
 The following image shows the parasitics read by the tool.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/5e33ed1c-d146-4380-b28e-fcc26117722c)
 
 
-The following image shows the report of check_timing as follows:
-
+The following image shows the report of **check_timing** as follows:
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/3db610ef-c60f-4d37-b93e-9071c52d676c)
 
 The design can be viewed using GUI is as follows:
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7227f4b5-24b9-427c-91e5-61a018476b06)
 
 
 The various checks done specific to crosstalk analysis are:
-- no_driving_cell : reports input ports with no driving cell and doesn't have case analysis set on it. These nets are assigned as a stronger driver for modelling agressors.
+- no_driving_cell : reports input ports with no driving cell and doesn't have case analysis set on it. These nets are assigned as a stronger driver for 
+  modelling agressors.
 - ideal_clocks : reports nets that do not have propagated clocks. The design must have propagating clock tree to calaculate crosstalk.
 - partial_input_delay : reports the delays set with set_max_delay and set_min_delay commands in SDC.
 - unexpandable_clocks : reports any clocks that are not expanded to common time base.
@@ -7899,7 +7908,18 @@ report_si_delay_analysis
 report_si_aggressor_exclusion
 report_si_noise_analysis
 ```
+**man report_bottleneck** 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/11790ce4-9ba7-4917-97d8-2ecd1905cd26)
 
+**man report_si analysis**
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/9bfce5a8-be39-491b-863c-7ebad8c18421)
+
+
+**report_bottleneck**
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/86208ec3-c28a-4e97-ad09-3033bd145ece)
+
+**report_si_noise**
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/c0d7a0de-7b8e-45c3-8c36-b508dba43d18)
 
 </details>
   
