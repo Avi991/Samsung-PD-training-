@@ -7742,3 +7742,164 @@ A ".tf" file, often referred to as a timing file, contains information about the
 A ".tlu" file typically contains lookup tables that define the behavior of certain digital or 'analog' components, such as memory cells, logical functions, or transfer functions for analog devices.
 these files are used to model and simulate the behavior of specific components or blocks within the design.
 </details>
+
+## Day-27 : Introduction to crosstalk - glitch and delta delay
+
+<details>
+  <summary>Introduction</summary>
+  
+### Introduction to crosstalk
+  
+Signal Integrity & Crosstalk are the Quality checks of the clock routes.
+-  Signal integrity is the ability of an electrical signal to carry information reliably and resist the effects of high-frequency electromagnetic interference from nearby signals.
+- Crosstalk is the undesirable electrical interaction between two or more physically adjacent nets due to capacitive cross-coupling. Crosstalk is a type of noise signal that corrupts the actual signal while transmission through the communication medium
+
+As the geometry of cell reduces, the distance between the interconnects decrease, thus increasing crosscoupling capacitance between nets. So, the parasitic capacitance becomes less as interconnections become narrower.The cell delays are also reduced as the size of transistor is small.
+
+The various reasons for Crosstalk are more number of metal layers in design, more congestion (interms of routing), low voltage design and Thin and long metal layers are routed.
+These can be fixed by using guard rings, down-sizing the agressors or shielding, layer promotion of nets or breaking of long nets.
+
+-  A net that receives undesirable cross-coupling effects from a nearby net is called a **victim net**.
+-  A net that causes these effects in a victim net is called an **aggressor net**.
+-  An agressor can also be a victim net and vice-versa.
+  The timing effects of an agressor net on a victim net can be depending on various factors such as switching direction of rise and fall, relative times & slew rates of signal transition, amount of cross coupled capacitance and combinatinal effects of multiple agressor nets on single victim net.
+
+#### Glitch
+When one net is switching, and another net is constant then switching signal may cause spikes on other net because of which coupling capacitance (Cc) occurs between two nets, this is called as crosstalk noise.
+A steady signal net can have a glitch due to the charge transferred by the switching aggressors through coupling capacitances. The glitch magnitude may be large enough to be seen as a different logic value by the fan-out cells of the victim nets.
+The various types of glitches are rise, fall, overshoot and undershoot.
+
+- Rise glitch: Raising aggressor net induces a rise glitch on a steady low
+- Fall glitch: Falling aggressor net induces a fall glitch on a steady high
+- Overshoot glitch: Raising aggressor net induces overshoot glitch on a steady high This takes the victim net voltage above its steady high value.
+- Undershoot glitch: Falling aggressor net induces an undershoot glitch on a steady low This takes the victim net voltage below its steady low value.
+  
+</details>
+
+
+<details>
+  <summary>Crosstalk Noise Reasons and Definition</summary>
+	
+**High routing density and large number of standard cells**
+  
+* 0.25 um and 0.1 um are the channel/gate length.
+
+* Looking through 0.25 um and above process, there are quite some spaces and routes between each other.
+  
+* Quick way to reduce the size of the MOSFET is to reduce the channel length. When we reduce the channel length, the overall size of the MOSFET shrinks the 
+  overall size of the combinational logic, resulting the cell inside shrinks too. That way, we achieved a smaller size of the MOSFET.
+
+* If smaller size has been achieved, resulting the cells inside shrank, the complete circuit accomodates in a smaller area. Therefore, we can have multiple 
+  instances of the circuits or similar kind of circuits which are getting made to get back into the area.
+
+* Initially, there are 20 number of standard cells. After reducing the size, the number of standard cell has increased 9 times where the standard cell has to be connected to each other and as a result of that, the number of routes has increased and the routing has becomes very close to each other. 
+  
+* Hence, we will started to see some failures in the design, where there was some functionality failure is happening which we can called it as crosstalk.
+  
+   
+  **Dominant Lateral Capacitance**
+  
+  **Increase in number of metal layers resulting in increase in lateral capacitance**
+  
+* Basically, there are 2 kinds of capacitance.
+  + Interlayer capacitance: capacitors that is placed between 2 consecutive different layers.
+  + Lateral capacitance: capacitors that is placed between 2 wires at the same level and metal layer.
+  
+* The second reason of increasing the crosstalk noise is increase in the lateral capacitance because it is increasing the metal layer.
+
+  </details>
+
+<details>
+  <summary>Introduction to noise margin</summary>
+<details>
+  <summary>Noise Margin Summary</summary>
+  
+  
+* Anything that lies between VOL and VIL will be considered as logic 0.
+  
+* Any voltage that lies between VIL and VIH will be considered as undefined region.
+  
+* Undefined region -> the logic can either moved from logic 1 to logic 0 or from the interception point of (b) to logic 0. Undefined region is a danger case.
+  
+* Whenever the voltage lies between VIH and VOH, it will always being treated as 1V or logic 1.
+  
+* Therefore, we have to ensure that the voltage didn't enter in undefined region since it cannot be identified whether the voltage might be in logic 1 or not.
+  
+* That is the problem when we are having a large physical distance from the main power supply to the circuit.
+  
+* Noise margin defines the input voltage range and the output voltage. Basically it varies the input voltage.
+
+**Noise margin**: Any voltage in between the range of VOH and VIH will be detected as logic 1. It should be put under the inputs/outputs of the circuit.
+
+* Any voltage level in NML range will be detected as logic 0.
+
+* Noise could be easily eliminated or can be ignored at this margin.
+
+  </details>
+<details>
+<summary>Lab</summary>
+
+
+Before generating the reports for the crosstalk and SI analysis using primetime, the inputs required to read the design by the primetime tool are generated using icc2_shell.
+
+**Generating SPEF file**:
+
+```
+source top1.tcl
+update_timing
+write_parasitics -format spef -output vsdbabysoc_spef
+```
+The following image shows the generation of SPEF:
+
+The generated zip file is unzipped using the command:
+```
+cd write_data_dir/vsdbabysoc
+gzip -d vsdbabysoc.pt.v.gz
+gzip -d func1.sdc.gz
+cp vsdbabysoc.pt.v /home/aviral.s/Day20/VsdbabySoC_ICC2/standaloneFlow
+cp func1.sdc /home/aviral.s/Day20/VsdBabySoc_ICC2/standaloneFlow
+```
+These files are copied to main directory standalone flow.
+
+The design is read into the pt_shell are as follows:
+```
+set target_library {list set target_library "avsddac.db avsdpll.db sky130_fd_sc_hd__tt_025C_1v80.db"
+set link_library [list avsddac.db avsdpll.db sky130_fd_sc_hd__tt_025C_1v80.db]
+read_verilog vsdbabysoc.pt.v
+link_design vsdbabysoc_1
+current_design
+```
+
+The sdc is read into the design and
+```
+read_sdc func1.sdc
+set_app_var si_enable_analysis true
+read_parasitics -keep_capacitive_coupling vsdbabysoc_spef.temp1_25.spef
+```
+The following image shows the parasitics read by the tool.
+
+
+The following image shows the report of check_timing as follows:
+
+
+The design can be viewed using GUI is as follows:
+
+
+The various checks done specific to crosstalk analysis are:
+- no_driving_cell : reports input ports with no driving cell and doesn't have case analysis set on it. These nets are assigned as a stronger driver for modelling agressors.
+- ideal_clocks : reports nets that do not have propagated clocks. The design must have propagating clock tree to calaculate crosstalk.
+- partial_input_delay : reports the delays set with set_max_delay and set_min_delay commands in SDC.
+- unexpandable_clocks : reports any clocks that are not expanded to common time base.
+
+The various reports are as follows in pt_shell
+```
+report_si_bottleneck              
+report_bottleneck                
+report_si_delay_analysis
+report_si_aggressor_exclusion
+report_si_noise_analysis
+```
+
+
+</details>
+  
