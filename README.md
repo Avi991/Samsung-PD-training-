@@ -7923,3 +7923,277 @@ report_si_noise_analysis
 
 </details>
   
+## Day28 : Introduction to DRC/LVS
+<details>
+<summary>Introduction to Skywater130</summary>
+
+Introduction:
+
+The skywater 130nm PDK is a complete open source tool with all design rules, layer definitions, device definitions and models made available. Since open PDKs are available, any one can design the circuit using open source tool. The caravel chip has a RISC-V processor and the space for the design to be implemented by the user.
+PDK stands for process design kit, is a bundles of files and documentation needed by a chip designer to know how to work with particular process foundry to use it to make chips.
+
+The 130 in the sky130 stands for the feature size of process. The size of the smallest transistor that can be made with these PDKs is 130nm.  
+
+Opensource EDA tools:
+
+The open_pdks files in opencircuitdesign.com.
+The open_pdks is designed as a makefile based installer that takes files from skywater pdk and reformats them for any number of open source tools.
+In order to install the open_pdks, the following steps are followed:
+```
+git clone https://github.com/RTimothyEdwards/open_pdks
+cd open_pdks
+configure –enable-sky130-pdk
+make 
+sudo make install
+```
+As the open source pdks support every process, the configured process is defined. The make command grabs the skywater PDKs from google and submerges and keeps them for install.
+Now, Building the libraries from repository is done after the installation.
+
+- Magic:
+  
+Magic is the opensource EDA tool that must be installed before running the open_pdk file. Magic reads and writes various command formats. It does extraction in DRC, handles GDS,LEF and DEF formats. It can create design layouts from parameterized descriptions. Magic is responsible for creating any files of any formats missing from the repository source files.
+
+- Klayout:
+  
+Klayout is an alternative layout editor and viewer, can also do DRC. The opensource PDKs are installed to check the DRCs.
+
+- Openlane:
+  
+This is the synthesis, place and route package based on openroad tools. It is basically a wrapper around the opneroad tool with set of scripts that supports skywater PDKs.
+
+- Xschem:
+  
+It is a schematic editing tool, is not directy implemented in open_pdks, but is a third party repository that open_pdks can pull in and copy to installation location.
+
+- Netgen:
+
+Netgen is a LVS tool that works with an extracted netlist from layout using magic and netlist generated from Xscem of openlane.
+
+- Ngspice :
+
+It is the analog simulation tool based on spice and open_pdks installs all the model files such that Ngspice can find them with right include statements.
+
+There are three types of libraries available in skwater pdks.
+- Digital standard cells:
+   These come with layout and GDS and formats used in synthesis flow. There are various flavours of cells covering high speed, high density, high voltage and low leakage.
+   All the libraries follow a naming convention.
+  ```
+  sky130_vendor_library_type[_name]
+  ```
+  The ```sky130_fd_sc_hd``` stands for fd is foundry(vendor), sc is standard cell(library type), hd is high density(library name). The library name prefixes all standard cell names. The standard cells must be placed such that abuttment bounding boxes touch each other.
+- I/O cells
+  The I/O cell libraries contain entire power and ground pads which have entire disconnected blocks with them. The overlay connects the clamps/pads to power rails.
+- Primitive devices and models
+  The primitive designs include bipolar transistors, varactors, ESD devices and so on.
+
+  **Physical Verification and Design Flow**
+
+Physical verification is perfomed to check whether we have a mask layout that matches what we think the circuit should be.
+
+There are 2 major steps in physical verification.
+
+- Design Rule Checking (DRC) --> Verifies if layout satisfies rules required for manufacturing. Rules may vary from foundary to foundaryand for different technology will have different different rules. It ensures that the layout matches all the rules provided by the foundry for the specific process.
+
+- Layout Vs. Schematic (LVS) --> It ensures that the layout netlist matches the schematic netlist. Usually extraction errors and comparison errors occurs during LVS stage. Extraction errors like short, open device extraction, missing device terminals, duplicate structure placement. Compare errors like ports are swapped, unmatched nets or devices or schematic.
+
+</details>
+<details>
+ <summary>Lab</summary>
+<br>
+	
+#### Checking tool installations
+- Magic:
+  Magic opens two windows namely layout window and console window. The console window has a command prompt,as a tcl interpreter running commands related to layout.
+
+The magic can be called without layout window using ```-dnull``` option and without console window using ```-noconsole``` option
+- Netgen:
+Netgen is a command driven and has no graphics interface.
+
+Netgen gui is run with the command
+```
+/usr/local/lib/netgen/python/lvs_manager.py
+```
+- Xschem:
+  Xschem doesn't have a console window, the terminal acts as console. It doesn't have quick command interface.
+ 
+
+- ngspice:
+  Ngspice doesn't have any additional consoles. It is executed on terminal. Ngspice has its own interpreter, neither tcl nor python.
+ 
+These tools can also be opened in batch mode as follows:
+
+Inorder to create a basic circuit like inverter, the tools must be linked to present working directory as shown.
+```
+mkdir inverter
+cd inverter
+mkdir xschem
+mkdir mag
+mkdir netgen
+cd xschem
+ln -sf /usr/share/pdk/sky130A/libs.tech/xschem/xschemrc
+ln -sf /usr/share/pdk/sky130A/libs.tech/ngspice/spinit .spiceinit
+cd ../mag/
+ln -sf /usr/share/pdk/sky130A/libs.tech/magic/sky130A.magicrc .magicrc
+cd ../netgen/
+ln -sf /usr/share/pdk/sky130A/libs.tech/netgen/sky130A_setup.tcl setup.tcl
+```
+
+
+
+The following image shows the schematic of a test varactor in xschem device models.
+
+
+On an empty window, let us try some magic shortcuts:
+```
+magic -d XR
+```
+The following image shows the painted view of selected area. By selecting the area, placing cursor on the required layer in color palette and clicking 'pk' from the keyboard.
+
+Any particular area can be erased by clicking 'e' as shown.
+
+
+Bind Keys In MAGIC,
+- Left and right mouse buttons --> to adjust the cursor box
+- Shift + Z --> to zoom out
+- Middle mouse button/pk --> to select a layer (also known as painting)
+- Key e --> to erase whatever is present in the cursor box (can also be done by clicking the middle mouse button on an empty part of the layout)
+- Key v --> to view the entire layout
+- CTRL+P --> opens up the parameter options for the selected device
+- s key --> to select layers
+- i key --> to select a device
+- m key --> to move the selected device
+
+ NMOS viewed is as follows:
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a25aef0a-b1cd-4f8a-b05d-b7c8e0bbe89b)
+
+Changing the device type to sky130_fd_pr__nfet_g5v0d10v5 to observe that voltage value changed but layout view is similar to see the i/p o/p variation
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/ebea9d77-e476-424e-a771-1969ec424a35)
+
+**Creating Simple Schematic In Xschem**
+
+```ruby
+cd ../xschem/
+xschem
+```
+Press "Insert" key to pop out Choose symbol window. Select the SkyWater library directory path to access SkyWater components and choose the fd_pr library. To create an inverter, a basic nfet and pfet are needed. Therefore, select nfet and pfet device from the insert window and place it
+
+
+- As pins are not PDK specific, they can be found under the xschem library in the insert window. These are named as ipin.sym, opin.sym and iopin.sym.
+
+- Press Q key to bring up the parameter window to modify the values
+
+- For nfet, change the length to 0.18 from default value of 0.15 since its restricted to sram devices only. Set the number of fingers to 3, and the width of each finger to 1.5.
+
+- Since we have 3 fingers now, the total width in the parameter window must be set to 3 times of the finger width, which is 4.5.
+
+- Similarly, for pfet, adjust the parameters to 3 fingers, width of 1 per finger, and a length of 0.18. We must specify the body to be connected to the Vdd pin as it is a 3 pin pfet.
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2c7eb7e2-8c81-4839-ae1f-0f5e2da98e35)
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/a539d05d-0c2a-431b-adf4-4d45e11e0ac6)
+
+**Creating Symbol And Exporting Schematic In Xschem**
+
+- Testbench is created seperately to verify the functionality of 
+
+- Firstly, create a symbol for the schematic as the schematic will appear as a symbol in the testbench. To do this, click on the Symbol menu and select "Make symbol from schematic". Then, create a testbench schematic using new schematic option and insert the generated symbol from the local directory using the Insert key.
+
+- Supply voltage is set to 1.8 V. For the input voltage, we must set the supply to a piece-wise linear function to get ramp. PWL function has voltage and time values stated that the supply will start at 0v, then start to ramp up from 20 ns till it reaches its final value at 900 ns of 1.8 V.
+
+- Next, place two more statements for ngspice, but as these aren't specific to any component, they must be placed in text boxes. To place a text box, select the code_shown.sym component under the xschem library.
+
+- The first text box will specify the location of the device models used in the device schematic, where it is using a .lib statement that selects a top level file that tells ngspice where to find all the models and also specifying a simulation corner for all the models. The first block specifying the typical corner with *value = ".lib /usr/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice tt"*.
+
+- For the second block, it specifies;
+
+```ruby
+value = ".control
+tran 1n 1u
+plot V(in) V(out)
+.endc"
+```
+This will tell ngspice to run a transient simulation for 1 ns and monitor voltages for the in and out pins. Therefore, a complete testbench schematic is shown as below, and save this as inverter_tb.sch
+
+ ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/601c3fc6-5c81-41a7-8697-66251cb762f8)
+
+
+- To generate the netlist, click on the Netlist button, then simulate it in Ngspice by clicking the Simulate button.
+
+- The waveform confirms that the schematic behaves as an inverter as shown below.
+
+  ![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e2fc753e-771d-492a-b18e-9e1770471745)
+
+  **Importing Schematic To Layout And Inverter Layout Steps**
+
+```ruby
+cd ../mag/
+magic -d XR
+```
+
+ Run the magic, then click on File -> Import SPICE and then select the inverter.spice file from the xschem directory. If done correctly, the following layout has been opened up in magic.
+
+
+- Referring to the layout generated above, the schematic import is unaware about analog placing and routing as it is very complex. Therefore, We must place them in the best positions and wire them up manually.
+
+- Now, place the pfet device above the nfet and adjust the placement of the input, output and supply pins. Refer below figure.
+
+- Next, set some parameters that are only adjustable in the layout which will make it more convenient to wire the whole layout up.
+
+- To pop out the parameter editing section, use S key and press I key to select the object, then use CTRL+P to open up the parameter options for the selected device.
+
+- Start to paint the wires using metal1 layers by connecting the source of the pfet to Vdd and source of the nfet to Vss. Next, connect the drains of both mosfets to the output. Finally, connect the input to all the poly contacts of the gate.
+
+Step By Step LAYOUT FORMATION OF INVERTER
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/bea96cbd-5e8d-4e1d-b7f1-ff877d1c7f2e)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/dcd160f8-e228-459a-bb28-6c2696c0e03b)
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e658198a-05ef-47e4-9e4d-091a9a44a785)
+
+Save the file and Run following commands in magic console.
+
+```
+extract do local    (Ensuring that magic writes all results to the local directory)
+extract all         (Performing the actual extraction)
+ext2spice lvs       (Simulating and setting up the netlist to hierarchical spice output in ngspice format with no parasitic components)
+ext2spice           (Generating the spice netlist)
+```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/fdc49f06-7ad3-43fa-92f1-a7850fe52af9)
+
+
+rm *.ext                                          (Clear any unwanted files -> .ext files are just intermediate results from the extraction)
+/usr/share/pdk/bin/cleanup_unref.py -remove .     (Clean up extra .mag files -> files containing paramaterised cells that were created and saved but not used in the design)
+netgen -batch lvs "../mag/inverter.spice inverter" "../xschem/inverter.spice inverter"    (Run LVS by entering the netgen subdirectory)
+```
+
+- Remember to always use the layout netlist first and schematic netlist second in the netgen command as in side by side, resulting the layout is on the left and the schematic is on the right.
+
+- Each netlist is represented by a pair of keywords in quotes, where the first is the location of the netlist file and the second is the name of the subcircuit to compare.
+
+```ruby
+cp ../xschem/.spiceinit .
+ngspice inverter_tb.spice
+```
+Referring to the netlist file below, there are multiple lines beginning with C, which detail the parasitic capacitances.
+```
+gvim inverter.spice
+```
+LOG File
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/2cb39f4b-715b-4d4e-9af1-58e65291af27)
+
+LVS RESULT
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/d9cd016a-cd5e-4b35-9955-525ebbfa3980)
+
+
+Modify the test bench netlist fileThe result is almost the same as in previous simulation in xschem as shown below.
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/7ccdfba0-e4f0-41bc-86c8-11ba63620314)
+
+
+</details>
+
+
+
+
