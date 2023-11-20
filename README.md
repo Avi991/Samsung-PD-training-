@@ -8194,10 +8194,15 @@ Modify the test bench netlist fileThe result is almost the same as in previous s
 
 </details>
 
+</details>
 
-## Day 1 - Introduction to TCL and VSDSYNTH Toolbox Usage (01/11/2023)
+# Day 30 TCL Programming
 
-Day 1's task is to create a command (in my case, ***synui***) and pass a .csv file from the UNIX shell to the TCL script,
+<details>
+
+ <summary>Introduction to TCL and VSDSYNTH Tool Box</summary>
+
+First is to create a command (in my case, ***synui***) and pass a .csv file from the UNIX shell to the TCL script,
 
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/53593010-5a25-4e8d-ba33-1bc30eb14142)
@@ -8298,9 +8303,9 @@ In my command ***synui***, I have implemented a total of *5 general scenarios* f
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/8ea9088c-de2f-4446-a714-9061fee7c521)
 
 
-## Day 2 - Variable Creation and Processing Constraints from CSV (02/11/2023)
+**Day 2 - Variable Creation and Processing Constraints from CSV**
 
-Day 2's task is to create variables, check file/directory existence, and convert constraints csv file to format[1] and SDc format. This is done by writing the code in *synui.tcl*.
+Our task is to create variables, check file/directory existence, and convert constraints csv file to format[1] and SDc format. This is done by writing the code in *synui.tcl*.
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/15011298-d33c-438c-a5af-5990e972dd37)
 
@@ -8321,9 +8326,7 @@ I have successfully completed Day 2 tasks, namely variable creation, file and di
 
 #### Variable Creation
 
-I have auto-created the variables (*have used special condition to identify design name*) from the csv file by converting it into a matrix and then to an array (*also added command to capture the start time of the script so that it can be used to calculate runtime at the end*). 
-
-*Code*
+I have auto-created the variables (*have used special condition to identify design name*) from the csv file by converting it into a matrix and then to an array 
 
 ```tcl
 #!/bin/tclsh
@@ -8365,7 +8368,7 @@ while {$i < $n_rows} {
 
 ```
 
-*Screenshot*
+**Screenshot**
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/bd530094-85fd-44b9-acce-71fe56e4a9bf)
 
@@ -8422,15 +8425,13 @@ if { ![file exists $Constraints_File] } {
 
 ```
 
-*Screenshots*
+**Screenshots**
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/9de8b0db-83c2-43a8-9fbc-5e48de115524)
 
 #### Processing of the constraints openMSP430_design_constraints.csv file
 
-The file was successfully analyzed and turned into a matrix. The beginning rows of the clocks, inputs, and outputs were also extracted, along with the rows and columns count. Below are the basic code for the same and a screenshot of the terminal showing many "puts" writing the variables.
-
-*Code*
+The file was successfully analyzed and turned into a matrix. The beginning rows of the clocks, inputs, and outputs were also extracted, along with the rows and columns count. 
 
 ```tcl
 # Constraints csv file data processing for convertion to format[1] and SDC
@@ -8464,28 +8465,24 @@ puts "OUTPUTS starting row in CSV file = $outputs_start "
 *Screenshot*
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/b2dc950e-8ea7-40ab-b448-cf62ab7ae13a)
-## Day 3 - Processing Clock and Input Constraints from CSV and dumping SDC (03/11/2023)
 
-The assignment for Day 3 is to essentially to analyze clock and input constraints in a CSV file and output SDC commands into a .sdc file with the actual processed data. In addition to a number of matrix search algorithms, it also uses an algorithm to distinguish between inputs that are buses and bits.
+**Day 3 - Processing Clock and Input Constraints from CSV and dump SDC**
+
+
 
 **Review of input file - openMSP430_design_constraints.csv**
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/d74d6bbd-20a8-4521-a1d6-38d08c61b8ec)
 
 
-### Implementation
-
-Day 3 tasks are succesfully complete i.e. To process constraints in a csv file for clocks and inputs and dump SDC commands into a .sdc file with actual processed data.
 
 #### Processing of the constraints .csv file for CLOCKS and dumping SDC commands to .sdc
 
-The csv file containing the CLOCKS data has been successfully processed, and clock-based SDC commands (*with distinct clock names by appending "_synyui" to the SDC create_clock command*) have been dumped into the.sdc file. Below are screenshots of the terminal with many "puts" spitting out the variables, user debug information, and output.sdc, along with the basic code for the same.
-
+The csv file containing the CLOCKS data has been successfully processed, and clock-based SDC commands 
 *Code*
 
 ```tcl
-##############################################################################################
-################### Day 3 ###################################################################
+
 # Conversion of constraints csv file to SDC
 # -----------------------------------------
 # CLOCKS section
@@ -8575,8 +8572,7 @@ I've processed the inputs data csv file, separated bit and bus inputs, and dumpe
 
 *Code*
 
-```tcl
-######################## DAY3 Part 2 ######################################
+```tcL
 
 # Finding the starting column number for input clock latency in INPUTS section
 set ip_erd_st_col [lindex [lindex [m1 search rect $clocks_start_column $inputs_start [expr {$n_columns_concsv-1}] [expr {$outputs_start-1}] early_rise_delay] 0 ] 0 ]
@@ -8659,30 +8655,7 @@ while { $i < $end_of_inputs } {
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/f7a8d3c2-f60d-4b4b-95d4-76249961d668)
 
 
-/tmp/1 and /tmp/2 file screenshots for bit port
-
-*/tmp/1*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/fc4a5897-69b5-4c9c-bea2-441568c48ac6)
-
-
-*/tmp/2*
-
-![Screenshot from 2023-08-29 15-47-30](https://github.com/fayizferosh/yosys-tcl-ui-report/assets/63997454/8c27a27e-7693-4017-9f35-52e35ee59dde)
-
-
-/tmp/1 and /tmp/2 file screenshots for bussed port
-
-*/tmp/1*
-
-![Screenshot from 2023-08-29 15-42-44](https://github.com/fayizferosh/yosys-tcl-ui-report/assets/63997454/e16d45ea-24ee-47c2-baf9-e90a35134bc6)
-
-*/tmp/2*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/1e31a116-0ed2-4ab7-b198-0834887315dd)
-
-
-## Day 4 - Complete Scripting and Yosys Synthesis Introduction (04/11/2023)
+**Day 4 - Complete Scripting and Yosys Synthesis IntroductioN**
 
 The activities for Day 4 included processing the output section and dumping the SDC file, checking the Yosys hierarchy, resolving errors, and doing a sample Yosys synthesis using example memory and explanation.
 
@@ -8691,20 +8664,13 @@ The activities for Day 4 included processing the output section and dumping the 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/baa4d034-475a-4cb2-b96f-40fdaea0aefc)
 
 
-### Implementation
+## Processing of the constraints .csv file for OUTPUTS and dumping SDC commands to .sdc
 
-I've successfully finished the tasks assigned for Day 4: writing code to handle errors in hierarchy check, learning about sample memory synthesis and its memory write and read processes, processing constraints csv files for outputs, and dumping SDC commands to.sdc files with actual processed data.
-
-#### Processing of the constraints .csv file for OUTPUTS and dumping SDC commands to .sdc
-
-I've processed the csv file for the outputs data, separated the bit and bus outputs, then dumped the output-based SDC instructions into a.sdc file successfully. Below are images of the terminal with many "puts" spitting out the variables, user debug information, and output.sdc, along with the basic code for the same.
-
+I've processed the csv file for the outputs data, separated the bit and bus outputs, then dumped the output-based SDC instructions into a.sdc file successfully. B
 *Code*
 
 ```tcl
-#################################################################################################
-######################################## Day 4 ##################################################
-#################################################################################################
+
 #
 #Output constraint
 #
@@ -8788,11 +8754,6 @@ puts "\nInfo-SDC: SDC created. Please use constraints in path $Output_Directory/
 
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/d3498b58-6af0-460b-800f-673f7a5e2bf3)
 
-
-/tmp/1 and /tmp/2 files similar to input ports
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/420ea3b0-af02-465a-b620-1969668f0cf0)
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/3a496abe-b82c-42ae-b052-ef71cd183115)
 
 
 #### Memory module yosys synthesis and explanation
@@ -8891,9 +8852,9 @@ I have successfully written the code for dumping the hierarchy check script. The
 *Code*
 
 ```tcl
-######################################## Day 4 part 2 #######################################
+
 # Hierarchy Check
-#############################################################################################
+#########################################################
 puts "\nInfo: Creating hierarchy check script to be used by Yosys"
 set data "read_liberty -lib -ignore_miss_dir -setattr blackbox ${Late_Library_Path}"
 set filename "$Design_Name.hier.ys"
@@ -8976,13 +8937,10 @@ if { $error_flag } {
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c5666238-73ff-4af3-a94e-bf7079c4245c)
 
 
-## Day 5 - Advanced Scripting Techniques and Quality of Results (QoR) Generation (05/11/2023)
+**Day 5 - Advanced Scripting Techniques and Quality of Results (QoR) Generation**
 
 The activities for day five include running Yosys' main synthesis, learning about and using procedures at the application level, creating commands, and writing the files needed for the OpenTimer tool, like .conf,.spef, and timing Create an OpenTimer script, launch an OpenTimer STA, and gather the information needed to create a QoR.final step is to print the gathered data in a tool-standard QoR output format using the results file that was created during the OpenTimer STA run.
 
-### Implementation
-
-I have successfully coded all the required elements to achieve Day 5 tasks, and all the details of the sub-tasks achieved are shown below.
 
 #### Main Yosys synthesis script dumping
 
@@ -8991,10 +8949,6 @@ I have successfully written the code for the main Yosys synthesis script .ys fil
 *Code*
 
 ```tcl
-##################################################################################################################################################
-######################################################## Day 5 ###################################################################################
-####################################################### Sub task 1 ###############################################################################
-##################################################################################################################################################
 # Main Synthesis Script for yosys
 # ---------------------
 puts "\nInfo: Creating main synthesis script to be used by Yosys"
@@ -9115,11 +9069,11 @@ puts "\nPath: $Output_Directory/$Design_Name.final.synth.v"
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/9fcee46b-5004-41f0-9925-e17632b0944e)
 
 
-#### World of Procs (TCL Procedure)
+**World of Procs (TCL Procedure)**
 
 Procs can be used to create user-defined commands, as shown below. I have successfully written the code for all the procs. The basic codes of all the procs and screenshots of the terminal with several "puts" printing out the variables and user debug information for the 'set_multi_cpu_usage' and the 'read_sdc' procs are shown below.
 
-##### reopenStdout.proc
+## reopenStdout.proc
 
 This proc redirects the 'stdout' screen log to the file in the proc's argument.
 
@@ -9178,7 +9132,7 @@ proc set_multi_cpu_usage {args} {
 ![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/b1ef0281-3b72-42cd-86fa-ba4f3f99691b)
 
 
-##### read_lib.proc
+## read_lib.proc
 
 This proc outputs commands to read early and late libraries required for the OpenTimer tool.
 
@@ -9212,7 +9166,7 @@ proc read_lib args {
 }
 ```
 
-##### read_verilog.proc
+## read_verilog.proc
 
 This proc outputs commands to read the synthesised netlist required for the OpenTimer tool.
 
@@ -9231,374 +9185,243 @@ proc read_verilog {arg1} {
 
 This proc outputs commands to read constraints .timing file required for the OpenTimer tool. This procs converts SDC file contents to .timing file format for use by the OpenTimer tool, and the conversion code is explained stage by stage with sufficient screenshots.
 
-###### Converting 'create_clock' constraints
+read_sdc.proc
 
-Initially, the proc takes the SDC file as an input argument or parameter and processes the 'create_clock' constraints part of SDC.
-
-*Code*
-
-```tcl
-#!/bin/tclsh
-proc read_sdc {arg1} {
-
-# 'file dirname <>' to get directory path only from full path
+  ```ruby
+  proc read_sdc {arg1} {
 set sdc_dirname [file dirname $arg1]
-# 'file tail <>' to get last element
 set sdc_filename [lindex [split [file tail $arg1] .] 0 ]
 set sdc [open $arg1 r]
 set tmp_file [open /tmp/1 w]
 
-# Removing "[" & "]" from SDC for further processing the data with 'lindex'
-# 'read <>' to read entire file
 puts -nonewline $tmp_file [string map {"\[" "" "\]" " "} [read $sdc]]     
 close $tmp_file
 
-# Opening tmp file to write constraints converted from generated SDC
-set timing_file [open /tmp/3 w]
+#-----------------------------------------------------------------------------#
+#----------------converting create_clock constraints--------------------------#
+#-----------------------------------------------------------------------------#
 
-# Converting create_clock constraints
-# -----------------------------------
 set tmp_file [open /tmp/1 r]
+set timing_file [open /tmp/3 w]
 set lines [split [read $tmp_file] "\n"]
-# 'lsearch -all -inline' to search list for pattern and retain elementas with pattern only
 set find_clocks [lsearch -all -inline $lines "create_clock*"]
 foreach elem $find_clocks {
-	set clock_port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
-	set clock_period [lindex $elem [expr {[lsearch $elem "-period"]+1}]]
-	set duty_cycle [expr {100 - [expr {[lindex [lindex $elem [expr {[lsearch $elem "-waveform"]+1}]] 1]*100/$clock_period}]}]
-	puts $timing_file "\nclock $clock_port_name $clock_period $duty_cycle"
-}
+  set clock_port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
+  set clock_period [lindex $elem [expr {[lsearch $elem "-period"]+1}]]
+  set duty_cycle [expr {100 - [expr {[lindex [lindex $elem [expr {[lsearch $elem "-waveform"]+1}]] 1]*100/$clock_period}]}]
+  puts $timing_file "clock $clock_port_name $clock_period $duty_cycle"
+  }
 close $tmp_file
-```
 
-*Screenshots*
+#-----------------------------------------------------------------------------#
+#----------------converting set_clock_latency constraints---------------------#
+#-----------------------------------------------------------------------------#
 
-*openMSP430.sdc*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/3a242e4d-cb59-4f72-af38-630b276966b4)
-
-
-*/tmp/1*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c7589b9c-a500-43f8-a7b9-d4a478d36fb0)
-
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/1764cb53-d0e5-49c1-9f83-a9ed20b1fd73)
-
-
-
-###### Converting 'set_clock_latency' constraints
-
-Processes 'set_clock_latency' constraints part of SDC.
-
-*Code*
-
-```tcl
-# Converting set_clock_latency constraints
-# ----------------------------------------
 set find_keyword [lsearch -all -inline $lines "set_clock_latency*"]
 set tmp2_file [open /tmp/2 w]
 set new_port_name ""
 foreach elem $find_keyword {
-        set port_name [lindex $elem [expr {[lsearch $elem "get_clocks"]+1}]]
-	if {![string match $new_port_name $port_name]} {
-        	set new_port_name $port_name
-        	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
-        	set delay_value ""
-        	foreach new_elem $delays_list {
-        		set port_index [lsearch $new_elem "get_clocks"]
-        		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
-        	}
-		puts -nonewline $tmp2_file "\nat $port_name $delay_value"
-	}
+      set port_name [lindex $elem [expr {[lsearch $elem "get_clocks"]+1}]]
+  if {![string match $new_port_name $port_name]} {
+      	set new_port_name $port_name
+      	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
+      	set delay_value ""
+      	foreach new_elem $delays_list {
+      		set port_index [lsearch $new_elem "get_clocks"]
+      		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
+      	}
+  	puts -nonewline $tmp2_file "\nat $port_name $delay_value"
+  }
 }
 
 close $tmp2_file
 set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
-```
 
-*Screenshots*
+#-----------------------------------------------------------------------------#
+#----------------converting set_clock_transition constraints------------------#
+#-----------------------------------------------------------------------------#
 
-*/tmp/2*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/bf48ccc1-c88f-418d-8c5f-c0733d99a65a)
-
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/3194d29b-396a-455e-8326-c3402b41faf7)
-
-###### Converting 'set_clock_transition' constraints
-
-Processes 'set_clock_transition' constraints part of SDC.
-
-*Code*
-
-```tcl
-# Converting set_clock_transition constraints
-# -------------------------------------------
 set find_keyword [lsearch -all -inline $lines "set_clock_transition*"]
 set tmp2_file [open /tmp/2 w]
 set new_port_name ""
 foreach elem $find_keyword {
-        set port_name [lindex $elem [expr {[lsearch $elem "get_clocks"]+1}]]
-        if {![string match $new_port_name $port_name]} {
-		set new_port_name $port_name
-		set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
-        	set delay_value ""
-        	foreach new_elem $delays_list {
-        		set port_index [lsearch $new_elem "get_clocks"]
-        		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
-        	}
-        	puts -nonewline $tmp2_file "\nslew $port_name $delay_value"
-	}
+      set port_name [lindex $elem [expr {[lsearch $elem "get_clocks"]+1}]]
+      if {![string match $new_port_name $port_name]} {
+  	set new_port_name $port_name
+  	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
+      	set delay_value ""
+      	foreach new_elem $delays_list {
+      		set port_index [lsearch $new_elem "get_clocks"]
+      		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
+      	}
+      	puts -nonewline $tmp2_file "\nslew $port_name $delay_value"
+  }
 }
 
 close $tmp2_file
 set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
-```
 
-*Screenshots*
+#-----------------------------------------------------------------------------#
+#----------------converting set_input_delay constraints-----------------------#
+#-----------------------------------------------------------------------------#
 
-*/tmp/2*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/f79988e7-6d93-47b1-bfd6-5f3fd53fcd4c)
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/a1b77860-8270-4471-b2a3-2c15745ce35f)
-
-
-###### Converting 'set_input_delay' constraints
-
-Processes 'set_input_delay' constraints part of SDC.
-
-*Code*
-
-```tcl
-# Converting set_input_delay constraints
-# --------------------------------------
 set find_keyword [lsearch -all -inline $lines "set_input_delay*"]
 set tmp2_file [open /tmp/2 w]
 set new_port_name ""
 foreach elem $find_keyword {
-        set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
-        if {![string match $new_port_name $port_name]} {
-                set new_port_name $port_name
-        	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
-		set delay_value ""
-        	foreach new_elem $delays_list {
-        		set port_index [lsearch $new_elem "get_ports"]
-        		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
-        	}
-        	puts -nonewline $tmp2_file "\nat $port_name $delay_value"
-	}
+      set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
+      if {![string match $new_port_name $port_name]} {
+              set new_port_name $port_name
+      	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
+  	set delay_value ""
+      	foreach new_elem $delays_list {
+      		set port_index [lsearch $new_elem "get_ports"]
+      		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
+      	}
+      	puts -nonewline $tmp2_file "\nat $port_name $delay_value"
+  }
 }
 close $tmp2_file
 set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
-```
 
-*Screenshots*
+#-----------------------------------------------------------------------------#
+#----------------converting set_input_transition constraints------------------#
+#-----------------------------------------------------------------------------#
 
-*/tmp/2*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/fc114f66-e050-4ae1-bcda-f3030c93db72)
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/ec6e8736-91c2-4dec-98b6-3fd7ac0861e5)
-
-###### Converting 'set_input_transition' constraints
-
-Processes 'set_input_transition' constraints part of SDC.
-
-*Code*
-
-```tcl
-# Converting set_input_transition constraints
-# -------------------------------------------
 set find_keyword [lsearch -all -inline $lines "set_input_transition*"]
 set tmp2_file [open /tmp/2 w]
 set new_port_name ""
 foreach elem $find_keyword {
-        set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
-        if {![string match $new_port_name $port_name]} {
-                set new_port_name $port_name
-        	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
-        	set delay_value ""
-        	foreach new_elem $delays_list {
-        		set port_index [lsearch $new_elem "get_ports"]
-        		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
-        	}
-        	puts -nonewline $tmp2_file "\nslew $port_name $delay_value"
-	}
+      set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
+      if {![string match $new_port_name $port_name]} {
+              set new_port_name $port_name
+      	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
+      	set delay_value ""
+      	foreach new_elem $delays_list {
+      		set port_index [lsearch $new_elem "get_ports"]
+      		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
+      	}
+      	puts -nonewline $tmp2_file "\nslew $port_name $delay_value"
+  }
 }
 
 close $tmp2_file
 set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
-```
 
-*Screenshots*
+#-----------------------------------------------------------------------------#
+#---------------converting set_output_delay constraints-----------------------#
+#-----------------------------------------------------------------------------#
 
-*/tmp/2*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/f836a956-ef06-499e-9d2a-118306801fb6)
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/ca085ba4-de55-4014-9e8b-90acd02d93f0)
-
-
-###### Converting 'set_output_delay' constraints
-
-Processes 'set_output_delay' constraints part of SDC.
-
-*Code*
-
-```tcl
-# Converting set_output_delay constraints
-# ---------------------------------------
 set find_keyword [lsearch -all -inline $lines "set_output_delay*"]
 set tmp2_file [open /tmp/2 w]
 set new_port_name ""
 foreach elem $find_keyword {
-        set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
-        if {![string match $new_port_name $port_name]} {
-                set new_port_name $port_name
-        	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
-        	set delay_value ""
-        	foreach new_elem $delays_list {
-        		set port_index [lsearch $new_elem "get_ports"]
-        		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
-        	}
-        	puts -nonewline $tmp2_file "\nrat $port_name $delay_value"
-	}
+      set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
+      if {![string match $new_port_name $port_name]} {
+              set new_port_name $port_name
+      	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*"] ""]]
+      	set delay_value ""
+      	foreach new_elem $delays_list {
+      		set port_index [lsearch $new_elem "get_ports"]
+      		lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
+      	}
+      	puts -nonewline $tmp2_file "\nrat $port_name $delay_value"
+  }
 }
 
 close $tmp2_file
 set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
-```
 
-*Screenshots*
+#-----------------------------------------------------------------------------#
+#-------------------converting set_load constraints---------------------------#
+#-----------------------------------------------------------------------------#
 
-*/tmp/2*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/884f248a-32ef-492f-a3ea-7d8763be136a)
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/17393f00-8ab6-419e-85cb-249622a783cd)
-
-
-###### Converting 'set_load' constraints
-
-Processes 'set_load' constraints part of SDC. And with that, all SDC constarints are processed, so we close the /tmp/3 file containing all processed data for now.
-
-*Code*
-
-```tcl
-# Converting set_load constraints
-# -------------------------------
 set find_keyword [lsearch -all -inline $lines "set_load*"]
 set tmp2_file [open /tmp/2 w]
 set new_port_name ""
 foreach elem $find_keyword {
-        set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
-        if {![string match $new_port_name $port_name]} {
-                set new_port_name $port_name
-        	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*" ] ""]]
-        	set delay_value ""
-        	foreach new_elem $delays_list {
-        	set port_index [lsearch $new_elem "get_ports"]
-        	lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
-        	}
-        	puts -nonewline $timing_file "\nload $port_name $delay_value"
-	}
+      set port_name [lindex $elem [expr {[lsearch $elem "get_ports"]+1}]]
+      if {![string match $new_port_name $port_name]} {
+              set new_port_name $port_name
+      	set delays_list [lsearch -all -inline $find_keyword [join [list "*" " " $port_name " " "*" ] ""]]
+      	set delay_value ""
+      	foreach new_elem $delays_list {
+      	set port_index [lsearch $new_elem "get_ports"]
+      	lappend delay_value [lindex $new_elem [expr {$port_index-1}]]
+      	}
+      	puts -nonewline $timing_file "\nload $port_name $delay_value"
+  }
 }
 close $tmp2_file
 set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file  [read $tmp2_file]
 close $tmp2_file
 
-# Closing tmp file after writing constraints converted from generated SDC
+#-----------------------------------------------------------------------------#
 close $timing_file
-```
 
-*Screenshots*
-
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/6579b1df-32f0-4b20-bd35-297025c163ab)
-
-
-###### Expanding the bussed input and output ports
-
-The /tmp/3 file contains bussed ports as <port_name>*, which is expanded to each bit, and single-bit port lines are untouched. This new content is dumped to .timing file, and then the proc exits by giving output the OpenTimer command to access this .timing file.
-
-*Code*
-
-```tcl
-# Expanding the bussed input and output ports to it's individual bits and writing final .timing file for OpenTimer
 set ot_timing_file [open $sdc_dirname/$sdc_filename.timing w]
 set timing_file [open /tmp/3 r]
-while { [gets $timing_file line] != -1 } {
-        if {[regexp -all -- {\*} $line]} {
-                set bussed [lindex [lindex [split $line "*"] 0] 1]
-                set final_synth_netlist [open $sdc_dirname/$sdc_filename.final.synth.v r]
-                while { [gets $final_synth_netlist line2] != -1 } {
-                        if {[regexp -all -- $bussed $line2] && [regexp -all -- {input} $line2] && ![string match "" $line]} {
-
-                        	puts -nonewline $ot_timing_file "\n[lindex [lindex [split $line "*"] 0 ] 0 ] [lindex [lindex [split $line2 ";"] 0 ] 1 ] [lindex [split $line "*"] 1 ]"
-
-                        } elseif {[regexp -all -- $bussed $line2] && [regexp -all -- {output} $line2] && ![string match "" $line]} {
-
-                        	puts -nonewline $ot_timing_file "\n[lindex [lindex [split $line "*"] 0 ] 0 ] [lindex [lindex [split $line2 ";"] 0 ] 1 ] [lindex [split $line "*"] 1 ]"
-
-                        }
-                }
-        } else {
-        	puts -nonewline $ot_timing_file  "\n$line"
-        }
+while {[gets $timing_file line] != -1} {
+      if {[regexp -all -- {\*} $line]} {
+              set bussed [lindex [lindex [split $line "*"] 0] 1]
+              set final_synth_netlist [open $sdc_dirname/$sdc_filename.final.synth.v r]
+              while {[gets $final_synth_netlist line2] != -1 } {
+                      if {[regexp -all -- $bussed $line2] && [regexp -all -- {input} $line2] && ![string match "" $line]} {
+                      puts -nonewline $ot_timing_file "\n[lindex [lindex [split $line "*"] 0 ] 0 ] [lindex [lindex [split $line2 ";"] 0 ] 1 ] [lindex [split $line "*"] 1 ]"
+                      } elseif {[regexp -all -- $bussed $line2] && [regexp -all -- {output} $line2] && ![string match "" $line]} {
+                      puts -nonewline $ot_timing_file "\n[lindex [lindex [split $line "*"] 0 ] 0 ] [lindex [lindex [split $line2 ";"] 0 ] 1 ] [lindex [split $line "*"] 1 ]"
+                      }
+              }
+      } else {
+      puts -nonewline $ot_timing_file  "\n$line"
+      }
 }
+
 close $timing_file
 puts "set_timing_fpath $sdc_dirname/$sdc_filename.timing"
-
 }
 ```
 
-*Screenshots*
+Using procs to write the tming files
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0c8a4cd2-0d6e-48ca-ab08-64c3c3d2ffa3)
+In below code procs are used to create timing configuration files required for the OpenTimer tool.
 
-
-*/tmp/3*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/76606c63-c173-4b3b-8c3c-aaee54290edc)
-
-*openMSP430.timing*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c6a209eb-c3ba-4bcc-a07a-e0f6df4c68b6)
-
-
+```ruby
+############## Calling procs needed to generate .timing file ##########
+# Procs are used below 
+puts "\nInfo: Timing Analysis Started...."
+puts "\nInfo: Initializing number of threads, libraries, sdc, verilog netlist path..."
+puts " Invoking required procs"
+puts "reopenStdout.proc \nset_multi_cpu_usage,proc \nread_lib.proc \nread_verilog.proc \nread_sdc.prc"
+source /home/vsduser/vsdsynth/procs/reopenStdout.proc
+source /home/vsduser/vsdsynth/procs/set_multi_cpu_usage.proc
+source /home/vsduser/vsdsynth/procs/read_lib.proc
+source /home/vsduser/vsdsynth/procs/read_verilog.proc
+source /home/vsduser/vsdsynth/procs/read_sdc.proc
+# Writing command required for OpenTimer tool to .conf file by closing and redirecting 'stdout' to a file
+reopenStdout $Output_Directory/$Design_Name.conf
+#set_multi_cpu_usage -localCpu 4
+read_lib -early $Early_Library_Path
+read_lib -late $Late_Library_Path
+read_verilog $Output_Directory/$Design_Name.final.synth.v
+read_sdc $Output_Directory/$Design_Name.sdc
+# Reopening 'stdout' to bring back screen log
+reopenStdout /dev/tty
+# Closing .conf file opened by 'reopenStdout' proc
+#close $Output_Directory/$Design_Name.conf
+#puts "closed .conf and redirected to stdout"
+```
 #### Using the procs to write .conf
 
 I have successfully written the code to use these procs on an application level and create some portion of the .conf configuration file required for the OpenTimer tool. The basic code of the same and screenshots of terminal and .conf are shown below.
@@ -9606,7 +9429,7 @@ I have successfully written the code to use these procs on an application level 
 *Code*
 
 ```tcl
-############################################# Calling procs needed to generate .timing file ###################################################
+################# Calling procs needed to generate .timing file #################
 ## Editing .synth.v to be usable by Opentimer
 # ------------------------------------------
 # Preparation of .conf for OpenTimer STA
@@ -9656,7 +9479,7 @@ I have successfully written the code to write .spef *with the current date and t
 *Code*
 
 ```tcl
-################################################ SPEF and CONF creation #########################################################################
+##################### SPEF and CONF creation ##################
 
 # Continue to write .conf and also write a .spef
 # Writing .spef
@@ -9745,7 +9568,7 @@ I have successfully written the code to collect all required data for specific c
 *Code*
 
 ```tcl
-#################################### RESULTS ########################################################################
+################### RESULTS ######################
 #
 
 # Find worst output violation
