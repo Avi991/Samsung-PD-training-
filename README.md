@@ -8202,27 +8202,7 @@ Modify the test bench netlist fileThe result is almost the same as in previous s
 
  <summary>Introduction to TCL and VSDSYNTH Tool Box</summary>
 
-First is to create a command (in my case, ***synui***) and pass a .csv file from the UNIX shell to the TCL script,
-
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/53593010-5a25-4e8d-ba33-1bc30eb14142)
-
-**Review of input file - openMSP430_design_details.csv**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c9199ac5-6c69-4273-ac90-40a677e06962)
-
-
-### Implementation
-
-Creation of the *synui* command script and *synui.tcl* files.
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/ea68e2da-f6ad-4d75-b66f-2dbbf4d8ae20)
-
-
-*synui Code*
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0aaed71a-4854-40f3-a0d8-301a57a62e5f)
-
-
+First is to create a command (in my case, ***synthui***) and pass a .csv file from the UNIX shell to the TCL script,
 
 The basic structure of bash code used for the implementation of general scenarios is shown below.
 
@@ -8278,50 +8258,18 @@ fi
 
 In my command ***synui***, I have implemented a total of *5 general scenarios* from the user's point of view in the bash script.
 
-#### 1. No input file provided
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8b680817-2b38-4be1-a450-e2df5b59c4ff)
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/75e05d7e-8a67-47c0-bb6b-6b9090800a7d)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/dc114f67-6574-4660-9a69-94619c0cf8e8)
 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/58093c97-635e-4662-ae79-11d469bd2ef4)
 
-#### 2. File provided exists but is not of .csv format
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/231d6a08-bfc6-4d29-b5c5-6d8b5b083268)
-
-
-#### 3. More than one file or parameters provided
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/8f845166-881b-4640-ba72-c2ae101c501f)
-
-
-#### 4. Provide a .csv file that does not exist
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/d09b28a5-78dd-4a02-a895-8e9995e815df)
-
-
-#### 5. Type "-help" to find out usage
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/8ea9088c-de2f-4446-a714-9061fee7c521)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e0d268b9-1d79-43e8-91b7-2905cdef953b)
 
 
 **Day 2 - Variable Creation and Processing Constraints from CSV**
 
-Our task is to create variables, check file/directory existence, and convert constraints csv file to format[1] and SDc format. This is done by writing the code in *synui.tcl*.
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/15011298-d33c-438c-a5af-5990e972dd37)
-
-
-**Review of input file - openMSP430_design_constraints.csv**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0987a45d-426f-4dc2-8132-4ae41d757731)
-
-
-### Implementation
-
-I have successfully completed Day 2 tasks, namely variable creation, file and directory existence checks, and the processing of the constraints csv file.
-
-**synui.tcl snapshot**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0af273e8-67ae-41ca-be68-68e134c5c8aa)
+Our task is to create variables, check file/directory existence, and convert constraints csv file to format[1] and SDc format. This is done by writing the code in *synui.tcl*
 
 
 #### Variable Creation
@@ -8365,14 +8313,10 @@ while {$i < $n_rows} {
         set i [expr {$i+1}]
 }
 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/8d1f2c5c-78d4-484d-9359-924a6f8e5a85)
+
 
 ```
-
-**Screenshot**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/bd530094-85fd-44b9-acce-71fe56e4a9bf)
-
-
 #### File / Directory Existence Check
 
 Since the existence of these files and directories is essential to the program's operation, I have built code to check for their existence. If the input files do not exist, we exit from the code except for output directory in which case it  is created. Below are screenshots of the terminal displaying the functionality and the basic code for the same.
@@ -8422,12 +8366,10 @@ if { ![file exists $Constraints_File] } {
         puts "\nInfo: Constraints file found in path $Constraints_File"
 }
 
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/0afcc972-e70e-4a00-a806-8b8029b50ee1)
+
 
 ```
-
-**Screenshots**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/9de8b0db-83c2-43a8-9fbc-5e48de115524)
 
 #### Processing of the constraints openMSP430_design_constraints.csv file
 
@@ -8461,22 +8403,16 @@ puts "INPUTS starting row in CSV file = $inputs_start "
 puts "OUTPUTS starting row in CSV file = $outputs_start "
 
 ```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/adfed575-2b45-45ce-9cc0-b392938caa39)
 
-*Screenshot*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/b2dc950e-8ea7-40ab-b448-cf62ab7ae13a)
 
 **Day 3 - Processing Clock and Input Constraints from CSV and dump SDC**
 
 
-
-**Review of input file - openMSP430_design_constraints.csv**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/d74d6bbd-20a8-4521-a1d6-38d08c61b8ec)
-
-
-
 #### Processing of the constraints .csv file for CLOCKS and dumping SDC commands to .sdc
+
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/19b9bceb-7903-49c7-a20f-dde1a36edb86)
+
 
 The csv file containing the CLOCKS data has been successfully processed, and clock-based SDC commands 
 *Code*
@@ -8552,18 +8488,11 @@ puts "\n Clock actual starting row = $clocks_start_row_actual"
 puts "\n Clock actual ending row = $end_of_clocks"
 ```
 
-*Screenshots*
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/545e3e8a-3e1d-4e24-b610-2101c3cead32)
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/1873682e-c453-45b1-bf5b-4cad9a237290)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/24d6bc20-033b-44c7-b60c-302ac8ec5ac3)
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/3a8fa7e3-5fc8-4c5c-b958-f6e082c339e5)
-
-
-
-*openMSP430.sdc*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/568d2d09-b06f-4cb8-ba49-a78353566e2f)
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/f494ac70-a0cf-4871-8bcd-dd9f18d8d72b)
 
 
 #### Processing of the constraints .csv file for INPUTS and dumping SDC commands to .sdc
@@ -8645,23 +8574,9 @@ while { $i < $end_of_inputs } {
 }
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/160f3caf-d3a0-4dd6-8840-cecba8532b70)
-
-
-*openMSP430.sdc*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/f7a8d3c2-f60d-4b4b-95d4-76249961d668)
-
-
 **Day 4 - Complete Scripting and Yosys Synthesis IntroductioN**
 
 The activities for Day 4 included processing the output section and dumping the SDC file, checking the Yosys hierarchy, resolving errors, and doing a sample Yosys synthesis using example memory and explanation.
-
-**Review of input file - openMSP430_design_constraints.csv**
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/baa4d034-475a-4cb2-b96f-40fdaea0aefc)
 
 
 ## Processing of the constraints .csv file for OUTPUTS and dumping SDC commands to .sdc
@@ -8744,18 +8659,6 @@ close $sdc_file
 puts "\nInfo-SDC: SDC created. Please use constraints in path $Output_Directory/$Design_Name.sdc"
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/f9b55fc6-88b3-41cc-91d6-2481eb2e3109)
-
-
-
-*openMSP430.sdc*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/d3498b58-6af0-460b-800f-673f7a5e2bf3)
-
-
-
 #### Memory module yosys synthesis and explanation
 
 The verilog code *memory.v* for a single-bit address and single-bit data memory unit is given below.
@@ -8805,44 +8708,8 @@ write_verilog memory_synth.v
 show
 ~     
 ```
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/e64dab4d-c6ea-4485-bf0f-419d4f5c0fcd)
 
-The output view of netlist from the code is shown below.
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/bc471dc9-7abf-4bf7-98b0-6b9d0fcfec5e)
-
-
-*Memory write process explained in following images using truth table*
-
-Basic illustration of the write process
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/be50e508-dd21-4e4f-b884-ebbf5b738ebe)
-
-
-Before first rising edge of the clock
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/5a17e6fc-ca77-43f6-87c0-9fb9aa82cc5e)
-
-
-After first rising edge of the clock - write process done
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0a241feb-b155-46e6-bf64-c7923542074c)
-
-
-*Memory read process explained in following images using truth table*
-
-Basic illustration of the read process
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/5bb227cd-e216-4b08-bec3-cfb3b8c58b99)
-
-
-After first rising edge and before second rising edge of the clock
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/ed9602bd-ca76-431b-b446-0b9623030087)
-
-
-After second rising edge of the clock - read process done
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0ca4528d-c96c-4165-b173-2b6d0025423b)
 
 
 #### Hierarchy check script dumping
@@ -8872,13 +8739,7 @@ close $fileId
 
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/b24d8c13-a241-4249-910e-6384823b58a4)
-
-*openMSP430.hier.ys*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/7afcf456-19f3-4f74-85fe-049ed24b4b69)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/16404854-c2b8-4c19-8baf-3fd29501bb16)
 
 
 #### Hierarchy Check Run & Error Handling
@@ -8916,27 +8777,6 @@ if { $error_flag } {
 
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/bd06b80d-8a87-487c-86bb-372e9159931a)
-
-
-*openMSP430.hierarchy_check.log*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/346eb0bc-cc10-404b-8071-be43765c46f6)
-
-*Change module name by adding _vsd to check error is coming or not.*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/6c93a313-443a-4c7f-879e-e996936173fc)
-
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c4400400-ab35-4341-b83a-0c1b02708914)
-
-*openMSP430.hierarchy_check.log*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c5666238-73ff-4af3-a94e-bf7079c4245c)
-
-
 **Day 5 - Advanced Scripting Techniques and Quality of Results (QoR) Generation**
 
 The activities for day five include running Yosys' main synthesis, learning about and using procedures at the application level, creating commands, and writing the files needed for the OpenTimer tool, like .conf,.spef, and timing Create an OpenTimer script, launch an OpenTimer STA, and gather the information needed to create a QoR.final step is to print the gathered data in a tool-standard QoR output format using the results file that was created during the OpenTimer STA run.
@@ -8972,16 +8812,6 @@ puts "\nInfo: Synthesis script created and can be accessed from path $Output_Dir
 
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/92e9b582-ef79-4db0-af96-2de93c4bdcd2)
-
-
-*openMSP430.ys*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/3c9a5541-913a-495a-88f4-32aebb38a688)
-
-
 #### Running main synthesis script & error handling
 
 I have successfully written the code for running the main Yosys synthesis script and exiting if errors are found. The basic code and screenshots of the terminal are shown below.
@@ -9001,28 +8831,6 @@ if { [catch {exec yosys -s $Output_Directory/$Design_Name.ys >& $Output_Director
 puts "\nInfo: Please refer to log $Output_Directory/$Design_Name.synthesis.log"
 
 ```
-
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/672babce-8bc3-40dd-aa12-18caaa73a2aa)
-
-
-*openMSP430.synthesis.log*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/4cbbc0d3-6a88-4d55-b32a-72fbd5df2d95)
-
-*openMSP430.synth.v*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/91034e4c-600c-4518-9408-1f5aa3887290)
-
-*Error handling*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/2a93510f-4110-4057-ab0c-f4e759130474)
-
-*Log file for error handling*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/de9aae64-7e37-4b00-84eb-2bdeedcfa5bb)
-
 
 #### Editing .synth.v to be usable by OpenTimer
 
@@ -9049,24 +8857,6 @@ close $output
 puts "\nInfo: Please find the synthesized netlist for $Design_Name at below path. You can use this netlist for STA or PNR"
 puts "\nPath: $Output_Directory/$Design_Name.final.synth.v"
 ```
-
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/a9c0a733-3111-408b-8ee8-487f839a141f)
-
-
-*openMSP430.synth.v*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/8f028452-f788-4a7c-ba2b-0784250d55dd)
-
-
-*/tmp/1*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/e0a31938-408c-475b-9f9f-3138f28b2929)
-
-*openMSP430.final.synth.v*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/9fcee46b-5004-41f0-9925-e17632b0944e)
 
 
 **World of Procs (TCL Procedure)**
@@ -9127,9 +8917,6 @@ proc set_multi_cpu_usage {args} {
 #set_multi_cpu_usage -localCpu 5 -help
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/b1ef0281-3b72-42cd-86fa-ba4f3f99691b)
 
 
 ## read_lib.proc
@@ -9197,9 +8984,9 @@ set tmp_file [open /tmp/1 w]
 puts -nonewline $tmp_file [string map {"\[" "" "\]" " "} [read $sdc]]     
 close $tmp_file
 
-#-----------------------------------------------------------------------------#
+
 #----------------converting create_clock constraints--------------------------#
-#-----------------------------------------------------------------------------#
+
 
 set tmp_file [open /tmp/1 r]
 set timing_file [open /tmp/3 w]
@@ -9213,9 +9000,9 @@ foreach elem $find_clocks {
   }
 close $tmp_file
 
-#-----------------------------------------------------------------------------#
+
 #----------------converting set_clock_latency constraints---------------------#
-#-----------------------------------------------------------------------------#
+
 
 set find_keyword [lsearch -all -inline $lines "set_clock_latency*"]
 set tmp2_file [open /tmp/2 w]
@@ -9239,9 +9026,7 @@ set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
 
-#-----------------------------------------------------------------------------#
 #----------------converting set_clock_transition constraints------------------#
-#-----------------------------------------------------------------------------#
 
 set find_keyword [lsearch -all -inline $lines "set_clock_transition*"]
 set tmp2_file [open /tmp/2 w]
@@ -9265,9 +9050,7 @@ set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
 
-#-----------------------------------------------------------------------------#
 #----------------converting set_input_delay constraints-----------------------#
-#-----------------------------------------------------------------------------#
 
 set find_keyword [lsearch -all -inline $lines "set_input_delay*"]
 set tmp2_file [open /tmp/2 w]
@@ -9290,9 +9073,7 @@ set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
 
-#-----------------------------------------------------------------------------#
 #----------------converting set_input_transition constraints------------------#
-#-----------------------------------------------------------------------------#
 
 set find_keyword [lsearch -all -inline $lines "set_input_transition*"]
 set tmp2_file [open /tmp/2 w]
@@ -9316,9 +9097,7 @@ set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
 
-#-----------------------------------------------------------------------------#
 #---------------converting set_output_delay constraints-----------------------#
-#-----------------------------------------------------------------------------#
 
 set find_keyword [lsearch -all -inline $lines "set_output_delay*"]
 set tmp2_file [open /tmp/2 w]
@@ -9342,9 +9121,7 @@ set tmp2_file [open /tmp/2 r]
 puts -nonewline $timing_file [read $tmp2_file]
 close $tmp2_file
 
-#-----------------------------------------------------------------------------#
 #-------------------converting set_load constraints---------------------------#
-#-----------------------------------------------------------------------------#
 
 set find_keyword [lsearch -all -inline $lines "set_load*"]
 set tmp2_file [open /tmp/2 w]
@@ -9458,20 +9235,6 @@ reopenStdout /dev/tty
 #puts "closed .conf and redirected to stdout"
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/bcedffb1-c9ef-4484-b6d4-28aa9de0ad78)
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/051c9b4e-25ec-4f9a-8827-e5809a14a14d)
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/63a7496f-d602-4016-bf05-114dcf62fd92)
-
-
-*openMSP430.conf*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/4ad13ac7-9af5-4506-a7a7-8d4aec65aac1)
-
-
 #### Preparation of rest of .conf & .spef files for OpenTimer STA
 
 I have successfully written the code to write .spef *with the current date and time in the spef code* and to append the rest of the portion of .conf file. The basic code of the same and screenshots of terminal, .conf and .spef are shown below.
@@ -9515,21 +9278,6 @@ close $conf_file
 
 ```
 
-*Screenshots*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/b1334d67-660a-43ae-b27e-ce9209c685cf)
-
-
-*openMSP430.spef*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c70532a4-85c0-42ea-bcdf-2275d51afacf)
-
-
-*openMSP430.conf*
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/8fc10454-7d04-4756-ab82-4d30cd882e59)
-
-
 #### STA using OpenTimer
 
 I have successfully written the code to run STA on OpenTimer and capture its runtime. The basic code of the same and screenshots of the terminal with several "puts" printing out the variables and user debug information are shown below.
@@ -9550,16 +9298,11 @@ puts "\nInfo: Refer to $Output_Directory/$Design_Name.results for warnings and e
 
 *Screenshots*
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/c07c7094-7a60-4cf4-b542-53db64d5ca1a)
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/108666d1-bdc4-4f61-8903-e11078cbbcc0)
 
 *openMSP430.results*
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/753ad960-966d-49eb-9589-e6e2ab9b571f)
-
-*Results*
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/2a5e4df0-514c-4116-92f5-8c981dbe7e8a)
-
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/c569e24a-b86f-472a-98a2-02da7181f8eb)
 
 #### Data collection from .results file and other sources for QoR
 
@@ -9671,7 +9414,8 @@ puts "\nInfo: Time elapsed = $time_elapsed_in_sec"
 
 *Screenshots*
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/ee3793de-84e3-454d-b0e5-b545006415f3)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/6ac07bd2-cb5b-46bd-8698-e46d059ab56c)
+
 
 
 #### QoR (Quality of Results) Generation
@@ -9698,12 +9442,6 @@ puts "\n"
 
 *Screenshots*
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/3b6545f6-0e5e-4f94-8be5-80b977ea1f0d)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/283139fe-634d-4347-af9c-aa837fbf6600)
 
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/ff039ac4-ce98-4f38-9abb-ab61b92a644e)
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/6f59d8b3-aa49-4d45-a0cd-2253783fbc4d)
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0563fa71-d9fc-4e0c-b034-fbfb976ab873)
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/0f4493ad-1fdf-482e-99bb-2ae6ee9f8adf)
-
-![image](https://github.com/Niharika-Kummithi/Synthesis_UI_using_TCL/assets/149615846/8d38ec9c-eeea-494c-9e0e-5e1f02dfb940)
+![image](https://github.com/Avi991/Samsung-PD-training-/assets/142480104/53226370-3459-422a-8fdc-fca844ac872c)
